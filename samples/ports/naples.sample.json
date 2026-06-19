@@ -1,0 +1,11 @@
+{
+  "schema": "complete-cruising-port-sample",
+  "schemaVersion": 1,
+  "sampleOnly": true,
+  "name": "Naples",
+  "country": "Italy",
+  "language": "Italian",
+  "currency": "Euro",
+  "guideStatus": "partial",
+  "dataCaveat": "Illustrative sample only. Port logistics should be refreshed before travel."
+}

@@ -1,0 +1,9 @@
+{
+  "schema": "complete-cruising-ship-sample",
+  "schemaVersion": 1,
+  "sampleOnly": true,
+  "name": "Sun Princess",
+  "cruiseLine": "Princess Cruises",
+  "guideStatus": "partial",
+  "dataCaveat": "Illustrative sample only. Ship details should be verified before use."
+}

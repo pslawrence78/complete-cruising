@@ -1,0 +1,14 @@
+{
+  "schema": "complete-cruising-sailing-sample",
+  "schemaVersion": 1,
+  "sampleOnly": true,
+  "name": "Sun Princess Mediterranean 2026",
+  "cruiseLine": "Princess Cruises",
+  "ship": "Sun Princess",
+  "route": "Rome to Barcelona",
+  "nights": 14,
+  "ports": 9,
+  "seaDays": 4,
+  "status": "planned",
+  "dataCaveat": "Illustrative sample only. Confirm all final details against booking and cruise line sources before travel."
+}
