@@ -1,6 +1,6 @@
 # Complete Cruising app
 
-This directory contains the tested Vite, React and TypeScript application scaffold and the Tranche 2 Ocean Luxe shell.
+This directory contains the tested Vite, React and TypeScript application scaffold, the Ocean Luxe shell and the static-data Tranche 3 dashboard.
 
 ## Commands
 
@@ -16,7 +16,9 @@ npm run test
 
 ## Current scope
 
-The application renders a responsive Ocean Luxe shell with shared design tokens, glass and paper surfaces, route-ready navigation placeholders, status chips and confidence chips. Its content remains deliberately lightweight: no production feature screens, local database, import/export flow or PWA support are included.
+The application renders a responsive Ocean Luxe dashboard with a cinematic sailing hero, representative route ribbon, voyage metrics and readiness cards. Dashboard content comes from typed illustrative static data; all other routes remain placeholders, and no local database, import/export flow or PWA support is included.
+
+Vite and Vitest use their runner-based configuration loader so validation remains compatible with restricted Windows workspaces without requiring broader filesystem access.
 
 ## GitHub Pages base path
 

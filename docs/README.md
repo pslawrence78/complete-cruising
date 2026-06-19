@@ -2,13 +2,13 @@
 
 This is the entry point for project knowledge in the Complete Cruising repository. It inventories the current project files, explains which document to consult for each kind of decision, and records gaps between the documented target and the repository as it exists.
 
-Last inventoried: 19 June 2026.
+Last inventoried: 20 June 2026.
 
 ## Repository at a glance
 
 Complete Cruising is a documentation-first project for a premium, local-first Lawrence Family Series PWA. The intended experience is a rich cruise guidebook and companion, not a plain administration or CRUD interface.
 
-The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the initial delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Tranche 2 Ocean Luxe application shell. The shell deliberately contains no production feature screens, database, PWA support or deployment workflow.
+The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the initial delivery tracker, illustrative sample records, reserved enrichment workspaces, the tested Ocean Luxe application shell and Dashboard v0.1. The dashboard remains static and deliberately contains no local database, PWA support or deployment workflow.
 
 ```text
 complete-cruising/
@@ -28,7 +28,7 @@ complete-cruising/
 |   |-- tsconfig.app.json             Browser-source TypeScript config
 |   |-- tsconfig.node.json            Tooling TypeScript config
 |   `-- src/
-|       |-- App.tsx                   Ocean Luxe shell landing composition
+|       |-- App.tsx                   Shell and dashboard composition
 |       |-- main.tsx                  React entry point
 |       |-- vite-env.d.ts             Vite client types
 |       |-- components/
@@ -40,7 +40,20 @@ complete-cruising/
 |       |   |-- surfaces/CardSurface.tsx
 |       |   |-- visual/BrandMark.tsx
 |       |   `-- visual/RouteMotif.tsx
-|       |-- data/sampleData.ts        Static Tranche 2 placeholder
+|       |-- data/sampleData.ts        Static shell metadata
+|       |-- data/sampleDashboardData.ts
+|       |                                  Typed illustrative dashboard data
+|       |-- features/dashboard/
+|       |   |-- DashboardPage.tsx     Dashboard screen composition
+|       |   |-- DashboardPage.css     Dashboard visual and responsive rules
+|       |   `-- components/
+|       |       |-- SailingHero.tsx
+|       |       |-- RouteRibbon.tsx
+|       |       |-- MetricCard.tsx
+|       |       |-- VoyageStatusGrid.tsx
+|       |       |-- VoyageStatusCard.tsx
+|       |       |-- NextPortCard.tsx
+|       |       `-- FamilyFocusCard.tsx
 |       |-- routes/routeConfig.ts     Typed placeholder route config
 |       |-- styles/
 |       |   |-- tokens.css            Ocean Luxe design tokens
@@ -48,7 +61,7 @@ complete-cruising/
 |       |   |-- app-shell.css         Shell and landing layout
 |       |   |-- components.css        Shared component treatments
 |       |   `-- responsive.css        Responsive shell behaviour
-|       |-- tests/App.test.tsx        Shell and route-placeholder tests
+|       |-- tests/App.test.tsx        Dashboard and route-placeholder tests
 |       `-- tests/setup.ts            Testing Library setup and cleanup
 |-- docs/
 |   |-- README.md                     This living inventory and knowledge index
@@ -102,15 +115,17 @@ complete-cruising/
 | [../enrichment/imports/README.md](../enrichment/imports/README.md) | Enrichment workspace guidance | Reserves the import staging area and states that staged files are neither trusted nor committed data. |
 | [../enrichment/reviewed/README.md](../enrichment/reviewed/README.md) | Enrichment workspace guidance | Reserves the reviewed-output area without allowing reviewed content to overwrite trusted data silently. |
 | [../app/README.md](../app/README.md) | App guidance | Records scaffold commands, current scope and the `/complete-cruising/` GitHub Pages base-path decision. |
-| [../app/package.json](../app/package.json) and [package-lock.json](../app/package-lock.json) | App configuration | Define the Tranche 1 scripts and locked React, TypeScript, Vite, Vitest and Testing Library dependencies. |
+| [../app/package.json](../app/package.json) and [package-lock.json](../app/package-lock.json) | App configuration | Define sandbox-compatible development and validation scripts plus locked React, TypeScript, Vite, Vitest and Testing Library dependencies. |
 | [../app/index.html](../app/index.html) | App entry point | Provides the static Vite document shell using British English document metadata. |
 | [../app/vite.config.ts](../app/vite.config.ts) and [vitest.config.ts](../app/vitest.config.ts) | Tooling configuration | Configure React builds, the documented GitHub Pages base path and jsdom component tests. |
 | [../app/tsconfig.json](../app/tsconfig.json), [tsconfig.app.json](../app/tsconfig.app.json) and [tsconfig.node.json](../app/tsconfig.node.json) | TypeScript configuration | Separate browser-source and tooling checks through TypeScript project references. |
-| [../app/src/App.tsx](../app/src/App.tsx), [main.tsx](../app/src/main.tsx) and [vite-env.d.ts](../app/src/vite-env.d.ts) | App source | Compose and mount the lightweight Ocean Luxe shell without introducing production feature screens. |
+| [../app/src/App.tsx](../app/src/App.tsx), [main.tsx](../app/src/main.tsx) and [vite-env.d.ts](../app/src/vite-env.d.ts) | App source | Compose and mount the Ocean Luxe shell with Dashboard v0.1. |
 | [../app/src/components/layout/AppShell.tsx](../app/src/components/layout/AppShell.tsx), [navigation](../app/src/components/navigation/TopNavigation.tsx), [status](../app/src/components/status/StatusChip.tsx), [surfaces](../app/src/components/surfaces/CardSurface.tsx) and [visual](../app/src/components/visual/BrandMark.tsx) components | Shell components | Provide maintainable layout, responsive navigation, status, confidence, surface, brand and route-motif primitives. |
-| [../app/src/routes/routeConfig.ts](../app/src/routes/routeConfig.ts) and [data/sampleData.ts](../app/src/data/sampleData.ts) | App placeholders | Provide typed future-route placeholders and non-sensitive static Tranche 2 sample content. |
+| [../app/src/routes/routeConfig.ts](../app/src/routes/routeConfig.ts) and [data/sampleData.ts](../app/src/data/sampleData.ts) | App placeholders | Mark Dashboard as implemented while retaining non-functional future-route and shell metadata placeholders. |
+| [../app/src/data/sampleDashboardData.ts](../app/src/data/sampleDashboardData.ts) | Dashboard sample data | Supplies the non-sensitive illustrative sailing, 15-day representative route, metrics, status, confidence, review and refresh metadata used by Dashboard v0.1. |
+| [../app/src/features/dashboard/DashboardPage.tsx](../app/src/features/dashboard/DashboardPage.tsx), [DashboardPage.css](../app/src/features/dashboard/DashboardPage.css) and [dashboard components](../app/src/features/dashboard/components/SailingHero.tsx) | Dashboard feature | Implement the cinematic sailing hero, route ribbon, metrics and six voyage-readiness cards as maintainable React components. |
 | [../app/src/styles/tokens.css](../app/src/styles/tokens.css), [base.css](../app/src/styles/base.css), [app-shell.css](../app/src/styles/app-shell.css), [components.css](../app/src/styles/components.css) and [responsive.css](../app/src/styles/responsive.css) | App styles | Translate Ocean Luxe into shared tokens, atmospheric backgrounds, reusable surfaces, accessible focus states and responsive layouts. |
-| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify shell content, trust language and route placeholders with isolated Testing Library renders. |
+| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify dashboard content, the complete representative route, readiness metadata and placeholder actions with isolated Testing Library renders. |
 
 ## Knowledge routing
 
@@ -163,11 +178,11 @@ Specialist documents take precedence for decisions in their own domain. Product 
 
 The following are described by the foundation documents but are not present in the repository at the date of this inventory:
 
-- production screen implementations beyond the Ocean Luxe shell;
-- production routing beyond the typed Tranche 2 placeholders;
+- production screen implementations beyond Dashboard v0.1;
+- production routing beyond the implemented Dashboard and typed future placeholders;
 - detailed sample itinerary and family data beyond the lightweight Tranche 0 sailing, ship and port records;
 - runtime schemas, local database code and import/export logic;
-- broader automated test coverage and visual regression references beyond the shell checks;
+- broader automated test coverage and visual regression references beyond the dashboard checks;
 - PWA manifest, service worker and GitHub Pages workflow;
 
 ## Maintenance rules

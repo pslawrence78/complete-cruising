@@ -36,7 +36,7 @@ export function TopNavigation({
                   aria-disabled={!isActive}
                   title={
                     isActive
-                      ? "Current shell placeholder"
+                      ? "Current dashboard"
                       : "Placeholder route for a future tranche"
                   }
                 >

@@ -404,6 +404,34 @@
   background: rgba(201, 156, 72, 0.18);
 }
 
+.card-surface--paper .status-chip[data-tone="confirmed"],
+.card-surface--paper .confidence-chip[data-level="confirmed"],
+.card-surface--paper .confidence-chip[data-level="high"] {
+  color: #07545b;
+  border-color: rgba(7, 84, 91, 0.24);
+  background: rgba(28, 166, 168, 0.14);
+}
+
+.card-surface--paper .confidence-chip[data-level="medium"],
+.card-surface--paper .confidence-chip[data-level="low"] {
+  color: #6f4d13;
+  border-color: rgba(111, 77, 19, 0.24);
+  background: rgba(201, 156, 72, 0.18);
+}
+
+.card-surface--paper .status-chip[data-tone="refresh"] {
+  color: #8c2d1d;
+  border-color: rgba(140, 45, 29, 0.22);
+  background: rgba(240, 124, 97, 0.14);
+}
+
+.card-surface--paper .confidence-chip[data-level="inferred"],
+.card-surface--paper .confidence-chip[data-level="unknown"] {
+  color: var(--colour-ink-soft);
+  border-color: rgba(84, 106, 120, 0.22);
+  background: rgba(84, 106, 120, 0.1);
+}
+
 .quiet-action {
   display: inline-flex;
   gap: var(--space-3);

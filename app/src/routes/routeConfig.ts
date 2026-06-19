@@ -2,7 +2,7 @@ export interface RouteDefinition {
   id: string;
   path: string;
   title: string;
-  status: "placeholder";
+  status: "implemented" | "placeholder";
 }
 
 export const routeConfig: readonly RouteDefinition[] = [
@@ -10,7 +10,7 @@ export const routeConfig: readonly RouteDefinition[] = [
     id: "dashboard",
     path: "/",
     title: "Dashboard",
-    status: "placeholder",
+    status: "implemented",
   },
   {
     id: "itinerary",

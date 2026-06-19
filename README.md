@@ -6,9 +6,9 @@ The product follows the **Ocean Luxe** direction established by the standalone p
 
 ## Project status
 
-**Visual shell stage - Tranche 2: Ocean Luxe Shell complete.**
+**Dashboard stage - Tranche 3: Dashboard v0.1 complete.**
 
-The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype and a tested Ocean Luxe React application shell. Production feature screens remain deliberately deferred.
+The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype, tested Ocean Luxe React shell and the first static-data product screen. Itinerary and other feature screens remain deliberately deferred.
 
 ## Start here
 
@@ -21,7 +21,7 @@ The repository contains the project foundations, governance, illustrative sample
 
 ```text
 complete-cruising/
-|-- app/               Vite, React and TypeScript Ocean Luxe application shell
+|-- app/               Ocean Luxe React app with static Dashboard v0.1
 |-- docs/              Product foundations, decisions and delivery plans
 |-- enrichment/        Prompt, staged-import and reviewed-output workspaces
 |-- prototypes/        Preserved visual reference artefacts
@@ -45,4 +45,4 @@ Work proceeds in small, independently reviewable tranches. The MVP direction is 
 
 Sample data must remain illustrative and must never include sensitive family information, booking references, cabin details, passport data, insurance data, addresses or other private details.
 
-The shell can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The next planned tranche is **Tranche 3: Dashboard v0.1**.
+The dashboard can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The next planned tranche is **Tranche 4: Itinerary v0.1**.
