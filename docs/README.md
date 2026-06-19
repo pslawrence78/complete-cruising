@@ -8,7 +8,7 @@ Last inventoried: 19 June 2026.
 
 Complete Cruising is a documentation-first project for a premium, local-first Lawrence Family Series PWA. The intended experience is a rich cruise guidebook and companion, not a plain administration or CRUD interface.
 
-The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the initial delivery tracker, illustrative sample records and reserved enrichment workspaces. It does not yet contain application source code, package configuration, test code or generated output.
+The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the initial delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Tranche 1 application scaffold. The scaffold deliberately contains no production feature screens, database, PWA support or deployment workflow.
 
 ```text
 complete-cruising/
@@ -18,7 +18,24 @@ complete-cruising/
 |-- AGENTS.md                         Mandatory project-working instructions
 |-- README.md                         Contributor-facing project introduction
 |-- app/
-|   `-- README.md                     Tranche 0 app placeholder
+|   |-- README.md                     Scaffold usage and base-path note
+|   |-- index.html                    Vite HTML entry point
+|   |-- package.json                  App scripts and dependencies
+|   |-- package-lock.json             Reproducible npm dependency lock
+|   |-- vite.config.ts                Vite and GitHub Pages base-path config
+|   |-- vitest.config.ts              Component-test configuration
+|   |-- tsconfig.json                 TypeScript project references
+|   |-- tsconfig.app.json             Browser-source TypeScript config
+|   |-- tsconfig.node.json            Tooling TypeScript config
+|   `-- src/
+|       |-- App.tsx                   Minimal scaffold component
+|       |-- main.tsx                  React entry point
+|       |-- vite-env.d.ts             Vite client types
+|       |-- data/sampleData.ts        Static Tranche 1 placeholder
+|       |-- routes/routeConfig.ts     Typed placeholder route config
+|       |-- styles/base.css           Minimal non-production base styles
+|       |-- tests/App.test.tsx        Scaffold render test
+|       `-- tests/setup.ts            Testing Library matchers
 |-- docs/
 |   |-- README.md                     This living inventory and knowledge index
 |   |-- 01-product-specification-v0.1.md
@@ -70,7 +87,15 @@ complete-cruising/
 | [../enrichment/prompts/README.md](../enrichment/prompts/README.md) | Enrichment workspace guidance | Reserves the prompt area for small, structured packs while preserving trust metadata and record boundaries. |
 | [../enrichment/imports/README.md](../enrichment/imports/README.md) | Enrichment workspace guidance | Reserves the import staging area and states that staged files are neither trusted nor committed data. |
 | [../enrichment/reviewed/README.md](../enrichment/reviewed/README.md) | Enrichment workspace guidance | Reserves the reviewed-output area without allowing reviewed content to overwrite trusted data silently. |
-| [../app/README.md](../app/README.md) | App placeholder | Reserves the application directory for Tranche 1 and explicitly prohibits production app code in Tranche 0. |
+| [../app/README.md](../app/README.md) | App guidance | Records scaffold commands, current scope and the `/complete-cruising/` GitHub Pages base-path decision. |
+| [../app/package.json](../app/package.json) and [package-lock.json](../app/package-lock.json) | App configuration | Define the Tranche 1 scripts and locked React, TypeScript, Vite, Vitest and Testing Library dependencies. |
+| [../app/index.html](../app/index.html) | App entry point | Provides the static Vite document shell using British English document metadata. |
+| [../app/vite.config.ts](../app/vite.config.ts) and [vitest.config.ts](../app/vitest.config.ts) | Tooling configuration | Configure React builds, the documented GitHub Pages base path and jsdom component tests. |
+| [../app/tsconfig.json](../app/tsconfig.json), [tsconfig.app.json](../app/tsconfig.app.json) and [tsconfig.node.json](../app/tsconfig.node.json) | TypeScript configuration | Separate browser-source and tooling checks through TypeScript project references. |
+| [../app/src/App.tsx](../app/src/App.tsx), [main.tsx](../app/src/main.tsx) and [vite-env.d.ts](../app/src/vite-env.d.ts) | App source | Render the minimal Complete Cruising scaffold without introducing production feature screens. |
+| [../app/src/routes/routeConfig.ts](../app/src/routes/routeConfig.ts) and [data/sampleData.ts](../app/src/data/sampleData.ts) | App placeholders | Provide a typed root-route skeleton and non-sensitive static Tranche 1 sample data. |
+| [../app/src/styles/base.css](../app/src/styles/base.css) | App styles | Supplies only minimal scaffold styling; Ocean Luxe remains reserved for Tranche 2. |
+| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx) and [setup.ts](../app/src/tests/setup.ts) | App tests | Configure Testing Library matchers and verify that the scaffold renders. |
 
 ## Knowledge routing
 
@@ -123,11 +148,11 @@ Specialist documents take precedence for decisions in their own domain. Product 
 
 The following are described by the foundation documents but are not present in the repository at the date of this inventory:
 
-- the React, TypeScript and Vite application scaffold;
 - design tokens, reusable components and screen implementations;
+- production routing beyond the typed Tranche 1 placeholder;
 - detailed sample itinerary and family data beyond the lightweight Tranche 0 sailing, ship and port records;
 - runtime schemas, local database code and import/export logic;
-- automated tests, visual regression references and validation scripts;
+- broader automated test coverage and visual regression references beyond the scaffold render check;
 - PWA manifest, service worker and GitHub Pages workflow;
 
 ## Maintenance rules

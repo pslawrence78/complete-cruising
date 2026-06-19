@@ -6,9 +6,9 @@ The product follows the **Ocean Luxe** direction established by the standalone p
 
 ## Project status
 
-**Foundation stage - Tranche 0: Repository Foundations.**
+**Application scaffold stage - Tranche 1: App Scaffold complete.**
 
-The repository contains the project foundations, governance, illustrative sample records and authoritative visual prototype. Production application code has deliberately not been created yet.
+The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype and a minimal tested Vite React TypeScript application scaffold. Production feature screens and the Ocean Luxe visual system remain deliberately deferred.
 
 ## Start here
 
@@ -21,7 +21,7 @@ The repository contains the project foundations, governance, illustrative sample
 
 ```text
 complete-cruising/
-|-- app/               Placeholder for the future React, TypeScript and Vite app
+|-- app/               Vite, React and TypeScript application scaffold
 |-- docs/              Product foundations, decisions and delivery plans
 |-- enrichment/        Prompt, staged-import and reviewed-output workspaces
 |-- prototypes/        Preserved visual reference artefacts
@@ -45,4 +45,4 @@ Work proceeds in small, independently reviewable tranches. The MVP direction is 
 
 Sample data must remain illustrative and must never include sensitive family information, booking references, cabin details, passport data, insurance data, addresses or other private details.
 
-There is no application to install or run in Tranche 0. The next planned tranche is **Tranche 1: App Scaffold**.
+The scaffold can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The next planned tranche is **Tranche 2: Ocean Luxe Shell**.
