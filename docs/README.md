@@ -8,7 +8,7 @@ Last inventoried: 19 June 2026.
 
 Complete Cruising is a documentation-first project for a premium, local-first Lawrence Family Series PWA. The intended experience is a rich cruise guidebook and companion, not a plain administration or CRUD interface.
 
-The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the initial delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Tranche 1 application scaffold. The scaffold deliberately contains no production feature screens, database, PWA support or deployment workflow.
+The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the initial delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Tranche 2 Ocean Luxe application shell. The shell deliberately contains no production feature screens, database, PWA support or deployment workflow.
 
 ```text
 complete-cruising/
@@ -28,14 +28,28 @@ complete-cruising/
 |   |-- tsconfig.app.json             Browser-source TypeScript config
 |   |-- tsconfig.node.json            Tooling TypeScript config
 |   `-- src/
-|       |-- App.tsx                   Minimal scaffold component
+|       |-- App.tsx                   Ocean Luxe shell landing composition
 |       |-- main.tsx                  React entry point
 |       |-- vite-env.d.ts             Vite client types
-|       |-- data/sampleData.ts        Static Tranche 1 placeholder
+|       |-- components/
+|       |   |-- layout/AppShell.tsx
+|       |   |-- navigation/TopNavigation.tsx
+|       |   |-- navigation/MobileNavigation.tsx
+|       |   |-- status/StatusChip.tsx
+|       |   |-- status/ConfidenceChip.tsx
+|       |   |-- surfaces/CardSurface.tsx
+|       |   |-- visual/BrandMark.tsx
+|       |   `-- visual/RouteMotif.tsx
+|       |-- data/sampleData.ts        Static Tranche 2 placeholder
 |       |-- routes/routeConfig.ts     Typed placeholder route config
-|       |-- styles/base.css           Minimal non-production base styles
-|       |-- tests/App.test.tsx        Scaffold render test
-|       `-- tests/setup.ts            Testing Library matchers
+|       |-- styles/
+|       |   |-- tokens.css            Ocean Luxe design tokens
+|       |   |-- base.css              Global and accessibility foundations
+|       |   |-- app-shell.css         Shell and landing layout
+|       |   |-- components.css        Shared component treatments
+|       |   `-- responsive.css        Responsive shell behaviour
+|       |-- tests/App.test.tsx        Shell and route-placeholder tests
+|       `-- tests/setup.ts            Testing Library setup and cleanup
 |-- docs/
 |   |-- README.md                     This living inventory and knowledge index
 |   |-- 01-product-specification-v0.1.md
@@ -92,10 +106,11 @@ complete-cruising/
 | [../app/index.html](../app/index.html) | App entry point | Provides the static Vite document shell using British English document metadata. |
 | [../app/vite.config.ts](../app/vite.config.ts) and [vitest.config.ts](../app/vitest.config.ts) | Tooling configuration | Configure React builds, the documented GitHub Pages base path and jsdom component tests. |
 | [../app/tsconfig.json](../app/tsconfig.json), [tsconfig.app.json](../app/tsconfig.app.json) and [tsconfig.node.json](../app/tsconfig.node.json) | TypeScript configuration | Separate browser-source and tooling checks through TypeScript project references. |
-| [../app/src/App.tsx](../app/src/App.tsx), [main.tsx](../app/src/main.tsx) and [vite-env.d.ts](../app/src/vite-env.d.ts) | App source | Render the minimal Complete Cruising scaffold without introducing production feature screens. |
-| [../app/src/routes/routeConfig.ts](../app/src/routes/routeConfig.ts) and [data/sampleData.ts](../app/src/data/sampleData.ts) | App placeholders | Provide a typed root-route skeleton and non-sensitive static Tranche 1 sample data. |
-| [../app/src/styles/base.css](../app/src/styles/base.css) | App styles | Supplies only minimal scaffold styling; Ocean Luxe remains reserved for Tranche 2. |
-| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx) and [setup.ts](../app/src/tests/setup.ts) | App tests | Configure Testing Library matchers and verify that the scaffold renders. |
+| [../app/src/App.tsx](../app/src/App.tsx), [main.tsx](../app/src/main.tsx) and [vite-env.d.ts](../app/src/vite-env.d.ts) | App source | Compose and mount the lightweight Ocean Luxe shell without introducing production feature screens. |
+| [../app/src/components/layout/AppShell.tsx](../app/src/components/layout/AppShell.tsx), [navigation](../app/src/components/navigation/TopNavigation.tsx), [status](../app/src/components/status/StatusChip.tsx), [surfaces](../app/src/components/surfaces/CardSurface.tsx) and [visual](../app/src/components/visual/BrandMark.tsx) components | Shell components | Provide maintainable layout, responsive navigation, status, confidence, surface, brand and route-motif primitives. |
+| [../app/src/routes/routeConfig.ts](../app/src/routes/routeConfig.ts) and [data/sampleData.ts](../app/src/data/sampleData.ts) | App placeholders | Provide typed future-route placeholders and non-sensitive static Tranche 2 sample content. |
+| [../app/src/styles/tokens.css](../app/src/styles/tokens.css), [base.css](../app/src/styles/base.css), [app-shell.css](../app/src/styles/app-shell.css), [components.css](../app/src/styles/components.css) and [responsive.css](../app/src/styles/responsive.css) | App styles | Translate Ocean Luxe into shared tokens, atmospheric backgrounds, reusable surfaces, accessible focus states and responsive layouts. |
+| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify shell content, trust language and route placeholders with isolated Testing Library renders. |
 
 ## Knowledge routing
 
@@ -148,11 +163,11 @@ Specialist documents take precedence for decisions in their own domain. Product 
 
 The following are described by the foundation documents but are not present in the repository at the date of this inventory:
 
-- design tokens, reusable components and screen implementations;
-- production routing beyond the typed Tranche 1 placeholder;
+- production screen implementations beyond the Ocean Luxe shell;
+- production routing beyond the typed Tranche 2 placeholders;
 - detailed sample itinerary and family data beyond the lightweight Tranche 0 sailing, ship and port records;
 - runtime schemas, local database code and import/export logic;
-- broader automated test coverage and visual regression references beyond the scaffold render check;
+- broader automated test coverage and visual regression references beyond the shell checks;
 - PWA manifest, service worker and GitHub Pages workflow;
 
 ## Maintenance rules

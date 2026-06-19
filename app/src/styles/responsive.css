@@ -1,0 +1,199 @@
+@media (max-width: 73.75rem) {
+  .top-navigation {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .top-navigation__nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .navigation-list {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    padding-bottom: 0.2rem;
+    scrollbar-width: thin;
+  }
+
+  .active-sailing {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 56.25rem) {
+  .shell-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .shell-hero__copy {
+    padding-top: var(--space-20);
+  }
+
+  .sailing-card {
+    width: min(100%, 36rem);
+    transform: none;
+  }
+
+  .section-heading {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading > p {
+    max-width: 42rem;
+  }
+}
+
+@media (max-width: 50rem) {
+  :root {
+    --page-gutter: 0.85rem;
+  }
+
+  html {
+    scroll-padding-top: 7rem;
+  }
+
+  .app-shell__frame {
+    padding-top: var(--space-3);
+    padding-bottom: 7rem;
+  }
+
+  .top-navigation {
+    top: var(--space-2);
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+
+  .brand-lockup {
+    min-width: 0;
+  }
+
+  .top-navigation__nav {
+    display: none;
+  }
+
+  .active-sailing {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: stretch;
+    max-width: none;
+    border-radius: var(--radius-md);
+  }
+
+  .mobile-navigation {
+    display: block;
+  }
+
+  .shell-landing {
+    gap: var(--space-16);
+  }
+
+  .shell-hero {
+    min-height: auto;
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+  }
+
+  .shell-hero__copy {
+    padding-top: var(--space-16);
+  }
+
+  .shell-hero h1 {
+    font-size: clamp(3.2rem, 17vw, 4.8rem);
+    line-height: 0.84;
+  }
+
+  .shell-hero__route {
+    top: 1%;
+    left: -10%;
+    width: 130%;
+  }
+
+  .foundation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .foundation-card {
+    min-height: auto;
+  }
+
+  .app-shell__footer {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  .app-shell__signature {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 32.5rem) {
+  .brand-mark {
+    width: 2.8rem;
+    height: 2.8rem;
+  }
+
+  .brand-lockup__copy strong {
+    font-size: 1.02rem;
+  }
+
+  .brand-lockup__tagline {
+    font-size: 0.7rem;
+  }
+
+  .shell-hero {
+    padding: var(--space-5);
+  }
+
+  .shell-hero__lede {
+    font-size: 0.98rem;
+  }
+
+  .sailing-card,
+  .foundation-card {
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+  }
+
+  .sailing-card__facts div {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+
+  .sailing-card__facts dd {
+    text-align: left;
+  }
+
+  .surface-swatch {
+    grid-template-columns: 1fr;
+  }
+
+  .surface-swatch span {
+    min-height: 4rem;
+  }
+}
+
+@media (max-width: 25rem) {
+  .brand-lockup__tagline {
+    display: none;
+  }
+
+  .shell-hero h1 {
+    font-size: 3.2rem;
+  }
+
+  .meta-chip {
+    white-space: normal;
+  }
+}
+
+@media (hover: none) {
+  .navigation-item:hover,
+  .quiet-action:hover {
+    transform: none;
+  }
+}
