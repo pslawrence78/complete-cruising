@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { AppShell } from "./components/layout/AppShell";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
+import { FamilyGuidePage } from "./features/family/FamilyGuidePage";
 import { ItineraryPage } from "./features/itinerary/ItineraryPage";
+import { MemoriesPage } from "./features/memories/MemoriesPage";
+import { PlansPage } from "./features/plans/PlansPage";
 import { PortGuidePage } from "./features/ports/PortGuidePage";
 import { ShipPage } from "./features/ship/ShipPage";
 import { TodayPage } from "./features/today/TodayPage";
@@ -44,7 +47,13 @@ function App() {
   };
 
   const activePage =
-    activeRouteId === "itinerary" ? (
+    activeRouteId === "plans" ? (
+      <PlansPage />
+    ) : activeRouteId === "family" ? (
+      <FamilyGuidePage />
+    ) : activeRouteId === "memories" ? (
+      <MemoriesPage />
+    ) : activeRouteId === "itinerary" ? (
       <ItineraryPage />
     ) : activeRouteId === "today" ? (
       <TodayPage />

@@ -40,19 +40,19 @@ export const routeConfig: readonly RouteDefinition[] = [
     id: "plans",
     path: "/plans",
     title: "Plans",
-    status: "placeholder",
+    status: "implemented",
   },
   {
     id: "family",
     path: "/family",
     title: "Family",
-    status: "placeholder",
+    status: "implemented",
   },
   {
     id: "memories",
     path: "/memories",
     title: "Memories",
-    status: "placeholder",
+    status: "implemented",
   },
   {
     id: "import-export",

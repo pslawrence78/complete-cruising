@@ -75,6 +75,15 @@ describe("App", () => {
     expect(
       screen.getByRole("link", { name: /Open Naples guide/i }),
     ).toHaveAttribute("href", "#/ports");
+    expect(
+      screen.getByRole("link", { name: /Compare shore plans/i }),
+    ).toHaveAttribute("href", "#/plans");
+    expect(
+      screen.getByRole("link", { name: /Open Family Guide/i }),
+    ).toHaveAttribute("href", "#/family");
+    expect(
+      screen.getByRole("link", { name: /Preview memories/i }),
+    ).toHaveAttribute("href", "#/memories");
 
     const navigation = screen.getByRole("navigation", {
       name: "Primary navigation",
@@ -294,5 +303,42 @@ describe("App", () => {
     expect(screen.getAllByText("Medium confidence").length).toBeGreaterThan(0);
     expect(screen.getByText(/No berth, terminal, transport/)).toBeInTheDocument();
     expect(screen.queryByText("17:30")).not.toBeInTheDocument();
+  });
+
+  it("renders the selected Naples shore plan with full trust metadata", () => {
+    window.history.replaceState(null, "", "#/plans");
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "Three ways to meet Naples." })).toBeInTheDocument();
+    expect(screen.getAllByText("Recommended")).toHaveLength(1);
+    expect(screen.getByRole("heading", { name: "Stories, volcanoes & pizza" })).toBeInTheDocument();
+    expect(screen.getByText("Selected recommendation")).toBeInTheDocument();
+    expect(screen.getAllByText("Needs family review")).toHaveLength(3);
+    expect(screen.getAllByText("Refresh before sailing")).toHaveLength(3);
+  });
+
+  it("renders the Naples Family Guide discovery content", () => {
+    window.history.replaceState(null, "", "#/family");
+    render(<App />);
+
+    expect(screen.getByLabelText("Italian flag")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Ciao" })).toBeInTheDocument();
+    expect(screen.getByText(/Which famous Roman town/)).toBeInTheDocument();
+    expect(screen.getByText("Pompeii.")).toBeInTheDocument();
+    expect(screen.getByText("Seb’s Discovery")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Leave room for the day to breathe." })).toBeInTheDocument();
+  });
+
+  it("renders reflective memories and the Adventure Almanac preview", () => {
+    window.history.replaceState(null, "", "#/memories");
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "Keep the feeling, not just the facts." })).toBeInTheDocument();
+    expect(screen.getByText("Seb favourite")).toBeInTheDocument();
+    expect(screen.getByText("Family highlight")).toBeInTheDocument();
+    expect(screen.getByText("Food memory")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "A future page in the family story." })).toBeInTheDocument();
+    expect(screen.getByText("Draft preview · memories required")).toBeInTheDocument();
+    expect(screen.getByText(/No export file is created/)).toBeInTheDocument();
   });
 });

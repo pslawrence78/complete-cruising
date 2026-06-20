@@ -6,9 +6,9 @@ The product follows the **Ocean Luxe** direction established by the standalone p
 
 ## Project status
 
-**Port guidebook stage - Tranche 7: Port Guide v0.1 complete.**
+**Personal experience stage - Tranche 8: Plans, Family and Memories v0.1 complete.**
 
-The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype, tested Ocean Luxe React shell, Dashboard v0.1, Itinerary v0.1, Today View v0.1, Ship Guide v0.1 and the static Naples Port Guide v0.1. Plans, Family, Memories and later feature screens remain deliberately deferred.
+The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype and tested Ocean Luxe React experience through the Naples Shore Plans, Family Guide, Memories and Adventure Almanac export preview. Persistence, schemas and live integrations remain deliberately deferred.
 
 ## Start here
 
@@ -21,7 +21,7 @@ The repository contains the project foundations, governance, illustrative sample
 
 ```text
 complete-cruising/
-|-- app/               Ocean Luxe React app through Port Guide v0.1
+|-- app/               Ocean Luxe React app through Tranche 8
 |-- docs/              Product foundations, decisions and delivery plans
 |-- enrichment/        Prompt, staged-import and reviewed-output workspaces
 |-- prototypes/        Preserved visual reference artefacts
@@ -45,4 +45,4 @@ Work proceeds in small, independently reviewable tranches. The MVP direction is 
 
 Sample data must remain illustrative and must never include sensitive family information, booking references, cabin details, passport data, insurance data, addresses or other private details.
 
-The app can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The next planned tranche is **Tranche 8: Plans, Family and Memories v0.1**.
+The app can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The next planned tranche is **Tranche 9: Data Types and Schemas**.

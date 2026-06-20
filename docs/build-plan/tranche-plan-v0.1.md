@@ -10,7 +10,7 @@ This delivery tracker summarises the intended tranche sequence. The authoritativ
 5. Today View v0.1
 6. Ship Guide v0.1
 7. Port Guide v0.1
-8. Plans, Family and Memories v0.1
+8. Plans, Family and Memories v0.1 — complete
 9. Data Types and Schemas
 10. Local Database Foundation
 11. Data-Driven Screens

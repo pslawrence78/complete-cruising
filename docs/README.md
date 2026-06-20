@@ -8,7 +8,7 @@ Last inventoried: 20 June 2026.
 
 Complete Cruising is a documentation-first project for a premium, local-first Lawrence Family Series PWA. The intended experience is a rich cruise guidebook and companion, not a plain administration or CRUD interface.
 
-The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the initial delivery tracker, illustrative sample records, reserved enrichment workspaces, the tested Ocean Luxe application shell, Dashboard v0.1, Itinerary v0.1, Today View v0.1, Ship Guide v0.1 and Port Guide v0.1. All screens remain static and deliberately contain no local database, live APIs, PWA support or deployment workflow.
+The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Ocean Luxe application through Tranche 8: Dashboard, Itinerary, Today, Ship Guide, Port Guide, Shore Plans, Family Guide, Memories and Adventure Almanac export preview. All screens remain static and deliberately contain no persistence, live APIs, PWA support or deployment workflow.
 
 ```text
 complete-cruising/
@@ -28,7 +28,7 @@ complete-cruising/
 |   |-- tsconfig.app.json             Browser-source TypeScript config
 |   |-- tsconfig.node.json            Tooling TypeScript config
 |   `-- src/
-|       |-- App.tsx                   Lightweight five-view hash routing
+|       |-- App.tsx                   Lightweight eight-view hash routing
 |       |-- main.tsx                  React entry point
 |       |-- vite-env.d.ts             Vite client types
 |       |-- components/
@@ -48,6 +48,8 @@ complete-cruising/
 |       |-- data/sampleTodayData.ts   Typed illustrative Naples day data
 |       |-- data/sampleShipData.ts    Typed reusable ship guide sample
 |       |-- data/samplePortData.ts    Typed reusable Naples guide sample
+|       |-- data/sampleExperienceData.ts
+|       |                                  Typed plans, family guidance and memories
 |       |-- features/dashboard/
 |       |   |-- DashboardPage.tsx     Dashboard screen composition
 |       |   |-- DashboardPage.css     Dashboard visual and responsive rules
@@ -97,6 +99,11 @@ complete-cruising/
 |       |       |-- ShipGuideCard.tsx
 |       |       |-- ShipFactsPanel.tsx
 |       |       `-- EnrichmentStatusPanel.tsx
+|       |-- features/plans/            Naples shore-plan comparison
+|       |-- features/family/           Premium family discovery guide
+|       |-- features/memories/         Reflective prompts and Almanac preview
+|       |-- features/experience-pages.css
+|       |                                  Shared Tranche 8 responsive styling
 |       |-- routes/routeConfig.ts     Implemented and placeholder routes
 |       |-- styles/
 |       |   |-- tokens.css            Ocean Luxe design tokens
@@ -162,7 +169,7 @@ complete-cruising/
 | [../app/index.html](../app/index.html) | App entry point | Provides the static Vite document shell using British English document metadata. |
 | [../app/vite.config.ts](../app/vite.config.ts) and [vitest.config.ts](../app/vitest.config.ts) | Tooling configuration | Configure React builds, the documented GitHub Pages base path and jsdom component tests. |
 | [../app/tsconfig.json](../app/tsconfig.json), [tsconfig.app.json](../app/tsconfig.app.json) and [tsconfig.node.json](../app/tsconfig.node.json) | TypeScript configuration | Separate browser-source and tooling checks through TypeScript project references. |
-| [../app/src/App.tsx](../app/src/App.tsx), [main.tsx](../app/src/main.tsx) and [vite-env.d.ts](../app/src/vite-env.d.ts) | App source | Compose and mount the Ocean Luxe shell with lightweight hash switching between Dashboard, Itinerary, Today, Ship and Ports. |
+| [../app/src/App.tsx](../app/src/App.tsx), [main.tsx](../app/src/main.tsx) and [vite-env.d.ts](../app/src/vite-env.d.ts) | App source | Compose and mount the Ocean Luxe shell with lightweight hash switching across eight implemented routes. |
 | [../app/src/components/layout/AppShell.tsx](../app/src/components/layout/AppShell.tsx), [navigation](../app/src/components/navigation/TopNavigation.tsx), [status](../app/src/components/status/StatusChip.tsx), [surfaces](../app/src/components/surfaces/CardSurface.tsx) and [visual](../app/src/components/visual/BrandMark.tsx) components | Shell components | Provide maintainable layout, responsive navigation, status, confidence, surface, brand and route-motif primitives. |
 | [../app/src/routes/routeConfig.ts](../app/src/routes/routeConfig.ts) and [data/sampleData.ts](../app/src/data/sampleData.ts) | App placeholders | Mark Dashboard, Itinerary, Today, Ship and Ports as implemented while retaining non-functional future-route and shell metadata placeholders. |
 | [../app/src/data/sampleDashboardData.ts](../app/src/data/sampleDashboardData.ts) | Dashboard sample data | Supplies the non-sensitive illustrative sailing, 15-day representative route, metrics, status, confidence, review and refresh metadata used by Dashboard v0.1. |
@@ -174,7 +181,9 @@ complete-cruising/
 | [../app/src/data/sampleShipData.ts](../app/src/data/sampleShipData.ts) | Ship guide sample data | Supplies a reusable, explicitly illustrative Sun Princess handbook record with seven guide sections and visible confidence, review and refresh metadata. |
 | [../app/src/features/ship/ShipPage.tsx](../app/src/features/ship/ShipPage.tsx), [ShipPage.css](../app/src/features/ship/ShipPage.css) and [Ship components](../app/src/features/ship/components/ShipHero.tsx) | Ship guide feature | Implement the premium ship hero, handbook facts, enrichment readiness and seven editorial guide cards without mixing ship knowledge into sailing-specific records. |
 | [../app/src/data/samplePortData.ts](../app/src/data/samplePortData.ts) | Port guide sample data | Supplies a reusable, explicitly illustrative Naples guidebook record with separate attraction ideas and visible confidence, review and refresh metadata. |
+| [../app/src/data/sampleExperienceData.ts](../app/src/data/sampleExperienceData.ts) | Tranche 8 sample data | Keeps sailing-specific Naples shore plans and memory prompts separate from reusable port context, while supplying non-sensitive Family Guide presentation data and visible trust metadata. |
 | [../app/src/features/ports/PortGuidePage.tsx](../app/src/features/ports/PortGuidePage.tsx), [PortGuidePage.css](../app/src/features/ports/PortGuidePage.css) and [Port Guide components](../app/src/features/ports/components/PortPostcard.tsx) | Port guide feature | Implement the warm postcard hero, practical guide sections, separate attraction cards, restrained family lens, photography prompt and uncertainty notes without mixing port knowledge into itinerary-day timings. |
+| [../app/src/features/plans/PlansPage.tsx](../app/src/features/plans/PlansPage.tsx), [family/FamilyGuidePage.tsx](../app/src/features/family/FamilyGuidePage.tsx), [memories/MemoriesPage.tsx](../app/src/features/memories/MemoriesPage.tsx) and [experience-pages.css](../app/src/features/experience-pages.css) | Tranche 8 experience features | Implement three premium Naples experience routes, selected plan comparison, Seb discovery, reflective memory prompts and a non-functional Adventure Almanac export preview. |
 | [../app/src/styles/tokens.css](../app/src/styles/tokens.css), [base.css](../app/src/styles/base.css), [app-shell.css](../app/src/styles/app-shell.css), [components.css](../app/src/styles/components.css) and [responsive.css](../app/src/styles/responsive.css) | App styles | Translate Ocean Luxe into shared tokens, atmospheric backgrounds, reusable surfaces, accessible focus states and responsive layouts. |
 | [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify all five implemented views, Today operational hierarchy, itinerary data, ship and port trust metadata, attraction separation and future-route placeholders. |
 
@@ -229,8 +238,8 @@ Specialist documents take precedence for decisions in their own domain. Product 
 
 The following are described by the foundation documents but are not present in the repository at the date of this inventory:
 
-- production screen implementations beyond Dashboard, Itinerary, Today, Ship Guide and Port Guide v0.1;
-- production routing beyond the five implemented views and typed future placeholders;
+- production screen implementations beyond the eight Tranche 8 views;
+- production routing beyond the eight implemented views and typed future placeholders;
 - detailed sample itinerary and family data beyond the lightweight Tranche 0 sailing, ship and port records;
 - runtime schemas, local database code and import/export logic;
 - broader automated test coverage and visual regression references beyond the Dashboard, Itinerary, Today, Ship and Port checks;

@@ -35,6 +35,9 @@ export function FamilyFocusCard({ item }: FamilyFocusCardProps) {
           level={item.confidence.level}
         />
       </div>
+      <a className="quiet-action" href="#/family">
+        Open Family Guide <span aria-hidden="true">→</span>
+      </a>
     </CardSurface>
   );
 }

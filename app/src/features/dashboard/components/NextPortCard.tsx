@@ -33,6 +33,9 @@ export function NextPortCard({ item }: NextPortCardProps) {
       <a className="quiet-action" href="#/ports">
         Open Naples guide <span aria-hidden="true">→</span>
       </a>
+      <a className="quiet-action" href="#/plans">
+        Compare shore plans <span aria-hidden="true">→</span>
+      </a>
       <div className="next-port-card__coordinate" aria-hidden="true">
         40.8518° N · 14.2681° E
       </div>

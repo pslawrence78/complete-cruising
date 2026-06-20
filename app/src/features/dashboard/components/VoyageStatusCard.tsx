@@ -34,6 +34,11 @@ export function VoyageStatusCard({
           level={item.confidence.level}
         />
       </div>
+      {item.id === "memories" && (
+        <a className="quiet-action" href="#/memories">
+          Preview memories <span aria-hidden="true">→</span>
+        </a>
+      )}
     </CardSurface>
   );
 }
