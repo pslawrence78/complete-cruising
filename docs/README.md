@@ -8,7 +8,7 @@ Last inventoried: 20 June 2026.
 
 Complete Cruising is a documentation-first project for a premium, local-first Lawrence Family Series PWA. The intended experience is a rich cruise guidebook and companion, not a plain administration or CRUD interface.
 
-The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Ocean Luxe application through Tranche 8: Dashboard, Itinerary, Today, Ship Guide, Port Guide, Shore Plans, Family Guide, Memories and Adventure Almanac export preview. All screens remain static and deliberately contain no persistence, live APIs, PWA support or deployment workflow.
+The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Ocean Luxe application through Tranche 10. Core records have TypeScript types, strict Zod schemas, canonical illustrative fixtures and versioned import/export shape validation. A version 1 Dexie database now provides validated sample seeding, reset utilities and repository access while all screens deliberately remain static. Import commit, export download, live APIs, PWA support and deployment workflow remain absent.
 
 ```text
 complete-cruising/
@@ -50,6 +50,10 @@ complete-cruising/
 |       |-- data/samplePortData.ts    Typed reusable Naples guide sample
 |       |-- data/sampleExperienceData.ts
 |       |                                  Typed plans, family guidance and memories
+|       |-- data/sampleSchemaData.ts    Canonical schema-aligned illustrative fixtures
+|       |-- db/                         Versioned Dexie database, seed/reset utilities and repositories
+|       |-- types/                      Inferred domain and import/export types
+|       |-- schemas/                    Strict Zod entity and envelope schemas
 |       |-- features/dashboard/
 |       |   |-- DashboardPage.tsx     Dashboard screen composition
 |       |   |-- DashboardPage.css     Dashboard visual and responsive rules
@@ -111,7 +115,8 @@ complete-cruising/
 |       |   |-- app-shell.css         Shell and landing layout
 |       |   |-- components.css        Shared component treatments
 |       |   `-- responsive.css        Responsive shell behaviour
-|       |-- tests/App.test.tsx        Five views, trust metadata and routing tests
+|       |-- tests/App.test.tsx        View, trust metadata and routing tests
+|       |-- tests/schemas.test.ts     Valid and invalid schema coverage
 |       `-- tests/setup.ts            Testing Library setup and cleanup
 |-- docs/
 |   |-- README.md                     This living inventory and knowledge index
@@ -182,10 +187,15 @@ complete-cruising/
 | [../app/src/features/ship/ShipPage.tsx](../app/src/features/ship/ShipPage.tsx), [ShipPage.css](../app/src/features/ship/ShipPage.css) and [Ship components](../app/src/features/ship/components/ShipHero.tsx) | Ship guide feature | Implement the premium ship hero, handbook facts, enrichment readiness and seven editorial guide cards without mixing ship knowledge into sailing-specific records. |
 | [../app/src/data/samplePortData.ts](../app/src/data/samplePortData.ts) | Port guide sample data | Supplies a reusable, explicitly illustrative Naples guidebook record with separate attraction ideas and visible confidence, review and refresh metadata. |
 | [../app/src/data/sampleExperienceData.ts](../app/src/data/sampleExperienceData.ts) | Tranche 8 sample data | Keeps sailing-specific Naples shore plans and memory prompts separate from reusable port context, while supplying non-sensitive Family Guide presentation data and visible trust metadata. |
+| [../app/src/data/sampleSchemaData.ts](../app/src/data/sampleSchemaData.ts) | Tranche 9 canonical samples | Provides non-sensitive schema-aligned sailing, itinerary, ship, port, attraction, shore plan, Today, weather, enrichment, memory and Almanac fixtures derived from the existing illustrative presentation content. |
+| [../app/src/db](../app/src/db/index.ts) | Tranche 10 local persistence | Defines the `completeCruisingDb` version 1 Dexie database, practical indexes, Zod-validated idempotent sample seeding, clear/reset utilities and repositories for future screen queries. |
+| [../app/src/tests/database.test.ts](../app/src/tests/database.test.ts) | Tranche 10 database tests | Verifies schema creation, seed idempotency, clear/reseed behaviour, repositories, record separation and trust metadata using a test-only IndexedDB polyfill. |
+| [../app/src/types](../app/src/types/index.ts) | Tranche 9 data types | Exposes shared, cruise, guidebook, plan, memory and import/export TypeScript types inferred from the canonical Zod schemas to prevent type drift. |
+| [../app/src/schemas](../app/src/schemas/index.ts) | Tranche 9 validation | Defines strict shared metadata and core entity schemas plus versioned, shape-only import and export envelopes; no import commit or export workflow is implemented. |
 | [../app/src/features/ports/PortGuidePage.tsx](../app/src/features/ports/PortGuidePage.tsx), [PortGuidePage.css](../app/src/features/ports/PortGuidePage.css) and [Port Guide components](../app/src/features/ports/components/PortPostcard.tsx) | Port guide feature | Implement the warm postcard hero, practical guide sections, separate attraction cards, restrained family lens, photography prompt and uncertainty notes without mixing port knowledge into itinerary-day timings. |
 | [../app/src/features/plans/PlansPage.tsx](../app/src/features/plans/PlansPage.tsx), [family/FamilyGuidePage.tsx](../app/src/features/family/FamilyGuidePage.tsx), [memories/MemoriesPage.tsx](../app/src/features/memories/MemoriesPage.tsx) and [experience-pages.css](../app/src/features/experience-pages.css) | Tranche 8 experience features | Implement three premium Naples experience routes, selected plan comparison, Seb discovery, reflective memory prompts and a non-functional Adventure Almanac export preview. |
 | [../app/src/styles/tokens.css](../app/src/styles/tokens.css), [base.css](../app/src/styles/base.css), [app-shell.css](../app/src/styles/app-shell.css), [components.css](../app/src/styles/components.css) and [responsive.css](../app/src/styles/responsive.css) | App styles | Translate Ocean Luxe into shared tokens, atmospheric backgrounds, reusable surfaces, accessible focus states and responsive layouts. |
-| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify all five implemented views, Today operational hierarchy, itinerary data, ship and port trust metadata, attraction separation and future-route placeholders. |
+| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx), [schemas.test.ts](../app/src/tests/schemas.test.ts) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify all implemented views and routing plus valid and invalid metadata, entity, sample and versioned import-envelope shapes. |
 
 ## Knowledge routing
 
@@ -241,7 +251,7 @@ The following are described by the foundation documents but are not present in t
 - production screen implementations beyond the eight Tranche 8 views;
 - production routing beyond the eight implemented views and typed future placeholders;
 - detailed sample itinerary and family data beyond the lightweight Tranche 0 sailing, ship and port records;
-- runtime schemas, local database code and import/export logic;
+- import/export commit or download logic;
 - broader automated test coverage and visual regression references beyond the Dashboard, Itinerary, Today, Ship and Port checks;
 - PWA manifest, service worker and GitHub Pages workflow;
 
@@ -258,4 +268,4 @@ Update this index whenever a tranche adds, removes, renames or supersedes a proj
 
 ## Inventory validation
 
-This inventory was created from a recursive repository file listing with Git metadata, dependency folders, build output and coverage output excluded from the knowledge set. Every non-Git file present on 19 June 2026 is represented above.
+This inventory was updated from a recursive repository file listing with Git metadata, dependency folders, build output and coverage output excluded from the knowledge set. Every knowledge-bearing file present on 20 June 2026 is represented above.

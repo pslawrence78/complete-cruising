@@ -11,8 +11,8 @@ This delivery tracker summarises the intended tranche sequence. The authoritativ
 6. Ship Guide v0.1
 7. Port Guide v0.1
 8. Plans, Family and Memories v0.1 — complete
-9. Data Types and Schemas
-10. Local Database Foundation
+9. Data Types and Schemas — complete
+10. Local Database Foundation — complete
 11. Data-Driven Screens
 12. Import Preview v0.1
 13. Import Commit and Export v0.1

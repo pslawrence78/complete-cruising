@@ -1,0 +1,21 @@
+import { z } from "zod";
+import { AuditMetadataSchema, IdSchema } from "./commonSchemas";
+import { DayGuideSchema } from "./dayGuideSchemas";
+import { EnrichmentSectionSchema } from "./enrichmentSchemas";
+import { ItineraryDaySchema } from "./itinerarySchemas";
+import { AdventureAlmanacExportPreviewSchema, MemoryEntrySchema } from "./memorySchemas";
+import { AttractionSchema, PortSchema } from "./portSchemas";
+import { SailingSchema } from "./sailingSchemas";
+import { ShipSchema } from "./shipSchemas";
+
+const ImportHeaderSchema = z.object({ schemaVersion: z.number().int().positive(), importedAt: z.string().datetime({ offset: true }), sampleOnly: z.boolean() }).strict();
+export const SailingShellImportSchema = z.object({ kind: z.literal("sailing_shell"), header: ImportHeaderSchema, sailing: SailingSchema }).strict();
+export const ItineraryImportSchema = z.object({ kind: z.literal("itinerary"), header: ImportHeaderSchema, sailingId: IdSchema, days: z.array(ItineraryDaySchema).min(1) }).strict();
+export const ShipEnrichmentImportSchema = z.object({ kind: z.literal("ship_enrichment"), header: ImportHeaderSchema, ship: ShipSchema, sections: z.array(EnrichmentSectionSchema) }).strict();
+export const PortEnrichmentImportSchema = z.object({ kind: z.literal("port_enrichment"), header: ImportHeaderSchema, port: PortSchema, attractions: z.array(AttractionSchema), sections: z.array(EnrichmentSectionSchema) }).strict();
+export const DayGuideImportSchema = z.object({ kind: z.literal("day_guide"), header: ImportHeaderSchema, dayGuide: DayGuideSchema }).strict();
+
+export const ImportBatchSchema = z.object({ id: IdSchema, schemaVersion: z.number().int().positive(), kind: z.enum(["sailing_shell", "itinerary", "ship_enrichment", "port_enrichment", "day_guide"]), status: z.enum(["staged", "valid", "invalid", "reviewed", "committed", "rejected"]), receivedAt: z.string().datetime({ offset: true }), rawContent: z.unknown(), validationWarnings: z.array(z.string()), audit: AuditMetadataSchema }).strict();
+
+export const FullBackupExportShellSchema = z.object({ kind: z.literal("full_backup"), schemaVersion: z.number().int().positive(), exportedAt: z.string().datetime({ offset: true }), sailings: z.array(SailingSchema), ships: z.array(ShipSchema), ports: z.array(PortSchema), itineraryDays: z.array(ItineraryDaySchema), memories: z.array(MemoryEntrySchema) }).strict();
+export const AdventureAlmanacExportDraftSchema = z.object({ kind: z.literal("adventure_almanac"), schemaVersion: z.number().int().positive(), exportedAt: z.string().datetime({ offset: true }), preview: AdventureAlmanacExportPreviewSchema }).strict();

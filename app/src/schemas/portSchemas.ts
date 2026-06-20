@@ -1,0 +1,12 @@
+import { z } from "zod";
+import { AuditMetadataSchema, BookingRequiredSchema, ConfidenceMetadataSchema, CostLevelSchema, FamilySuitabilitySchema, GeoMetadataSchema, IdSchema, PortTypeSchema, RiskLevelSchema, VisualMetadataSchema } from "./commonSchemas";
+
+export const CountrySchema = z.object({ id: IdSchema, name: z.string().min(1), isoCode: z.string().length(2).optional(), flagEmoji: z.string().optional(), primaryLanguage: z.string().optional(), additionalLanguages: z.array(z.string()).optional(), currencyCode: z.string().length(3).optional(), currencyName: z.string().optional(), sebFact: z.string().optional(), confidence: ConfidenceMetadataSchema.optional(), audit: AuditMetadataSchema }).strict();
+
+export const PortSchema = z.object({
+  id: IdSchema, name: z.string().min(1), localName: z.string().optional(), countryId: IdSchema, region: z.string().optional(), portType: PortTypeSchema.optional(), timezone: z.string().optional(), overview: z.string().optional(), cruiseLogisticsSummary: z.string().optional(), gettingAroundSummary: z.string().optional(), familySuitabilitySummary: z.string().optional(), foodCultureSummary: z.string().optional(), photographySummary: z.string().optional(), hintsTipsSummary: z.string().optional(), weatherSeasonalitySummary: z.string().optional(), returnRiskDefault: RiskLevelSchema.optional(), enrichmentSectionIds: z.array(IdSchema).optional(), visual: VisualMetadataSchema.optional(), geo: GeoMetadataSchema.optional(), confidence: ConfidenceMetadataSchema.optional(), audit: AuditMetadataSchema, sampleOnly: z.boolean().optional(), dataCaveat: z.string().min(1).optional(),
+}).strict();
+
+export const AttractionSchema = z.object({
+  id: IdSchema, portId: IdSchema, name: z.string().min(1), type: z.enum(["landmark", "museum", "beach", "viewpoint", "historic_site", "food_market", "nature", "shopping", "family_activity", "other"]).optional(), shortDescription: z.string().optional(), whyItMatters: z.string().optional(), distanceFromPortKm: z.number().nonnegative().optional(), typicalVisitDuration: z.string().optional(), bookingRequired: BookingRequiredSchema.optional(), costLevel: CostLevelSchema.optional(), familySuitability: FamilySuitabilitySchema.optional(), sebInterestSummary: z.string().optional(), accessibilityNotes: z.string().optional(), weatherDependency: z.enum(["low", "medium", "high", "unknown"]).optional(), geo: GeoMetadataSchema.optional(), confidence: ConfidenceMetadataSchema.optional(), audit: AuditMetadataSchema,
+}).strict();
