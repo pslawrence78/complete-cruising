@@ -19,9 +19,9 @@ import {
   sampleAttractionRecords,
   sampleAudit,
   sampleDayGuideRecord,
-  sampleEnrichmentSection,
+  sampleEnrichmentSections,
   sampleItineraryDayRecord,
-  sampleMemoryEntry,
+  sampleMemoryEntries,
   samplePortRecord,
   sampleSailingRecord,
   sampleShipRecord,
@@ -42,7 +42,7 @@ const cruiseLine = CruiseLineSchema.parse({
 });
 
 const countries = CountrySchema.array().parse([
-  { id: "country-italy", name: "Italy", isoCode: "IT", primaryLanguage: "Italian", currencyCode: "EUR", currencyName: "Euro", audit: sampleAudit, confidence: illustrativeConfidence },
+  { id: "country-italy", name: "Italy", isoCode: "IT", flagEmoji: "🇮🇹", primaryLanguage: "Italian", currencyCode: "EUR", currencyName: "Euro", sebFact: "Italy's Campania coast curves around the Bay of Naples beneath Mount Vesuvius.", audit: sampleAudit, confidence: illustrativeConfidence },
   { id: "country-greece", name: "Greece", isoCode: "GR", audit: sampleAudit, confidence: illustrativeConfidence },
   { id: "country-turkiye", name: "Türkiye", isoCode: "TR", audit: sampleAudit, confidence: illustrativeConfidence },
   { id: "country-montenegro", name: "Montenegro", isoCode: "ME", audit: sampleAudit, confidence: illustrativeConfidence },
@@ -133,8 +133,8 @@ function validatedSeed() {
     shorePlans: ShorePlanSchema.array().parse(sampleShorePlanRecords),
     dayGuide: DayGuideSchema.parse(sampleDayGuideRecord),
     weather: WeatherSnapshotSchema.parse(sampleWeatherRecord),
-    enrichment: EnrichmentSectionSchema.parse(sampleEnrichmentSection),
-    memory: MemoryEntrySchema.parse(sampleMemoryEntry),
+    enrichment: EnrichmentSectionSchema.array().parse(sampleEnrichmentSections),
+    memories: MemoryEntrySchema.array().parse(sampleMemoryEntries),
   };
 }
 
@@ -153,8 +153,8 @@ export async function seedSampleData(database: CompleteCruisingDb = db): Promise
     await database.shorePlans.bulkPut(seed.shorePlans);
     await database.dayGuides.put(seed.dayGuide);
     await database.weatherSnapshots.put(seed.weather);
-    await database.enrichmentSections.put(seed.enrichment);
-    await database.memoryEntries.put(seed.memory);
+    await database.enrichmentSections.bulkPut(seed.enrichment);
+    await database.memoryEntries.bulkPut(seed.memories);
     await database.adventureAlmanacExports.put(sampleAlmanacPreview);
     await database.appSettings.bulkPut([activeSailingSetting, selectedTodaySetting]);
   });

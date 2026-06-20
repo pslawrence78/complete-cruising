@@ -594,3 +594,16 @@
   font-family: var(--font-display);
   font-weight: 800;
 }
+.local-data-state {
+  max-width: 780px;
+  margin: clamp(3rem, 9vw, 8rem) auto;
+  padding: clamp(2rem, 5vw, 4rem);
+  border: 1px solid rgba(181, 225, 222, 0.28);
+  border-radius: var(--radius-large);
+  background: linear-gradient(145deg, rgba(11, 50, 63, 0.88), rgba(7, 31, 43, 0.94));
+  box-shadow: var(--shadow-deep);
+  text-align: center;
+}
+
+.local-data-state h1 { margin: 0.35rem 0 0.75rem; }
+.local-data-state p:last-child { max-width: 58ch; color: var(--colour-mist); }

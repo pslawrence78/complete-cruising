@@ -1,4 +1,6 @@
-import { sampleTodayData } from "../../data/sampleTodayData";
+import { LocalDataState } from "../../components/states/LocalDataState";
+import { mapToday } from "../../data/viewModelMappers";
+import { useTodayGuide } from "../../hooks/useLocalData";
 import { ConfidenceNotes } from "./components/ConfidenceNotes";
 import { SebDiscoveryPreview } from "./components/SebDiscoveryPreview";
 import { TakeAshoreChecklist } from "./components/TakeAshoreChecklist";
@@ -8,27 +10,33 @@ import { WeatherTile } from "./components/WeatherTile";
 import "./TodayPage.css";
 
 export function TodayPage() {
+  const query = useTodayGuide();
+  if (query.loading) return <LocalDataState kind="loading" />;
+  if (query.error) return <LocalDataState kind="error" />;
+  if (!query.data) return <LocalDataState kind="empty" />;
+  const today = mapToday(query.data);
+  if (!today) return <LocalDataState kind="empty" detail="The active sailing has no selected Today itinerary day." />;
   return (
     <div className="today-page">
       <TodayAshorePanel
-        currentDay={sampleTodayData.currentDay}
-        returnPlan={sampleTodayData.returnPlan}
+        currentDay={today.currentDay}
+        returnPlan={today.returnPlan}
       />
 
       <div className="today-page__primary">
-        <WeatherTile weather={sampleTodayData.weather} />
-        <TodayPlanSummary plans={sampleTodayData.plans} />
+        <WeatherTile weather={today.weather} />
+        <TodayPlanSummary plans={today.plans} />
       </div>
 
       <div className="today-page__support">
-        <TakeAshoreChecklist items={sampleTodayData.checklist} />
+        <TakeAshoreChecklist items={today.checklist} />
         <SebDiscoveryPreview
-          local={sampleTodayData.local}
-          sebDiscovery={sampleTodayData.sebDiscovery}
+          local={today.local}
+          sebDiscovery={today.sebDiscovery}
         />
       </div>
 
-      <ConfidenceNotes notes={sampleTodayData.confidenceNotes} />
+      <ConfidenceNotes notes={today.confidenceNotes} />
     </div>
   );
 }

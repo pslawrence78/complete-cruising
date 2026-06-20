@@ -66,7 +66,7 @@ describe("local database foundation", () => {
     const selectedPlan = await getSelectedShorePlanForDay("day-02-naples", database);
     expect(bundle?.port.name).toBe("Naples");
     expect(bundle?.country?.isoCode).toBe("IT");
-    expect(bundle?.attractions).toHaveLength(2);
+    expect(bundle?.attractions).toHaveLength(4);
     expect(selectedPlan?.status).toBe("selected");
     expect(selectedPlan?.sailingId).toBe("sailing-sun-princess-med-2026");
   });
@@ -74,7 +74,7 @@ describe("local database foundation", () => {
   it("round-trips enrichment trust metadata", async () => {
     await seedSampleData(database);
     const sections = await getShipEnrichmentSections("ship-sun-princess", database);
-    expect(sections[0].confidence).toMatchObject({
+    expect(sections.find(({ sectionType }) => sectionType === "identity")?.confidence).toMatchObject({
       confidence: "medium",
       reviewStatus: "needs_user_review",
       refreshRecommended: true,

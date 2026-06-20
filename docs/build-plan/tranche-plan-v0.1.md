@@ -13,7 +13,7 @@ This delivery tracker summarises the intended tranche sequence. The authoritativ
 8. Plans, Family and Memories v0.1 — complete
 9. Data Types and Schemas — complete
 10. Local Database Foundation — complete
-11. Data-Driven Screens
+11. Data-Driven Screens — complete
 12. Import Preview v0.1
 13. Import Commit and Export v0.1
 14. PWA and Offline Readiness

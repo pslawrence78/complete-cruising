@@ -2,13 +2,13 @@
 
 This is the entry point for project knowledge in the Complete Cruising repository. It inventories the current project files, explains which document to consult for each kind of decision, and records gaps between the documented target and the repository as it exists.
 
-Last inventoried: 20 June 2026.
+Last inventoried: 21 June 2026.
 
 ## Repository at a glance
 
 Complete Cruising is a documentation-first project for a premium, local-first Lawrence Family Series PWA. The intended experience is a rich cruise guidebook and companion, not a plain administration or CRUD interface.
 
-The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Ocean Luxe application through Tranche 10. Core records have TypeScript types, strict Zod schemas, canonical illustrative fixtures and versioned import/export shape validation. A version 1 Dexie database now provides validated sample seeding, reset utilities and repository access while all screens deliberately remain static. Import commit, export download, live APIs, PWA support and deployment workflow remain absent.
+The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Ocean Luxe application through Tranche 11. Core records have TypeScript types, strict Zod schemas, canonical illustrative fixtures and versioned import/export shape validation. A version 1 Dexie database provides validated sample seeding, reset utilities and repository access; all eight core screens now subscribe to local repository queries through feature hooks and view-model mappers. Import preview and commit, export download, live APIs, PWA support and deployment workflow remain absent.
 
 ```text
 complete-cruising/
@@ -37,6 +37,7 @@ complete-cruising/
 |       |   |-- navigation/MobileNavigation.tsx
 |       |   |-- status/StatusChip.tsx
 |       |   |-- status/ConfidenceChip.tsx
+|       |   |-- states/LocalDataState.tsx
 |       |   |-- surfaces/CardSurface.tsx
 |       |   |-- visual/BrandMark.tsx
 |       |   `-- visual/RouteMotif.tsx
@@ -51,7 +52,9 @@ complete-cruising/
 |       |-- data/sampleExperienceData.ts
 |       |                                  Typed plans, family guidance and memories
 |       |-- data/sampleSchemaData.ts    Canonical schema-aligned illustrative fixtures
+|       |-- data/viewModelMappers.ts    Local records to visual screen models
 |       |-- db/                         Versioned Dexie database, seed/reset utilities and repositories
+|       |-- hooks/useLocalData.ts       Live repository-backed feature hooks
 |       |-- types/                      Inferred domain and import/export types
 |       |-- schemas/                    Strict Zod entity and envelope schemas
 |       |-- features/dashboard/
@@ -177,7 +180,7 @@ complete-cruising/
 | [../app/src/App.tsx](../app/src/App.tsx), [main.tsx](../app/src/main.tsx) and [vite-env.d.ts](../app/src/vite-env.d.ts) | App source | Compose and mount the Ocean Luxe shell with lightweight hash switching across eight implemented routes. |
 | [../app/src/components/layout/AppShell.tsx](../app/src/components/layout/AppShell.tsx), [navigation](../app/src/components/navigation/TopNavigation.tsx), [status](../app/src/components/status/StatusChip.tsx), [surfaces](../app/src/components/surfaces/CardSurface.tsx) and [visual](../app/src/components/visual/BrandMark.tsx) components | Shell components | Provide maintainable layout, responsive navigation, status, confidence, surface, brand and route-motif primitives. |
 | [../app/src/routes/routeConfig.ts](../app/src/routes/routeConfig.ts) and [data/sampleData.ts](../app/src/data/sampleData.ts) | App placeholders | Mark Dashboard, Itinerary, Today, Ship and Ports as implemented while retaining non-functional future-route and shell metadata placeholders. |
-| [../app/src/data/sampleDashboardData.ts](../app/src/data/sampleDashboardData.ts) | Dashboard sample data | Supplies the non-sensitive illustrative sailing, 15-day representative route, metrics, status, confidence, review and refresh metadata used by Dashboard v0.1. |
+| [../app/src/data/sampleDashboardData.ts](../app/src/data/sampleDashboardData.ts), [sampleItineraryData.ts](../app/src/data/sampleItineraryData.ts), [sampleTodayData.ts](../app/src/data/sampleTodayData.ts), [sampleShipData.ts](../app/src/data/sampleShipData.ts), [samplePortData.ts](../app/src/data/samplePortData.ts) and [sampleExperienceData.ts](../app/src/data/sampleExperienceData.ts) | Legacy presentation fixtures | Retain visual view-model types and historical illustrative reference data; runtime screens no longer import their sample values. |
 | [../app/src/features/dashboard/DashboardPage.tsx](../app/src/features/dashboard/DashboardPage.tsx), [DashboardPage.css](../app/src/features/dashboard/DashboardPage.css) and [dashboard components](../app/src/features/dashboard/components/SailingHero.tsx) | Dashboard feature | Implement the cinematic sailing hero, route ribbon, metrics and six voyage-readiness cards as maintainable React components. |
 | [../app/src/data/sampleItineraryData.ts](../app/src/data/sampleItineraryData.ts) | Itinerary sample data | Supplies 15 illustrative days across embarkation, nine port calls, four sea days and disembarkation with confidence, review and refresh metadata. |
 | [../app/src/features/itinerary/ItineraryPage.tsx](../app/src/features/itinerary/ItineraryPage.tsx), [ItineraryPage.css](../app/src/features/itinerary/ItineraryPage.css) and [itinerary components](../app/src/features/itinerary/components/ItineraryTimeline.tsx) | Itinerary feature | Implement the route summary, legend, horizontal desktop timeline, vertical mobile timeline and visually differentiated day cards. |
@@ -188,14 +191,14 @@ complete-cruising/
 | [../app/src/data/samplePortData.ts](../app/src/data/samplePortData.ts) | Port guide sample data | Supplies a reusable, explicitly illustrative Naples guidebook record with separate attraction ideas and visible confidence, review and refresh metadata. |
 | [../app/src/data/sampleExperienceData.ts](../app/src/data/sampleExperienceData.ts) | Tranche 8 sample data | Keeps sailing-specific Naples shore plans and memory prompts separate from reusable port context, while supplying non-sensitive Family Guide presentation data and visible trust metadata. |
 | [../app/src/data/sampleSchemaData.ts](../app/src/data/sampleSchemaData.ts) | Tranche 9 canonical samples | Provides non-sensitive schema-aligned sailing, itinerary, ship, port, attraction, shore plan, Today, weather, enrichment, memory and Almanac fixtures derived from the existing illustrative presentation content. |
-| [../app/src/db](../app/src/db/index.ts) | Tranche 10 local persistence | Defines the `completeCruisingDb` version 1 Dexie database, practical indexes, Zod-validated idempotent sample seeding, clear/reset utilities and repositories for future screen queries. |
+| [../app/src/db](../app/src/db/index.ts), [hooks/useLocalData.ts](../app/src/hooks/useLocalData.ts) and [data/viewModelMappers.ts](../app/src/data/viewModelMappers.ts) | Tranche 10–11 local data flow | Defines the version 1 Dexie database, safe illustrative seeding, screen repository bundles, live feature hooks and explicit mapping into Ocean Luxe visual models. |
 | [../app/src/tests/database.test.ts](../app/src/tests/database.test.ts) | Tranche 10 database tests | Verifies schema creation, seed idempotency, clear/reseed behaviour, repositories, record separation and trust metadata using a test-only IndexedDB polyfill. |
 | [../app/src/types](../app/src/types/index.ts) | Tranche 9 data types | Exposes shared, cruise, guidebook, plan, memory and import/export TypeScript types inferred from the canonical Zod schemas to prevent type drift. |
 | [../app/src/schemas](../app/src/schemas/index.ts) | Tranche 9 validation | Defines strict shared metadata and core entity schemas plus versioned, shape-only import and export envelopes; no import commit or export workflow is implemented. |
 | [../app/src/features/ports/PortGuidePage.tsx](../app/src/features/ports/PortGuidePage.tsx), [PortGuidePage.css](../app/src/features/ports/PortGuidePage.css) and [Port Guide components](../app/src/features/ports/components/PortPostcard.tsx) | Port guide feature | Implement the warm postcard hero, practical guide sections, separate attraction cards, restrained family lens, photography prompt and uncertainty notes without mixing port knowledge into itinerary-day timings. |
 | [../app/src/features/plans/PlansPage.tsx](../app/src/features/plans/PlansPage.tsx), [family/FamilyGuidePage.tsx](../app/src/features/family/FamilyGuidePage.tsx), [memories/MemoriesPage.tsx](../app/src/features/memories/MemoriesPage.tsx) and [experience-pages.css](../app/src/features/experience-pages.css) | Tranche 8 experience features | Implement three premium Naples experience routes, selected plan comparison, Seb discovery, reflective memory prompts and a non-functional Adventure Almanac export preview. |
 | [../app/src/styles/tokens.css](../app/src/styles/tokens.css), [base.css](../app/src/styles/base.css), [app-shell.css](../app/src/styles/app-shell.css), [components.css](../app/src/styles/components.css) and [responsive.css](../app/src/styles/responsive.css) | App styles | Translate Ocean Luxe into shared tokens, atmospheric backgrounds, reusable surfaces, accessible focus states and responsive layouts. |
-| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx), [schemas.test.ts](../app/src/tests/schemas.test.ts) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify all implemented views and routing plus valid and invalid metadata, entity, sample and versioned import-envelope shapes. |
+| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx), [database.test.ts](../app/src/tests/database.test.ts), [schemas.test.ts](../app/src/tests/schemas.test.ts) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify all eight screens from local IndexedDB data, missing-active-sailing behaviour, routing, repository separation, trust metadata and schema validity. |
 
 ## Knowledge routing
 
@@ -248,11 +251,9 @@ Specialist documents take precedence for decisions in their own domain. Product 
 
 The following are described by the foundation documents but are not present in the repository at the date of this inventory:
 
-- production screen implementations beyond the eight Tranche 8 views;
 - production routing beyond the eight implemented views and typed future placeholders;
-- detailed sample itinerary and family data beyond the lightweight Tranche 0 sailing, ship and port records;
 - import/export commit or download logic;
-- broader automated test coverage and visual regression references beyond the Dashboard, Itinerary, Today, Ship and Port checks;
+- automated visual regression references;
 - PWA manifest, service worker and GitHub Pages workflow;
 
 ## Maintenance rules

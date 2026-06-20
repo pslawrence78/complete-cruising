@@ -1,4 +1,6 @@
-import { sampleShipData } from "../../data/sampleShipData";
+import { LocalDataState } from "../../components/states/LocalDataState";
+import { mapShipGuide } from "../../data/viewModelMappers";
+import { useShipGuide } from "../../hooks/useLocalData";
 import { EnrichmentStatusPanel } from "./components/EnrichmentStatusPanel";
 import { ShipFactsPanel } from "./components/ShipFactsPanel";
 import { ShipGuideCard } from "./components/ShipGuideCard";
@@ -6,15 +8,21 @@ import { ShipHero } from "./components/ShipHero";
 import "./ShipPage.css";
 
 export function ShipPage() {
+  const query = useShipGuide();
+  if (query.loading) return <LocalDataState kind="loading" />;
+  if (query.error) return <LocalDataState kind="error" />;
+  if (!query.data) return <LocalDataState kind="empty" />;
+  const ship = mapShipGuide(query.data);
+  if (!ship) return <LocalDataState kind="empty" detail="The active sailing does not have a local ship guide yet." />;
   return (
     <div className="ship-page">
-      <ShipHero hero={sampleShipData.hero} metadata={sampleShipData.metadata} />
+      <ShipHero hero={ship.hero} metadata={ship.metadata} />
 
       <div className="ship-page__overview">
-        <ShipFactsPanel facts={sampleShipData.facts} />
+        <ShipFactsPanel facts={ship.facts} />
         <EnrichmentStatusPanel
-          enrichment={sampleShipData.enrichment}
-          metadata={sampleShipData.metadata}
+          enrichment={ship.enrichment}
+          metadata={ship.metadata}
         />
       </div>
 
@@ -31,7 +39,7 @@ export function ShipPage() {
         </div>
 
         <div className="ship-guide__grid">
-          {sampleShipData.sections.map((section) => (
+          {ship.sections.map((section) => (
             <ShipGuideCard key={section.id} section={section} />
           ))}
         </div>
@@ -39,7 +47,7 @@ export function ShipPage() {
 
       <p className="ship-page__caveat">
         <span aria-hidden="true">i</span>
-        {sampleShipData.caveat}
+        {ship.caveat}
       </p>
     </div>
   );

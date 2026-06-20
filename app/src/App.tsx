@@ -9,6 +9,8 @@ import { PortGuidePage } from "./features/ports/PortGuidePage";
 import { ShipPage } from "./features/ship/ShipPage";
 import { TodayPage } from "./features/today/TodayPage";
 import { routeConfig } from "./routes/routeConfig";
+import { LocalDataState } from "./components/states/LocalDataState";
+import { useDatabaseBootstrap } from "./hooks/useLocalData";
 
 function getActiveRouteId() {
   const hashPath = window.location.hash.replace(/^#/, "") || "/";
@@ -21,6 +23,7 @@ function getActiveRouteId() {
 }
 
 function App() {
+  const database = useDatabaseBootstrap();
   const [activeRouteId, setActiveRouteId] = useState(getActiveRouteId);
 
   useEffect(() => {
@@ -64,6 +67,9 @@ function App() {
     ) : (
       <DashboardPage />
     );
+
+  if (database.loading) return <LocalDataState kind="loading" />;
+  if (database.error) return <LocalDataState kind="error" />;
 
   return (
     <AppShell
