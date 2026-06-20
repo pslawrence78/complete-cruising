@@ -2,11 +2,13 @@ import type { RouteDefinition } from "../../routes/routeConfig";
 
 interface MobileNavigationProps {
   activeRouteId: string;
+  onNavigate: (routeId: string) => void;
   routes: readonly RouteDefinition[];
 }
 
 export function MobileNavigation({
   activeRouteId,
+  onNavigate,
   routes,
 }: MobileNavigationProps) {
   return (
@@ -17,6 +19,7 @@ export function MobileNavigation({
       <ul className="mobile-navigation__list">
         {routes.map((route) => {
           const isActive = route.id === activeRouteId;
+          const isAvailable = route.status === "implemented";
 
           return (
             <li key={route.id}>
@@ -24,7 +27,12 @@ export function MobileNavigation({
                 className="mobile-navigation__item"
                 type="button"
                 aria-current={isActive ? "page" : undefined}
-                aria-disabled={!isActive}
+                aria-disabled={!isAvailable}
+                onClick={() => {
+                  if (isAvailable) {
+                    onNavigate(route.id);
+                  }
+                }}
               >
                 <span className="mobile-navigation__marker" aria-hidden="true" />
                 {route.title}

@@ -3,11 +3,13 @@ import { BrandMark } from "../visual/BrandMark";
 
 interface TopNavigationProps {
   activeRouteId: string;
+  onNavigate: (routeId: string) => void;
   routes: readonly RouteDefinition[];
 }
 
 export function TopNavigation({
   activeRouteId,
+  onNavigate,
   routes,
 }: TopNavigationProps) {
   return (
@@ -26,6 +28,7 @@ export function TopNavigation({
         <ul className="navigation-list">
           {routes.map((route) => {
             const isActive = route.id === activeRouteId;
+            const isAvailable = route.status === "implemented";
 
             return (
               <li key={route.id}>
@@ -33,11 +36,18 @@ export function TopNavigation({
                   className="navigation-item"
                   type="button"
                   aria-current={isActive ? "page" : undefined}
-                  aria-disabled={!isActive}
+                  aria-disabled={!isAvailable}
+                  onClick={() => {
+                    if (isAvailable) {
+                      onNavigate(route.id);
+                    }
+                  }}
                   title={
                     isActive
-                      ? "Current dashboard"
-                      : "Placeholder route for a future tranche"
+                      ? `Current ${route.title.toLowerCase()} view`
+                      : isAvailable
+                        ? `Open ${route.title}`
+                        : "Placeholder route for a future tranche"
                   }
                 >
                   {route.title}

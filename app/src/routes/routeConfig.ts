@@ -16,7 +16,7 @@ export const routeConfig: readonly RouteDefinition[] = [
     id: "itinerary",
     path: "/itinerary",
     title: "Itinerary",
-    status: "placeholder",
+    status: "implemented",
   },
   {
     id: "today",

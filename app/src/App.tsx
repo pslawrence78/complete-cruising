@@ -1,11 +1,52 @@
+import { useEffect, useState } from "react";
 import { AppShell } from "./components/layout/AppShell";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
+import { ItineraryPage } from "./features/itinerary/ItineraryPage";
 import { routeConfig } from "./routes/routeConfig";
 
+function getActiveRouteId() {
+  const hashPath = window.location.hash.replace(/^#/, "") || "/";
+  const route = routeConfig.find(
+    (candidate) =>
+      candidate.status === "implemented" && candidate.path === hashPath,
+  );
+
+  return route?.id ?? "dashboard";
+}
+
 function App() {
+  const [activeRouteId, setActiveRouteId] = useState(getActiveRouteId);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setActiveRouteId(getActiveRouteId());
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
+  const handleNavigate = (routeId: string) => {
+    const route = routeConfig.find(
+      (candidate) =>
+        candidate.id === routeId && candidate.status === "implemented",
+    );
+
+    if (!route) {
+      return;
+    }
+
+    setActiveRouteId(route.id);
+    window.location.hash = route.path;
+  };
+
   return (
-    <AppShell activeRouteId="dashboard" routes={routeConfig}>
-      <DashboardPage />
+    <AppShell
+      activeRouteId={activeRouteId}
+      onNavigate={handleNavigate}
+      routes={routeConfig}
+    >
+      {activeRouteId === "itinerary" ? <ItineraryPage /> : <DashboardPage />}
     </AppShell>
   );
 }

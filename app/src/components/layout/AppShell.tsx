@@ -6,12 +6,14 @@ import { TopNavigation } from "../navigation/TopNavigation";
 interface AppShellProps {
   activeRouteId: string;
   children: ReactNode;
+  onNavigate: (routeId: string) => void;
   routes: readonly RouteDefinition[];
 }
 
 export function AppShell({
   activeRouteId,
   children,
+  onNavigate,
   routes,
 }: AppShellProps) {
   return (
@@ -21,7 +23,11 @@ export function AppShell({
       </a>
 
       <div className="app-shell__frame">
-        <TopNavigation activeRouteId={activeRouteId} routes={routes} />
+        <TopNavigation
+          activeRouteId={activeRouteId}
+          onNavigate={onNavigate}
+          routes={routes}
+        />
 
         <main id="main-content" className="app-shell__main" tabIndex={-1}>
           {children}
@@ -42,7 +48,11 @@ export function AppShell({
         </footer>
       </div>
 
-      <MobileNavigation activeRouteId={activeRouteId} routes={routes} />
+      <MobileNavigation
+        activeRouteId={activeRouteId}
+        onNavigate={onNavigate}
+        routes={routes}
+      />
     </div>
   );
 }
