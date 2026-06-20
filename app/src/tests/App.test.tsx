@@ -72,6 +72,9 @@ describe("App", () => {
     expect(
       screen.getByRole("link", { name: /Open ship guide/i }),
     ).toHaveAttribute("href", "#/ship");
+    expect(
+      screen.getByRole("link", { name: /Open Naples guide/i }),
+    ).toHaveAttribute("href", "#/ports");
 
     const navigation = screen.getByRole("navigation", {
       name: "Primary navigation",
@@ -88,6 +91,9 @@ describe("App", () => {
     ).toHaveAttribute("aria-disabled", "false");
     expect(
       within(navigation).getByRole("button", { name: "Ship" }),
+    ).toHaveAttribute("aria-disabled", "false");
+    expect(
+      within(navigation).getByRole("button", { name: "Ports" }),
     ).toHaveAttribute("aria-disabled", "false");
   });
 
@@ -244,5 +250,49 @@ describe("App", () => {
     expect(screen.getAllByText("Medium confidence").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Refresh before sailing").length).toBeGreaterThan(0);
     expect(screen.getByText(/Illustrative sample only/)).toBeInTheDocument();
+  });
+
+  it("opens the Naples port guide through shell navigation", () => {
+    render(<App />);
+
+    const navigation = screen.getByRole("navigation", {
+      name: "Primary navigation",
+    });
+    fireEvent.click(within(navigation).getByRole("button", { name: "Ports" }));
+
+    expect(window.location.hash).toBe("#/ports");
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Naples, Italy" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Italian")).toBeInTheDocument();
+    expect(screen.getByText("Euro (€)")).toBeInTheDocument();
+    expect(
+      screen.getAllByText("Reusable port guidebook · not an itinerary day"),
+    ).toHaveLength(2);
+  });
+
+  it("separates attraction ideas and keeps port uncertainty visible", () => {
+    window.history.replaceState(null, "", "#/ports");
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "Cruise logistics" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Getting around" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Food and culture" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "A family day with room to breathe" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "A frame worth waiting for" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Hints and watchouts" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Useful now. Authoritative later." })).toBeInTheDocument();
+
+    const highlights = screen.getByRole("region", {
+      name: "Four possible Naples stories.",
+    });
+    expect(within(highlights).getAllByRole("article")).toHaveLength(4);
+    expect(within(highlights).getByRole("heading", { name: "Pompeii" })).toBeInTheDocument();
+    expect(within(highlights).getAllByText("Requirements unknown")).toHaveLength(2);
+
+    expect(screen.getAllByText("Needs refresh").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Medium confidence").length).toBeGreaterThan(0);
+    expect(screen.getByText(/No berth, terminal, transport/)).toBeInTheDocument();
+    expect(screen.queryByText("17:30")).not.toBeInTheDocument();
   });
 });

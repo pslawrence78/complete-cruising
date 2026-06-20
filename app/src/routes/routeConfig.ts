@@ -28,7 +28,7 @@ export const routeConfig: readonly RouteDefinition[] = [
     id: "ports",
     path: "/ports",
     title: "Ports",
-    status: "placeholder",
+    status: "implemented",
   },
   {
     id: "ship",

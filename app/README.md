@@ -1,6 +1,6 @@
 # Complete Cruising app
 
-This directory contains the tested Vite, React and TypeScript application scaffold, the Ocean Luxe shell, Dashboard v0.1, Itinerary v0.1, Today View v0.1 and the static-data Tranche 6 Ship Guide.
+This directory contains the tested Vite, React and TypeScript application scaffold, the Ocean Luxe shell, Dashboard v0.1, Itinerary v0.1, Today View v0.1, Ship Guide v0.1 and the static-data Tranche 7 Naples Port Guide.
 
 ## Commands
 
@@ -16,7 +16,7 @@ npm run test
 
 ## Current scope
 
-The application renders a responsive Ocean Luxe dashboard, route-led itinerary, operational Today view and premium Sun Princess ship handbook. All content comes from typed illustrative static data; Port and later routes remain placeholders, and no local database, live weather, import/export flow or PWA support is included.
+The application renders a responsive Ocean Luxe dashboard, route-led itinerary, operational Today view, premium Sun Princess ship handbook and postcard-led Naples port guidebook. All content comes from typed illustrative static data; Plans, Family, Memories and later routes remain placeholders, and no local database, live weather, import/export flow or PWA support is included.
 
 Vite and Vitest use their runner-based configuration loader so validation remains compatible with restricted Windows workspaces without requiring broader filesystem access.
 
