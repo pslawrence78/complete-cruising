@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AppShell } from "./components/layout/AppShell";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { ItineraryPage } from "./features/itinerary/ItineraryPage";
+import { ShipPage } from "./features/ship/ShipPage";
 import { TodayPage } from "./features/today/TodayPage";
 import { routeConfig } from "./routes/routeConfig";
 
@@ -46,6 +47,8 @@ function App() {
       <ItineraryPage />
     ) : activeRouteId === "today" ? (
       <TodayPage />
+    ) : activeRouteId === "ship" ? (
+      <ShipPage />
     ) : (
       <DashboardPage />
     );

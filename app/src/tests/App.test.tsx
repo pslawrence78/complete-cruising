@@ -60,7 +60,7 @@ describe("App", () => {
     expect(screen.getByText("Ready to capture")).toBeInTheDocument();
   });
 
-  it("keeps unfinished dashboard actions and later routes clearly marked", () => {
+  it("links implemented dashboard actions and keeps later routes clearly marked", () => {
     render(<App />);
 
     expect(
@@ -70,8 +70,8 @@ describe("App", () => {
       screen.getByRole("link", { name: /Explore itinerary/i }),
     ).toHaveAttribute("href", "#/itinerary");
     expect(
-      screen.getByRole("button", { name: /Open ship guide/i }),
-    ).toHaveAttribute("aria-disabled", "true");
+      screen.getByRole("link", { name: /Open ship guide/i }),
+    ).toHaveAttribute("href", "#/ship");
 
     const navigation = screen.getByRole("navigation", {
       name: "Primary navigation",
@@ -85,6 +85,9 @@ describe("App", () => {
     ).toHaveAttribute("aria-disabled", "false");
     expect(
       within(navigation).getByRole("button", { name: "Today" }),
+    ).toHaveAttribute("aria-disabled", "false");
+    expect(
+      within(navigation).getByRole("button", { name: "Ship" }),
     ).toHaveAttribute("aria-disabled", "false");
   });
 
@@ -196,5 +199,50 @@ describe("App", () => {
       screen.getByRole("heading", { name: "Confidence and refresh notes" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Terminal details")).toBeInTheDocument();
+  });
+
+  it("opens the premium ship handbook through shell navigation", () => {
+    render(<App />);
+
+    const navigation = screen.getByRole("navigation", {
+      name: "Primary navigation",
+    });
+    fireEvent.click(within(navigation).getByRole("button", { name: "Ship" }));
+
+    expect(window.location.hash).toBe("#/ship");
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Sun Princess" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "A useful first bearing" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Enrichment status" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Ship guidebook · not sailing-specific"),
+    ).toBeInTheDocument();
+  });
+
+  it("shows all seven illustrative ship sections with visible trust state", () => {
+    window.history.replaceState(null, "", "#/ship");
+    render(<App />);
+
+    [
+      "Identity and character",
+      "Layout and orientation",
+      "Dining",
+      "Family and Seb suitability",
+      "Pools and recreation",
+      "Entertainment",
+      "Tips and watchouts",
+    ].forEach((heading) => {
+      expect(screen.getByRole("heading", { name: heading })).toBeInTheDocument();
+    });
+
+    expect(screen.getAllByText("Reviewed sample")).toHaveLength(2);
+    expect(screen.getAllByText("Medium confidence").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Refresh before sailing").length).toBeGreaterThan(0);
+    expect(screen.getByText(/Illustrative sample only/)).toBeInTheDocument();
   });
 });

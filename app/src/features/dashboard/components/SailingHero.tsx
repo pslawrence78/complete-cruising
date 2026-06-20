@@ -57,7 +57,7 @@ export function SailingHero({ route, sailing }: SailingHeroProps) {
               A personalised guide to every port, plan and possibility.
             </p>
 
-            <div className="dashboard-hero__actions" aria-label="Future dashboard actions">
+            <div className="dashboard-hero__actions" aria-label="Dashboard actions">
               <a
                 className="dashboard-action"
                 data-variant="primary"
@@ -74,15 +74,14 @@ export function SailingHero({ route, sailing }: SailingHeroProps) {
                 <span>Explore itinerary</span>
                 <small>Open</small>
               </a>
-              <button
+              <a
                 className="dashboard-action"
                 data-variant="secondary"
-                type="button"
-                aria-disabled="true"
+                href="#/ship"
               >
                 <span>Open ship guide</span>
-                <small>Future view</small>
-              </button>
+                <small>Open</small>
+              </a>
             </div>
           </div>
 
