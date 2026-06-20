@@ -8,7 +8,7 @@ Last inventoried: 20 June 2026.
 
 Complete Cruising is a documentation-first project for a premium, local-first Lawrence Family Series PWA. The intended experience is a rich cruise guidebook and companion, not a plain administration or CRUD interface.
 
-The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the initial delivery tracker, illustrative sample records, reserved enrichment workspaces, the tested Ocean Luxe application shell, Dashboard v0.1 and Itinerary v0.1. Both screens remain static and deliberately contain no local database, PWA support or deployment workflow.
+The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the initial delivery tracker, illustrative sample records, reserved enrichment workspaces, the tested Ocean Luxe application shell, Dashboard v0.1, Itinerary v0.1 and Today View v0.1. All screens remain static and deliberately contain no local database, live APIs, PWA support or deployment workflow.
 
 ```text
 complete-cruising/
@@ -28,7 +28,7 @@ complete-cruising/
 |   |-- tsconfig.app.json             Browser-source TypeScript config
 |   |-- tsconfig.node.json            Tooling TypeScript config
 |   `-- src/
-|       |-- App.tsx                   Lightweight Dashboard/Itinerary routing
+|       |-- App.tsx                   Lightweight three-view hash routing
 |       |-- main.tsx                  React entry point
 |       |-- vite-env.d.ts             Vite client types
 |       |-- components/
@@ -45,6 +45,7 @@ complete-cruising/
 |       |                                  Typed illustrative dashboard data
 |       |-- data/sampleItineraryData.ts
 |       |                                  Typed 15-day itinerary data
+|       |-- data/sampleTodayData.ts   Typed illustrative Naples day data
 |       |-- features/dashboard/
 |       |   |-- DashboardPage.tsx     Dashboard screen composition
 |       |   |-- DashboardPage.css     Dashboard visual and responsive rules
@@ -64,6 +65,17 @@ complete-cruising/
 |       |       |-- ItineraryDayCard.tsx
 |       |       |-- ItinerarySummaryPanel.tsx
 |       |       `-- ItineraryLegend.tsx
+|       |-- features/today/
+|       |   |-- TodayPage.tsx         Today screen composition
+|       |   |-- TodayPage.css         Operational and responsive styling
+|       |   `-- components/
+|       |       |-- TodayAshorePanel.tsx
+|       |       |-- AllAboardCard.tsx
+|       |       |-- WeatherTile.tsx
+|       |       |-- TakeAshoreChecklist.tsx
+|       |       |-- TodayPlanSummary.tsx
+|       |       |-- SebDiscoveryPreview.tsx
+|       |       `-- ConfidenceNotes.tsx
 |       |-- routes/routeConfig.ts     Typed placeholder route config
 |       |-- styles/
 |       |   |-- tokens.css            Ocean Luxe design tokens
@@ -71,7 +83,7 @@ complete-cruising/
 |       |   |-- app-shell.css         Shell and landing layout
 |       |   |-- components.css        Shared component treatments
 |       |   `-- responsive.css        Responsive shell behaviour
-|       |-- tests/App.test.tsx        Dashboard, Itinerary and routing tests
+|       |-- tests/App.test.tsx        Dashboard, Itinerary, Today and routing tests
 |       `-- tests/setup.ts            Testing Library setup and cleanup
 |-- docs/
 |   |-- README.md                     This living inventory and knowledge index
@@ -129,15 +141,17 @@ complete-cruising/
 | [../app/index.html](../app/index.html) | App entry point | Provides the static Vite document shell using British English document metadata. |
 | [../app/vite.config.ts](../app/vite.config.ts) and [vitest.config.ts](../app/vitest.config.ts) | Tooling configuration | Configure React builds, the documented GitHub Pages base path and jsdom component tests. |
 | [../app/tsconfig.json](../app/tsconfig.json), [tsconfig.app.json](../app/tsconfig.app.json) and [tsconfig.node.json](../app/tsconfig.node.json) | TypeScript configuration | Separate browser-source and tooling checks through TypeScript project references. |
-| [../app/src/App.tsx](../app/src/App.tsx), [main.tsx](../app/src/main.tsx) and [vite-env.d.ts](../app/src/vite-env.d.ts) | App source | Compose and mount the Ocean Luxe shell with lightweight hash switching between Dashboard and Itinerary. |
+| [../app/src/App.tsx](../app/src/App.tsx), [main.tsx](../app/src/main.tsx) and [vite-env.d.ts](../app/src/vite-env.d.ts) | App source | Compose and mount the Ocean Luxe shell with lightweight hash switching between Dashboard, Itinerary and Today. |
 | [../app/src/components/layout/AppShell.tsx](../app/src/components/layout/AppShell.tsx), [navigation](../app/src/components/navigation/TopNavigation.tsx), [status](../app/src/components/status/StatusChip.tsx), [surfaces](../app/src/components/surfaces/CardSurface.tsx) and [visual](../app/src/components/visual/BrandMark.tsx) components | Shell components | Provide maintainable layout, responsive navigation, status, confidence, surface, brand and route-motif primitives. |
-| [../app/src/routes/routeConfig.ts](../app/src/routes/routeConfig.ts) and [data/sampleData.ts](../app/src/data/sampleData.ts) | App placeholders | Mark Dashboard and Itinerary as implemented while retaining non-functional future-route and shell metadata placeholders. |
+| [../app/src/routes/routeConfig.ts](../app/src/routes/routeConfig.ts) and [data/sampleData.ts](../app/src/data/sampleData.ts) | App placeholders | Mark Dashboard, Itinerary and Today as implemented while retaining non-functional future-route and shell metadata placeholders. |
 | [../app/src/data/sampleDashboardData.ts](../app/src/data/sampleDashboardData.ts) | Dashboard sample data | Supplies the non-sensitive illustrative sailing, 15-day representative route, metrics, status, confidence, review and refresh metadata used by Dashboard v0.1. |
 | [../app/src/features/dashboard/DashboardPage.tsx](../app/src/features/dashboard/DashboardPage.tsx), [DashboardPage.css](../app/src/features/dashboard/DashboardPage.css) and [dashboard components](../app/src/features/dashboard/components/SailingHero.tsx) | Dashboard feature | Implement the cinematic sailing hero, route ribbon, metrics and six voyage-readiness cards as maintainable React components. |
 | [../app/src/data/sampleItineraryData.ts](../app/src/data/sampleItineraryData.ts) | Itinerary sample data | Supplies 15 illustrative days across embarkation, nine port calls, four sea days and disembarkation with confidence, review and refresh metadata. |
 | [../app/src/features/itinerary/ItineraryPage.tsx](../app/src/features/itinerary/ItineraryPage.tsx), [ItineraryPage.css](../app/src/features/itinerary/ItineraryPage.css) and [itinerary components](../app/src/features/itinerary/components/ItineraryTimeline.tsx) | Itinerary feature | Implement the route summary, legend, horizontal desktop timeline, vertical mobile timeline and visually differentiated day cards. |
+| [../app/src/data/sampleTodayData.ts](../app/src/data/sampleTodayData.ts) | Today sample data | Supplies the illustrative Naples operational day, weather, plans, checklist, local context and protected confidence/refresh notes. |
+| [../app/src/features/today/TodayPage.tsx](../app/src/features/today/TodayPage.tsx), [TodayPage.css](../app/src/features/today/TodayPage.css) and [Today components](../app/src/features/today/components/TodayAshorePanel.tsx) | Today feature | Implement the five-second operational summary, prominent all-aboard time, return buffer, sample weather, plan, temporary checklist, Seb discovery and confidence notes. |
 | [../app/src/styles/tokens.css](../app/src/styles/tokens.css), [base.css](../app/src/styles/base.css), [app-shell.css](../app/src/styles/app-shell.css), [components.css](../app/src/styles/components.css) and [responsive.css](../app/src/styles/responsive.css) | App styles | Translate Ocean Luxe into shared tokens, atmospheric backgrounds, reusable surfaces, accessible focus states and responsive layouts. |
-| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify Dashboard, hash-based Itinerary navigation, all 15 itinerary days, operational timings, metadata and future-route placeholders. |
+| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify all three implemented views, Today operational hierarchy, temporary checklist behaviour, itinerary data and future-route placeholders. |
 
 ## Knowledge routing
 
@@ -190,11 +204,11 @@ Specialist documents take precedence for decisions in their own domain. Product 
 
 The following are described by the foundation documents but are not present in the repository at the date of this inventory:
 
-- production screen implementations beyond Dashboard and Itinerary v0.1;
-- production routing beyond the two implemented views and typed future placeholders;
+- production screen implementations beyond Dashboard, Itinerary and Today v0.1;
+- production routing beyond the three implemented views and typed future placeholders;
 - detailed sample itinerary and family data beyond the lightweight Tranche 0 sailing, ship and port records;
 - runtime schemas, local database code and import/export logic;
-- broader automated test coverage and visual regression references beyond the Dashboard and Itinerary checks;
+- broader automated test coverage and visual regression references beyond the Dashboard, Itinerary and Today checks;
 - PWA manifest, service worker and GitHub Pages workflow;
 
 ## Maintenance rules

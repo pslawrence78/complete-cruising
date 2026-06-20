@@ -63,11 +63,15 @@ describe("App", () => {
   it("keeps unfinished dashboard actions and later routes clearly marked", () => {
     render(<App />);
 
-    ["View today", "Explore itinerary", "Open ship guide"].forEach((label) => {
-      expect(
-        screen.getByRole("button", { name: new RegExp(label, "i") }),
-      ).toHaveAttribute("aria-disabled", "true");
-    });
+    expect(
+      screen.getByRole("link", { name: /View today/i }),
+    ).toHaveAttribute("href", "#/today");
+    expect(
+      screen.getByRole("link", { name: /Explore itinerary/i }),
+    ).toHaveAttribute("href", "#/itinerary");
+    expect(
+      screen.getByRole("button", { name: /Open ship guide/i }),
+    ).toHaveAttribute("aria-disabled", "true");
 
     const navigation = screen.getByRole("navigation", {
       name: "Primary navigation",
@@ -81,7 +85,7 @@ describe("App", () => {
     ).toHaveAttribute("aria-disabled", "false");
     expect(
       within(navigation).getByRole("button", { name: "Today" }),
-    ).toHaveAttribute("aria-disabled", "true");
+    ).toHaveAttribute("aria-disabled", "false");
   });
 
   it("opens the complete itinerary through lightweight shell navigation", () => {
@@ -148,5 +152,49 @@ describe("App", () => {
         name: "Sun Princess Mediterranean 2026",
       }),
     ).toBeInTheDocument();
+  });
+
+  it("opens the operational Today view through shell navigation", () => {
+    render(<App />);
+
+    const navigation = screen.getByRole("navigation", {
+      name: "Primary navigation",
+    });
+    fireEvent.click(within(navigation).getByRole("button", { name: "Today" }));
+
+    expect(window.location.hash).toBe("#/today");
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Naples, Italy" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 2, name: "17:30" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("16:45")).toBeInTheDocument();
+    expect(screen.getByText("Warm and dry")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Illustrative forecast - refresh closer to travel/),
+    ).toBeInTheDocument();
+  });
+
+  it("provides a temporary mobile-friendly checklist and local context", () => {
+    window.history.replaceState(null, "", "#/today");
+    render(<App />);
+
+    const checklist = screen.getByRole("heading", { name: "Take ashore" })
+      .closest("section");
+    const checkboxes = within(checklist as HTMLElement).getAllByRole("checkbox");
+
+    expect(checkboxes).toHaveLength(9);
+    expect(checkboxes[0]).not.toBeChecked();
+    fireEvent.click(checkboxes[0]);
+    expect(checkboxes[0]).toBeChecked();
+
+    expect(screen.getByText("Italian")).toBeInTheDocument();
+    expect(screen.getByText("Euro (€)")).toBeInTheDocument();
+    expect(screen.getByText("Buongiorno")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Confidence and refresh notes" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Terminal details")).toBeInTheDocument();
   });
 });

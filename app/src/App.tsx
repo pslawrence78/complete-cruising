@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AppShell } from "./components/layout/AppShell";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { ItineraryPage } from "./features/itinerary/ItineraryPage";
+import { TodayPage } from "./features/today/TodayPage";
 import { routeConfig } from "./routes/routeConfig";
 
 function getActiveRouteId() {
@@ -40,13 +41,22 @@ function App() {
     window.location.hash = route.path;
   };
 
+  const activePage =
+    activeRouteId === "itinerary" ? (
+      <ItineraryPage />
+    ) : activeRouteId === "today" ? (
+      <TodayPage />
+    ) : (
+      <DashboardPage />
+    );
+
   return (
     <AppShell
       activeRouteId={activeRouteId}
       onNavigate={handleNavigate}
       routes={routeConfig}
     >
-      {activeRouteId === "itinerary" ? <ItineraryPage /> : <DashboardPage />}
+      {activePage}
     </AppShell>
   );
 }

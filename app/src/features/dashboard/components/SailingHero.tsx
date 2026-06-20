@@ -58,22 +58,31 @@ export function SailingHero({ route, sailing }: SailingHeroProps) {
             </p>
 
             <div className="dashboard-hero__actions" aria-label="Future dashboard actions">
-              {[
-                ["View today", "primary"],
-                ["Explore itinerary", "secondary"],
-                ["Open ship guide", "secondary"],
-              ].map(([label, variant]) => (
-                <button
-                  className="dashboard-action"
-                  data-variant={variant}
-                  type="button"
-                  aria-disabled="true"
-                  key={label}
-                >
-                  <span>{label}</span>
-                  <small>Future view</small>
-                </button>
-              ))}
+              <a
+                className="dashboard-action"
+                data-variant="primary"
+                href="#/today"
+              >
+                <span>View today</span>
+                <small>Open</small>
+              </a>
+              <a
+                className="dashboard-action"
+                data-variant="secondary"
+                href="#/itinerary"
+              >
+                <span>Explore itinerary</span>
+                <small>Open</small>
+              </a>
+              <button
+                className="dashboard-action"
+                data-variant="secondary"
+                type="button"
+                aria-disabled="true"
+              >
+                <span>Open ship guide</span>
+                <small>Future view</small>
+              </button>
             </div>
           </div>
 
