@@ -8,7 +8,7 @@ import { AttractionSchema, PortSchema } from "./portSchemas";
 import { SailingSchema } from "./sailingSchemas";
 import { ShipSchema } from "./shipSchemas";
 
-const ImportHeaderSchema = z.object({ schemaVersion: z.number().int().positive(), importedAt: z.string().datetime({ offset: true }), sampleOnly: z.boolean() }).strict();
+const ImportHeaderSchema = z.object({ schemaVersion: z.number().int().positive(), importedAt: z.string().datetime({ offset: true }), sourceApp: z.string().trim().min(1).optional(), sampleOnly: z.boolean() }).strict();
 export const SailingShellImportSchema = z.object({ kind: z.literal("sailing_shell"), header: ImportHeaderSchema, sailing: SailingSchema }).strict();
 export const ItineraryImportSchema = z.object({ kind: z.literal("itinerary"), header: ImportHeaderSchema, sailingId: IdSchema, days: z.array(ItineraryDaySchema).min(1) }).strict();
 export const ShipEnrichmentImportSchema = z.object({ kind: z.literal("ship_enrichment"), header: ImportHeaderSchema, ship: ShipSchema, sections: z.array(EnrichmentSectionSchema) }).strict();

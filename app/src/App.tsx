@@ -8,6 +8,7 @@ import { PlansPage } from "./features/plans/PlansPage";
 import { PortGuidePage } from "./features/ports/PortGuidePage";
 import { ShipPage } from "./features/ship/ShipPage";
 import { TodayPage } from "./features/today/TodayPage";
+import { ImportExportPage } from "./features/import-export/ImportExportPage";
 import { routeConfig } from "./routes/routeConfig";
 import { LocalDataState } from "./components/states/LocalDataState";
 import { useDatabaseBootstrap } from "./hooks/useLocalData";
@@ -50,7 +51,9 @@ function App() {
   };
 
   const activePage =
-    activeRouteId === "plans" ? (
+    activeRouteId === "import-export" ? (
+      <ImportExportPage />
+    ) : activeRouteId === "plans" ? (
       <PlansPage />
     ) : activeRouteId === "family" ? (
       <FamilyGuidePage />

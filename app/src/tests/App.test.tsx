@@ -109,4 +109,22 @@ describe("data-driven application screens", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Naples, Italy" })).toBeInTheDocument();
     expect(window.location.hash).toBe("#/today");
   });
+
+  it("renders the preview-only Import / Export workbench", async () => {
+    await renderRoute("#/import-export");
+    expect(await screen.findByRole("heading", { level: 1, name: "Import Preview" })).toBeInTheDocument();
+    expect(screen.getByRole("radiogroup", { name: "Import type" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Complete Cruising JSON")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Validate preview/ })).toBeDisabled();
+    expect(screen.getByText("Nothing is committed")).toBeInTheDocument();
+  });
+
+  it("shows helpful import errors without exposing a commit action", async () => {
+    await renderRoute("#/import-export");
+    fireEvent.change(screen.getByLabelText("Complete Cruising JSON"), { target: { value: '{ "kind":' } });
+    fireEvent.click(screen.getByRole("button", { name: /Validate preview/ }));
+    expect(await screen.findByRole("heading", { name: "Correct these before previewing" })).toBeInTheDocument();
+    expect(screen.getByText("JSON could not be read")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Commit import/ })).toBeDisabled();
+  });
 });
