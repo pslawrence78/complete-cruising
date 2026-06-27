@@ -44,6 +44,15 @@
   .section-heading > p {
     max-width: 42rem;
   }
+
+  .pwa-readiness {
+    grid-template-columns: 1fr;
+  }
+
+  .pwa-readiness__item,
+  .pwa-readiness__update {
+    border-radius: var(--radius-lg);
+  }
 }
 
 @media (max-width: 50rem) {

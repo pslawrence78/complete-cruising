@@ -16,7 +16,7 @@ This delivery tracker summarises the intended tranche sequence. The authoritativ
 11. Data-Driven Screens — complete
 12. Import Preview v0.1 — complete
 13. Import Commit and Export v0.1 — complete
-14. PWA and Offline Readiness
+14. PWA and Offline Readiness â€” complete
 15. GitHub Pages Deployment
 
 This sequence may be refined as the product matures. Any change should preserve small, independently reviewable tranches and be reflected in the project knowledge index.

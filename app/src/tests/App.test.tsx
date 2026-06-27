@@ -111,6 +111,17 @@ describe("data-driven application screens", () => {
     expect(window.location.hash).toBe("#/today");
   });
 
+  it("shows app-shell offline readiness and local update status", async () => {
+    await renderRoute();
+    const readiness = await screen.findByRole("region", { name: "Offline readiness" });
+    expect(within(readiness).getByText("Connection")).toBeInTheDocument();
+    expect(within(readiness).getByText("Online")).toBeInTheDocument();
+    expect(within(readiness).getByText("Offline shell")).toBeInTheDocument();
+    expect(within(readiness).getByText("Browser storage only")).toBeInTheDocument();
+    expect(within(readiness).getByText("Last local update")).toBeInTheDocument();
+    expect(await within(readiness).findByText("20 Jun 2026")).toBeInTheDocument();
+  });
+
   it("renders the safe Import / Export workbench", async () => {
     await renderRoute("#/import-export");
     expect(await screen.findByRole("heading", { level: 1, name: "Import Control" })).toBeInTheDocument();

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { RouteDefinition } from "../../routes/routeConfig";
 import { MobileNavigation } from "../navigation/MobileNavigation";
 import { TopNavigation } from "../navigation/TopNavigation";
+import { PwaReadinessStatus } from "../status/PwaReadinessStatus";
 
 interface AppShellProps {
   activeRouteId: string;
@@ -28,6 +29,8 @@ export function AppShell({
           onNavigate={onNavigate}
           routes={routes}
         />
+
+        <PwaReadinessStatus />
 
         <main id="main-content" className="app-shell__main" tabIndex={-1}>
           {children}

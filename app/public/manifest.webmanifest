@@ -1,0 +1,27 @@
+{
+  "name": "Complete Cruising",
+  "short_name": "Complete Cruising",
+  "description": "A local-first Lawrence Family Series cruise companion for sailing guides, itinerary notes and family memories.",
+  "start_url": "/complete-cruising/",
+  "scope": "/complete-cruising/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#03111d",
+  "theme_color": "#082b43",
+  "categories": ["travel", "lifestyle", "productivity"],
+  "lang": "en-GB",
+  "icons": [
+    {
+      "src": "icons/complete-cruising-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/complete-cruising-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

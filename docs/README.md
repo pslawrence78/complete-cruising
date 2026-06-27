@@ -8,7 +8,7 @@ Last inventoried: 27 June 2026.
 
 Complete Cruising is a documentation-first project for a premium, local-first Lawrence Family Series PWA. The intended experience is a rich cruise guidebook and companion, not a plain administration or CRUD interface.
 
-The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Ocean Luxe application through Tranche 13. Core records have TypeScript types, strict Zod schemas, canonical illustrative fixtures and versioned import/export validation. A version 1 Dexie database provides validated sample seeding, reset utilities and repository access; eight core screens subscribe to local repository queries, while a ninth route provides JSON parsing, validation, conflict preview, protected-field confirmation, transactional local import commits, ImportBatch auditing and browser-native JSON exports. Live APIs, PWA support and deployment workflow remain absent.
+The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Ocean Luxe application through Tranche 14. Core records have TypeScript types, strict Zod schemas, canonical illustrative fixtures and versioned import/export validation. A version 1 Dexie database provides validated sample seeding, reset utilities and repository access; eight core screens subscribe to local repository queries, while a ninth route provides JSON parsing, validation, conflict preview, protected-field confirmation, transactional local import commits, ImportBatch auditing and browser-native JSON exports. Production PWA install metadata, app icon placeholders, service-worker registration, static app-shell caching and an offline readiness indicator are present. Live APIs and deployment workflow remain absent.
 
 ```text
 complete-cruising/
@@ -27,6 +27,11 @@ complete-cruising/
 |   |-- tsconfig.json                 TypeScript project references
 |   |-- tsconfig.app.json             Browser-source TypeScript config
 |   |-- tsconfig.node.json            Tooling TypeScript config
+|   |-- public/
+|   |   |-- manifest.webmanifest       PWA install metadata
+|   |   |-- sw.js                      Static app-shell service worker
+|   |   |-- offline.html               Offline fallback document
+|   |   `-- icons/                    Ocean Luxe PWA icon placeholders
 |   `-- src/
 |       |-- App.tsx                   Lightweight eight-view hash routing
 |       |-- main.tsx                  React entry point
@@ -37,6 +42,7 @@ complete-cruising/
 |       |   |-- navigation/MobileNavigation.tsx
 |       |   |-- status/StatusChip.tsx
 |       |   |-- status/ConfidenceChip.tsx
+|       |   |-- status/PwaReadinessStatus.tsx
 |       |   |-- states/LocalDataState.tsx
 |       |   |-- surfaces/CardSurface.tsx
 |       |   |-- visual/BrandMark.tsx
@@ -55,6 +61,9 @@ complete-cruising/
 |       |-- data/viewModelMappers.ts    Local records to visual screen models
 |       |-- db/                         Versioned Dexie database, seed/reset utilities and repositories
 |       |-- hooks/useLocalData.ts       Live repository-backed feature hooks
+|       |-- hooks/usePwaReadiness.ts    Offline readiness state hook
+|       |-- pwa/registerServiceWorker.ts
+|       |                                  Production service-worker registration
 |       |-- types/                      Inferred domain and import/export types
 |       |-- schemas/                    Strict Zod entity and envelope schemas
 |       |-- features/dashboard/
@@ -134,6 +143,8 @@ complete-cruising/
 |   |-- 12-import-preview-v0.1.md      Tranche 12 implementation record
 |   |-- 13-import-commit-and-export-v0.1.md
 |   |                                  Tranche 13 implementation record
+|   |-- 14-pwa-and-offline-readiness-v0.1.md
+|   |                                  Tranche 14 implementation record
 |   |-- build-plan/
 |   |   `-- tranche-plan-v0.1.md
 |   `-- decisions/
@@ -169,6 +180,7 @@ complete-cruising/
 | [07-build-plan-v0.1.md](07-build-plan-v0.1.md) | Delivery foundation | Converts the foundations into ordered implementation tranches with deliverables, acceptance criteria, validation expectations and suggested commit messages. |
 | [12-import-preview-v0.1.md](12-import-preview-v0.1.md) | Tranche record | Documents supported JSON import previews, validation, protected-field handling, safety boundaries, testing and limitations. |
 | [13-import-commit-and-export-v0.1.md](13-import-commit-and-export-v0.1.md) | Tranche record | Documents safe validated import commits, ImportBatch auditing, protected-field confirmation, full backup export, sailing export and Adventure Almanac draft export. |
+| [14-pwa-and-offline-readiness-v0.1.md](14-pwa-and-offline-readiness-v0.1.md) | Tranche record | Documents install metadata, app icon placeholders, conservative app-shell service-worker caching, offline fallback, readiness UI, validation and limitations. |
 | [build-plan/tranche-plan-v0.1.md](build-plan/tranche-plan-v0.1.md) | Delivery tracker | Concise 16-tranche sequence for implementation; subordinate to the detailed Build Plan v0.1 and intended to evolve transparently. |
 | [decisions/0001-project-start.md](decisions/0001-project-start.md) | Decision record | Records the accepted local-first static PWA, prototype-reference, tranche-delivery, no-live-API MVP and sample-data privacy decisions. |
 | [../prototypes/v0.1/complete-cruising-prototype-v0.1.html](../prototypes/v0.1/complete-cruising-prototype-v0.1.html) | Authoritative visual reference | Standalone Ocean Luxe concept prototype. Use it to preserve the proven visual direction during production implementation; it is reference material, not production code. |
@@ -180,11 +192,12 @@ complete-cruising/
 | [../enrichment/reviewed/README.md](../enrichment/reviewed/README.md) | Enrichment workspace guidance | Reserves the reviewed-output area without allowing reviewed content to overwrite trusted data silently. |
 | [../app/README.md](../app/README.md) | App guidance | Records scaffold commands, current scope and the `/complete-cruising/` GitHub Pages base-path decision. |
 | [../app/package.json](../app/package.json) and [package-lock.json](../app/package-lock.json) | App configuration | Define sandbox-compatible development and validation scripts plus locked React, TypeScript, Vite, Vitest and Testing Library dependencies. |
-| [../app/index.html](../app/index.html) | App entry point | Provides the static Vite document shell using British English document metadata. |
+| [../app/index.html](../app/index.html) | App entry point | Provides the static Vite document shell using British English document metadata, manifest link, theme colour and app icons. |
+| [../app/public/manifest.webmanifest](../app/public/manifest.webmanifest), [sw.js](../app/public/sw.js), [offline.html](../app/public/offline.html) and [icons](../app/public/icons/complete-cruising-icon.svg) | PWA assets | Define install metadata, Ocean Luxe icon placeholders, production static app-shell caching and the offline fallback document without live API dependencies. |
 | [../app/vite.config.ts](../app/vite.config.ts) and [vitest.config.ts](../app/vitest.config.ts) | Tooling configuration | Configure React builds, the documented GitHub Pages base path and jsdom component tests. |
 | [../app/tsconfig.json](../app/tsconfig.json), [tsconfig.app.json](../app/tsconfig.app.json) and [tsconfig.node.json](../app/tsconfig.node.json) | TypeScript configuration | Separate browser-source and tooling checks through TypeScript project references. |
-| [../app/src/App.tsx](../app/src/App.tsx), [main.tsx](../app/src/main.tsx) and [vite-env.d.ts](../app/src/vite-env.d.ts) | App source | Compose and mount the Ocean Luxe shell with lightweight hash switching across nine implemented routes. |
-| [../app/src/components/layout/AppShell.tsx](../app/src/components/layout/AppShell.tsx), [navigation](../app/src/components/navigation/TopNavigation.tsx), [status](../app/src/components/status/StatusChip.tsx), [surfaces](../app/src/components/surfaces/CardSurface.tsx) and [visual](../app/src/components/visual/BrandMark.tsx) components | Shell components | Provide maintainable layout, responsive navigation, status, confidence, surface, brand and route-motif primitives. |
+| [../app/src/App.tsx](../app/src/App.tsx), [main.tsx](../app/src/main.tsx), [pwa/registerServiceWorker.ts](../app/src/pwa/registerServiceWorker.ts) and [vite-env.d.ts](../app/src/vite-env.d.ts) | App source | Compose and mount the Ocean Luxe shell with lightweight hash switching across nine implemented routes and production service-worker registration. |
+| [../app/src/components/layout/AppShell.tsx](../app/src/components/layout/AppShell.tsx), [navigation](../app/src/components/navigation/TopNavigation.tsx), [status](../app/src/components/status/PwaReadinessStatus.tsx), [surfaces](../app/src/components/surfaces/CardSurface.tsx) and [visual](../app/src/components/visual/BrandMark.tsx) components | Shell components | Provide maintainable layout, responsive navigation, status, confidence, offline readiness, surface, brand and route-motif primitives. |
 | [../app/src/routes/routeConfig.ts](../app/src/routes/routeConfig.ts) and [data/sampleData.ts](../app/src/data/sampleData.ts) | App placeholders | Mark Dashboard, Itinerary, Today, Ship and Ports as implemented while retaining non-functional future-route and shell metadata placeholders. |
 | [../app/src/data/sampleDashboardData.ts](../app/src/data/sampleDashboardData.ts), [sampleItineraryData.ts](../app/src/data/sampleItineraryData.ts), [sampleTodayData.ts](../app/src/data/sampleTodayData.ts), [sampleShipData.ts](../app/src/data/sampleShipData.ts), [samplePortData.ts](../app/src/data/samplePortData.ts) and [sampleExperienceData.ts](../app/src/data/sampleExperienceData.ts) | Legacy presentation fixtures | Retain visual view-model types and historical illustrative reference data; runtime screens no longer import their sample values. |
 | [../app/src/features/dashboard/DashboardPage.tsx](../app/src/features/dashboard/DashboardPage.tsx), [DashboardPage.css](../app/src/features/dashboard/DashboardPage.css) and [dashboard components](../app/src/features/dashboard/components/SailingHero.tsx) | Dashboard feature | Implement the cinematic sailing hero, route ribbon, metrics and six voyage-readiness cards as maintainable React components. |
@@ -197,7 +210,7 @@ complete-cruising/
 | [../app/src/data/samplePortData.ts](../app/src/data/samplePortData.ts) | Port guide sample data | Supplies a reusable, explicitly illustrative Naples guidebook record with separate attraction ideas and visible confidence, review and refresh metadata. |
 | [../app/src/data/sampleExperienceData.ts](../app/src/data/sampleExperienceData.ts) | Tranche 8 sample data | Keeps sailing-specific Naples shore plans and memory prompts separate from reusable port context, while supplying non-sensitive Family Guide presentation data and visible trust metadata. |
 | [../app/src/data/sampleSchemaData.ts](../app/src/data/sampleSchemaData.ts) | Tranche 9 canonical samples | Provides non-sensitive schema-aligned sailing, itinerary, ship, port, attraction, shore plan, Today, weather, enrichment, memory and Almanac fixtures derived from the existing illustrative presentation content. |
-| [../app/src/db](../app/src/db/index.ts), [hooks/useLocalData.ts](../app/src/hooks/useLocalData.ts) and [data/viewModelMappers.ts](../app/src/data/viewModelMappers.ts) | Tranche 10–11 local data flow | Defines the version 1 Dexie database, safe illustrative seeding, screen repository bundles, live feature hooks and explicit mapping into Ocean Luxe visual models. |
+| [../app/src/db](../app/src/db/index.ts), [hooks/useLocalData.ts](../app/src/hooks/useLocalData.ts), [hooks/usePwaReadiness.ts](../app/src/hooks/usePwaReadiness.ts) and [data/viewModelMappers.ts](../app/src/data/viewModelMappers.ts) | Tranche 10-14 local data flow | Defines the version 1 Dexie database, safe illustrative seeding, screen repository bundles, live feature hooks, offline readiness metadata and explicit mapping into Ocean Luxe visual models. |
 | [../app/src/tests/database.test.ts](../app/src/tests/database.test.ts) | Tranche 10 database tests | Verifies schema creation, seed idempotency, clear/reseed behaviour, repositories, record separation and trust metadata using a test-only IndexedDB polyfill. |
 | [../app/src/types](../app/src/types/index.ts) | Tranche 9 data types | Exposes shared, cruise, guidebook, plan, memory and import/export TypeScript types inferred from the canonical Zod schemas to prevent type drift. |
 | [../app/src/schemas](../app/src/schemas/index.ts) | Tranche 9 and 13 validation | Defines strict shared metadata and core entity schemas plus versioned import/export envelopes and ImportBatch audit metadata. |
@@ -205,7 +218,7 @@ complete-cruising/
 | [../app/src/features/ports/PortGuidePage.tsx](../app/src/features/ports/PortGuidePage.tsx), [PortGuidePage.css](../app/src/features/ports/PortGuidePage.css) and [Port Guide components](../app/src/features/ports/components/PortPostcard.tsx) | Port guide feature | Implement the warm postcard hero, practical guide sections, separate attraction cards, restrained family lens, photography prompt and uncertainty notes without mixing port knowledge into itinerary-day timings. |
 | [../app/src/features/plans/PlansPage.tsx](../app/src/features/plans/PlansPage.tsx), [family/FamilyGuidePage.tsx](../app/src/features/family/FamilyGuidePage.tsx), [memories/MemoriesPage.tsx](../app/src/features/memories/MemoriesPage.tsx) and [experience-pages.css](../app/src/features/experience-pages.css) | Tranche 8 experience features | Implement three premium Naples experience routes, selected plan comparison, Seb discovery, reflective memory prompts and a non-functional Adventure Almanac export preview. |
 | [../app/src/styles/tokens.css](../app/src/styles/tokens.css), [base.css](../app/src/styles/base.css), [app-shell.css](../app/src/styles/app-shell.css), [components.css](../app/src/styles/components.css) and [responsive.css](../app/src/styles/responsive.css) | App styles | Translate Ocean Luxe into shared tokens, atmospheric backgrounds, reusable surfaces, accessible focus states and responsive layouts. |
-| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx), [importPreviewService.test.ts](../app/src/tests/importPreviewService.test.ts), [importCommitService.test.ts](../app/src/tests/importCommitService.test.ts), [exportService.test.ts](../app/src/tests/exportService.test.ts), [database.test.ts](../app/src/tests/database.test.ts), [schemas.test.ts](../app/src/tests/schemas.test.ts) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify nine routes, local data flows, repository separation, schema validity, preview safety, transactional import commits, ImportBatch auditing and local JSON export payloads. |
+| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx), [pwaAssets.test.ts](../app/src/tests/pwaAssets.test.ts), [importPreviewService.test.ts](../app/src/tests/importPreviewService.test.ts), [importCommitService.test.ts](../app/src/tests/importCommitService.test.ts), [exportService.test.ts](../app/src/tests/exportService.test.ts), [database.test.ts](../app/src/tests/database.test.ts), [schemas.test.ts](../app/src/tests/schemas.test.ts) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify nine routes, local data flows, repository separation, schema validity, preview safety, transactional import commits, ImportBatch auditing, local JSON export payloads and PWA app-shell assets. |
 
 ## Knowledge routing
 
@@ -260,7 +273,7 @@ The following are described by the foundation documents but are not present in t
 
 - production routing beyond the nine implemented views;
 - automated visual regression references;
-- PWA manifest, service worker and GitHub Pages workflow;
+- GitHub Pages deployment workflow;
 
 ## Maintenance rules
 
