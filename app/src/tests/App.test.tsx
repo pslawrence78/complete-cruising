@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import App from "../App";
 import { db } from "../db/completeCruisingDb";
 import { ACTIVE_SAILING_SETTING, seedSampleData } from "../db/seedDatabase";
+import { getSampleImport } from "../features/import-export/sampleImports";
 
 async function renderRoute(hash = "#/") {
   window.history.replaceState(null, "", hash);
@@ -110,21 +111,33 @@ describe("data-driven application screens", () => {
     expect(window.location.hash).toBe("#/today");
   });
 
-  it("renders the preview-only Import / Export workbench", async () => {
+  it("renders the safe Import / Export workbench", async () => {
     await renderRoute("#/import-export");
-    expect(await screen.findByRole("heading", { level: 1, name: "Import Preview" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Import Control" })).toBeInTheDocument();
     expect(screen.getByRole("radiogroup", { name: "Import type" })).toBeInTheDocument();
     expect(screen.getByLabelText("Complete Cruising JSON")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Validate preview/ })).toBeDisabled();
-    expect(screen.getByText("Nothing is committed")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Export full backup" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Export sailing" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Export Adventure Almanac draft" })).toBeInTheDocument();
   });
 
-  it("shows helpful import errors without exposing a commit action", async () => {
+  it("shows helpful import errors while keeping commit gated", async () => {
     await renderRoute("#/import-export");
     fireEvent.change(screen.getByLabelText("Complete Cruising JSON"), { target: { value: '{ "kind":' } });
     fireEvent.click(screen.getByRole("button", { name: /Validate preview/ }));
     expect(await screen.findByRole("heading", { name: "Correct these before previewing" })).toBeInTheDocument();
     expect(screen.getByText("JSON could not be read")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Commit import/ })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Commit unavailable until preview is valid/ })).toBeDisabled();
+  });
+
+  it("requires protected confirmation before committing protected import data", async () => {
+    await renderRoute("#/import-export");
+    fireEvent.click(screen.getByRole("radio", { name: /Itinerary/ }));
+    fireEvent.change(screen.getByLabelText("Complete Cruising JSON"), { target: { value: getSampleImport("itinerary") } });
+    fireEvent.click(screen.getByRole("button", { name: /Validate preview/ }));
+
+    expect(await screen.findByText("I understand this import will overwrite protected cruise data.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Protected confirmation required" })).toBeDisabled();
   });
 });

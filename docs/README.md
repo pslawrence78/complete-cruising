@@ -2,13 +2,13 @@
 
 This is the entry point for project knowledge in the Complete Cruising repository. It inventories the current project files, explains which document to consult for each kind of decision, and records gaps between the documented target and the repository as it exists.
 
-Last inventoried: 21 June 2026.
+Last inventoried: 27 June 2026.
 
 ## Repository at a glance
 
 Complete Cruising is a documentation-first project for a premium, local-first Lawrence Family Series PWA. The intended experience is a rich cruise guidebook and companion, not a plain administration or CRUD interface.
 
-The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Ocean Luxe application through Tranche 12. Core records have TypeScript types, strict Zod schemas, canonical illustrative fixtures and versioned import/export validation. A version 1 Dexie database provides validated sample seeding, reset utilities and repository access; eight core screens subscribe to local repository queries, while a ninth route provides read-only JSON parsing, validation, conflict preview and protected-field warnings. Import commit, export download, live APIs, PWA support and deployment workflow remain absent.
+The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Ocean Luxe application through Tranche 13. Core records have TypeScript types, strict Zod schemas, canonical illustrative fixtures and versioned import/export validation. A version 1 Dexie database provides validated sample seeding, reset utilities and repository access; eight core screens subscribe to local repository queries, while a ninth route provides JSON parsing, validation, conflict preview, protected-field confirmation, transactional local import commits, ImportBatch auditing and browser-native JSON exports. Live APIs, PWA support and deployment workflow remain absent.
 
 ```text
 complete-cruising/
@@ -109,7 +109,7 @@ complete-cruising/
 |       |-- features/plans/            Naples shore-plan comparison
 |       |-- features/family/           Premium family discovery guide
 |       |-- features/memories/         Reflective prompts and Almanac preview
-|       |-- features/import-export/    Preview-only JSON validation and conflict workbench
+|       |-- features/import-export/    JSON validation, safe import commit and local export workbench
 |       |-- features/experience-pages.css
 |       |                                  Shared Tranche 8 responsive styling
 |       |-- routes/routeConfig.ts     Nine implemented hash routes
@@ -119,7 +119,7 @@ complete-cruising/
 |       |   |-- app-shell.css         Shell and landing layout
 |       |   |-- components.css        Shared component treatments
 |       |   `-- responsive.css        Responsive shell behaviour
-|       |-- tests/App.test.tsx        View, trust metadata and routing tests
+|       |-- tests/App.test.tsx        View, trust metadata, import/export and routing tests
 |       |-- tests/schemas.test.ts     Valid and invalid schema coverage
 |       `-- tests/setup.ts            Testing Library setup and cleanup
 |-- docs/
@@ -132,6 +132,8 @@ complete-cruising/
 |   |-- 06-technical-architecture-v0.1.md
 |   |-- 07-build-plan-v0.1.md
 |   |-- 12-import-preview-v0.1.md      Tranche 12 implementation record
+|   |-- 13-import-commit-and-export-v0.1.md
+|   |                                  Tranche 13 implementation record
 |   |-- build-plan/
 |   |   `-- tranche-plan-v0.1.md
 |   `-- decisions/
@@ -166,6 +168,7 @@ complete-cruising/
 | [06-technical-architecture-v0.1.md](06-technical-architecture-v0.1.md) | Technical foundation | Defines the target PWA architecture, stack, source structure, local data, imports and exports, offline behaviour, security, testing, deployment and architectural decisions. |
 | [07-build-plan-v0.1.md](07-build-plan-v0.1.md) | Delivery foundation | Converts the foundations into ordered implementation tranches with deliverables, acceptance criteria, validation expectations and suggested commit messages. |
 | [12-import-preview-v0.1.md](12-import-preview-v0.1.md) | Tranche record | Documents supported JSON import previews, validation, protected-field handling, safety boundaries, testing and limitations. |
+| [13-import-commit-and-export-v0.1.md](13-import-commit-and-export-v0.1.md) | Tranche record | Documents safe validated import commits, ImportBatch auditing, protected-field confirmation, full backup export, sailing export and Adventure Almanac draft export. |
 | [build-plan/tranche-plan-v0.1.md](build-plan/tranche-plan-v0.1.md) | Delivery tracker | Concise 16-tranche sequence for implementation; subordinate to the detailed Build Plan v0.1 and intended to evolve transparently. |
 | [decisions/0001-project-start.md](decisions/0001-project-start.md) | Decision record | Records the accepted local-first static PWA, prototype-reference, tranche-delivery, no-live-API MVP and sample-data privacy decisions. |
 | [../prototypes/v0.1/complete-cruising-prototype-v0.1.html](../prototypes/v0.1/complete-cruising-prototype-v0.1.html) | Authoritative visual reference | Standalone Ocean Luxe concept prototype. Use it to preserve the proven visual direction during production implementation; it is reference material, not production code. |
@@ -197,12 +200,12 @@ complete-cruising/
 | [../app/src/db](../app/src/db/index.ts), [hooks/useLocalData.ts](../app/src/hooks/useLocalData.ts) and [data/viewModelMappers.ts](../app/src/data/viewModelMappers.ts) | Tranche 10–11 local data flow | Defines the version 1 Dexie database, safe illustrative seeding, screen repository bundles, live feature hooks and explicit mapping into Ocean Luxe visual models. |
 | [../app/src/tests/database.test.ts](../app/src/tests/database.test.ts) | Tranche 10 database tests | Verifies schema creation, seed idempotency, clear/reseed behaviour, repositories, record separation and trust metadata using a test-only IndexedDB polyfill. |
 | [../app/src/types](../app/src/types/index.ts) | Tranche 9 data types | Exposes shared, cruise, guidebook, plan, memory and import/export TypeScript types inferred from the canonical Zod schemas to prevent type drift. |
-| [../app/src/schemas](../app/src/schemas/index.ts) | Tranche 9 validation | Defines strict shared metadata and core entity schemas plus versioned, shape-only import and export envelopes; no import commit or export workflow is implemented. |
-| [../app/src/features/import-export](../app/src/features/import-export/ImportExportPage.tsx) | Tranche 12 import preview | Implements the Ocean Luxe import workbench, five schema-aware preview paths, read-only IndexedDB comparison, trust warnings and protected-field conflict visibility without persistence. |
+| [../app/src/schemas](../app/src/schemas/index.ts) | Tranche 9 and 13 validation | Defines strict shared metadata and core entity schemas plus versioned import/export envelopes and ImportBatch audit metadata. |
+| [../app/src/features/import-export](../app/src/features/import-export/ImportExportPage.tsx) | Tranche 12–13 import/export workflow | Implements the Ocean Luxe import workbench, five schema-aware preview paths, ID-based IndexedDB comparison, trust warnings, protected-field confirmation, transactional local commits and full backup, sailing and Adventure Almanac draft JSON exports. |
 | [../app/src/features/ports/PortGuidePage.tsx](../app/src/features/ports/PortGuidePage.tsx), [PortGuidePage.css](../app/src/features/ports/PortGuidePage.css) and [Port Guide components](../app/src/features/ports/components/PortPostcard.tsx) | Port guide feature | Implement the warm postcard hero, practical guide sections, separate attraction cards, restrained family lens, photography prompt and uncertainty notes without mixing port knowledge into itinerary-day timings. |
 | [../app/src/features/plans/PlansPage.tsx](../app/src/features/plans/PlansPage.tsx), [family/FamilyGuidePage.tsx](../app/src/features/family/FamilyGuidePage.tsx), [memories/MemoriesPage.tsx](../app/src/features/memories/MemoriesPage.tsx) and [experience-pages.css](../app/src/features/experience-pages.css) | Tranche 8 experience features | Implement three premium Naples experience routes, selected plan comparison, Seb discovery, reflective memory prompts and a non-functional Adventure Almanac export preview. |
 | [../app/src/styles/tokens.css](../app/src/styles/tokens.css), [base.css](../app/src/styles/base.css), [app-shell.css](../app/src/styles/app-shell.css), [components.css](../app/src/styles/components.css) and [responsive.css](../app/src/styles/responsive.css) | App styles | Translate Ocean Luxe into shared tokens, atmospheric backgrounds, reusable surfaces, accessible focus states and responsive layouts. |
-| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx), [importPreviewService.test.ts](../app/src/tests/importPreviewService.test.ts), [database.test.ts](../app/src/tests/database.test.ts), [schemas.test.ts](../app/src/tests/schemas.test.ts) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify nine routes, local data flows, repository separation, schema validity and preview-only import safety without IndexedDB writes. |
+| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx), [importPreviewService.test.ts](../app/src/tests/importPreviewService.test.ts), [importCommitService.test.ts](../app/src/tests/importCommitService.test.ts), [exportService.test.ts](../app/src/tests/exportService.test.ts), [database.test.ts](../app/src/tests/database.test.ts), [schemas.test.ts](../app/src/tests/schemas.test.ts) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify nine routes, local data flows, repository separation, schema validity, preview safety, transactional import commits, ImportBatch auditing and local JSON export payloads. |
 
 ## Knowledge routing
 
@@ -256,7 +259,6 @@ Specialist documents take precedence for decisions in their own domain. Product 
 The following are described by the foundation documents but are not present in the repository at the date of this inventory:
 
 - production routing beyond the nine implemented views;
-- import/export commit or download logic;
 - automated visual regression references;
 - PWA manifest, service worker and GitHub Pages workflow;
 
@@ -273,4 +275,4 @@ Update this index whenever a tranche adds, removes, renames or supersedes a proj
 
 ## Inventory validation
 
-This inventory was updated from a recursive repository file listing with Git metadata, dependency folders, build output and coverage output excluded from the knowledge set. Every knowledge-bearing file present on 21 June 2026 is represented above.
+This inventory was updated from a recursive repository file listing with Git metadata, dependency folders, build output and coverage output excluded from the knowledge set. Every knowledge-bearing file present on 27 June 2026 is represented above.

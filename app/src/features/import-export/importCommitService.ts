@@ -1,0 +1,97 @@
+import { ImportBatchSchema } from "../../schemas";
+import { db, type CompleteCruisingDb, type ImportBatch } from "../../db/completeCruisingDb";
+import type { ImportPreviewResult, ImportType } from "./importPreviewTypes";
+import { getImportRecordCandidates, getImportTable, importDefinitions, parseImportPayload } from "./importRecordMapping";
+
+export interface ImportCommitResult {
+  status: "committed" | "blocked" | "failed";
+  message: string;
+  batch?: ImportBatch;
+}
+
+function normaliseImportedRecord(record: any, existing: any, now: string) {
+  const incomingAudit = record.audit ?? {};
+  return {
+    ...record,
+    audit: {
+      createdAt: existing?.audit?.createdAt ?? incomingAudit.createdAt ?? now,
+      createdBy: existing?.audit?.createdBy ?? incomingAudit.createdBy ?? "import",
+      updatedAt: now,
+      updatedBy: "import",
+      archivedAt: existing?.audit?.archivedAt ?? incomingAudit.archivedAt,
+    },
+  };
+}
+
+function batchId(type: ImportType, now: string) {
+  return `import-${type}-${now.replace(/[^0-9]/g, "")}`;
+}
+
+export async function commitValidatedImport(
+  json: string,
+  selectedImportType: ImportType,
+  preview: ImportPreviewResult,
+  protectedFieldsConfirmed: boolean,
+  database: CompleteCruisingDb = db,
+): Promise<ImportCommitResult> {
+  if (preview.status !== "valid" || preview.selectedImportType !== selectedImportType) {
+    return { status: "blocked", message: "Commit unavailable until the current JSON has a valid preview." };
+  }
+  if (preview.protectedFieldImpacts.length > 0 && !protectedFieldsConfirmed) {
+    return { status: "blocked", message: "Protected cruise data needs explicit confirmation before commit." };
+  }
+
+  let payload: any;
+  try {
+    payload = parseImportPayload(json, selectedImportType);
+  } catch {
+    return { status: "blocked", message: "The JSON no longer matches the validated import type. Preview it again before committing." };
+  }
+
+  if (payload.kind !== preview.detectedImportType) {
+    return { status: "blocked", message: "The preview no longer matches the selected import type." };
+  }
+
+  const now = new Date().toISOString();
+  const records = getImportRecordCandidates(selectedImportType, payload);
+  const batch = ImportBatchSchema.parse({
+    id: batchId(selectedImportType, now),
+    schema: importDefinitions[selectedImportType].name,
+    schemaVersion: payload.header.schemaVersion,
+    kind: selectedImportType,
+    importType: selectedImportType,
+    status: "committed",
+    receivedAt: payload.header.importedAt,
+    committedAt: now,
+    sourceApp: payload.header.sourceApp,
+    rawContent: payload,
+    validationWarnings: preview.warnings.map((warning) => warning.message),
+    recordsCreated: preview.recordsToCreate.length,
+    recordsUpdated: preview.recordsToUpdate.length,
+    recordsSkipped: preview.recordsUnchanged.length,
+    warningCount: preview.warnings.length,
+    protectedFieldWarningCount: preview.protectedFieldImpacts.length,
+    protectedFieldsConfirmed,
+    validationSummary: preview.summary,
+    targetSummary: [preview.targetType, preview.targetName ?? preview.targetId].filter(Boolean).join(": "),
+    notes: "Committed from a Tranche 13 validated local preview.",
+    audit: { createdAt: now, updatedAt: now, createdBy: "import", updatedBy: "import" },
+  });
+
+  try {
+    await database.transaction("rw", database.tables, async () => {
+      for (const record of records) {
+        const table = getImportTable(database, record.tableName);
+        const existing = await table.get(record.value.id);
+        await table.put(normaliseImportedRecord(record.value, existing, now));
+      }
+      await database.importBatches.put(batch);
+    });
+    return { status: "committed", message: "Import committed to local storage.", batch };
+  } catch (error) {
+    return {
+      status: "failed",
+      message: error instanceof Error ? error.message : "The import transaction failed before it could be committed.",
+    };
+  }
+}

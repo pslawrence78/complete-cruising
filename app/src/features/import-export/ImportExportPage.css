@@ -11,7 +11,7 @@
 .import-hero aside strong { font-family: var(--font-display); font-size: 1.65rem; }
 .import-hero aside small { color: var(--text-on-ocean-soft); line-height: 1.55; }
 .import-hero__lock { display: grid; width: 3.5rem; height: 3.5rem; place-items: center; border: 1px solid rgba(142,228,225,.35); border-radius: 50%; color: var(--colour-sea-glass-aqua); font-size: 1.4rem; }
-.import-workbench, .import-results { display: grid; gap: 2rem; }
+.import-workbench, .import-results, .export-panel { display: grid; gap: 2rem; }
 .import-section-heading { display: flex; gap: 2rem; align-items: end; justify-content: space-between; }
 .import-section-heading h2, .import-card-heading h2 { margin: 0; font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 550; letter-spacing: -.04em; }
 .import-section-heading > p { max-width: 44ch; margin: 0; color: var(--text-on-ocean-soft); line-height: 1.6; }
@@ -23,7 +23,7 @@
 .import-type strong { margin-top: auto; font-size: .92rem; }
 .import-type small { color: var(--text-on-ocean-muted); line-height: 1.35; }
 .import-input-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(280px, .45fr); gap: 1rem; }
-.import-input-card, .import-status-card, .import-notice-panel, .import-conflict-card { border: 1px solid rgba(142,228,225,.16); border-radius: var(--radius-lg); background: linear-gradient(145deg, rgba(9,52,67,.78), rgba(5,31,44,.88)); box-shadow: 0 20px 60px rgba(0,0,0,.14); }
+.import-input-card, .import-status-card, .import-notice-panel, .import-conflict-card, .import-commit-panel { border: 1px solid rgba(142,228,225,.16); border-radius: var(--radius-lg); background: linear-gradient(145deg, rgba(9,52,67,.78), rgba(5,31,44,.88)); box-shadow: 0 20px 60px rgba(0,0,0,.14); }
 .import-input-card { padding: clamp(1.4rem, 3vw, 2.5rem); }
 .import-card-heading { display: flex; gap: 1rem; align-items: start; justify-content: space-between; margin-bottom: 1.4rem; }
 .import-card-heading h2 { font-size: 2rem; }
@@ -87,6 +87,21 @@
 .import-commit-bar { display: flex; gap: 2rem; align-items: center; justify-content: space-between; padding: 1.3rem 1.5rem; border: 1px solid rgba(216,181,109,.25); border-radius: var(--radius-md); background: rgba(216,181,109,.07); }
 .import-commit-bar p { margin: 0; color: var(--colour-champagne-gold); font-size: .65rem; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
 .import-commit-bar button { min-height: 3rem; padding: .8rem 1rem; border: 1px solid rgba(183,207,212,.16); border-radius: var(--radius-md); color: var(--text-on-ocean-muted); background: rgba(183,207,212,.05); cursor: not-allowed; }
+.import-commit-panel { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem 2rem; align-items: center; padding: clamp(1.4rem, 3vw, 2.2rem); border-color: rgba(216,181,109,.25); }
+.import-commit-panel h3 { margin: .25rem 0 .5rem; font: 1.9rem var(--font-display); }
+.import-commit-panel p { margin: 0; color: var(--text-on-ocean-soft); line-height: 1.55; }
+.import-commit-panel dl { display: grid; gap: .5rem; margin: 0; grid-column: 1 / -1; }
+.import-commit-panel dl div { display: flex; gap: 1rem; justify-content: space-between; padding-top: .55rem; border-top: 1px solid rgba(142,228,225,.12); }
+.import-commit-panel dt { color: var(--text-on-ocean-muted); font-size: .72rem; }
+.import-commit-panel dd { margin: 0; font-size: .78rem; font-weight: 800; text-align: right; }
+.import-protected-confirm { display: flex; grid-column: 1 / -1; gap: .7rem; align-items: center; padding: 1rem; border: 1px solid rgba(240,124,97,.3); border-radius: var(--radius-md); color: #ffe0d6; background: rgba(240,124,97,.08); font-size: .82rem; line-height: 1.4; }
+.import-protected-confirm input { width: 1rem; height: 1rem; accent-color: var(--colour-champagne-gold); }
+.import-commit-message { grid-column: 1 / -1; padding: .85rem 1rem; border: 1px solid rgba(142,228,225,.16); border-radius: var(--radius-md); background: rgba(142,228,225,.06); }
+.export-card-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1rem; }
+.export-card-grid article { display: grid; gap: .85rem; min-height: 18rem; padding: clamp(1.4rem,3vw,2rem); border: 1px solid rgba(142,228,225,.16); border-radius: var(--radius-lg); background: linear-gradient(145deg, #fffaf0, #e9d4a9); box-shadow: var(--shadow-paper); color: var(--colour-ink); }
+.export-card-grid h3 { margin: 0; font: 2rem var(--font-display); }
+.export-card-grid p:not(.paper-kicker) { margin: 0; color: var(--text-on-paper-soft); line-height: 1.5; }
+.export-card-grid .import-button { align-self: end; width: fit-content; color: #073342; border-color: rgba(13,82,91,.25); background: rgba(13,82,91,.08); }
 @media (max-width: 1024px) { .import-types { grid-template-columns: repeat(3,1fr); } .import-input-grid { grid-template-columns: 1fr; } .import-status-card dl { margin-top: 2rem; } .import-counts { grid-template-columns: repeat(3,1fr); } }
-@media (max-width: 768px) { .import-page { gap: 4rem; } .import-hero { grid-template-columns: 1fr; min-height: auto; } .import-hero aside { max-width: 28rem; } .import-section-heading { display: grid; } .import-types { grid-template-columns: repeat(2,1fr); } .import-summary-card, .import-notice-grid, .import-conflict-columns { grid-template-columns: 1fr; } .import-input-card textarea { min-height: 21rem; } }
-@media (max-width: 480px) { .import-hero { margin-inline: -.5rem; padding: 1.4rem; border-radius: var(--radius-md); } .import-hero h1 { font-size: 3.6rem; } .import-types { grid-template-columns: 1fr; } .import-type { min-height: 6.8rem; } .import-input-card, .import-status-card { padding: 1.1rem; border-radius: var(--radius-md); } .import-card-heading { display: grid; } .import-input-card textarea { min-height: 18rem; font-size: .75rem; } .import-input-actions { align-items: stretch; } .import-button, .import-button--primary { width: 100%; margin-left: 0; } .import-text-action { flex: 1; } .import-counts { grid-template-columns: repeat(2,1fr); } .import-summary-card dl div { grid-template-columns: 1fr; gap: .2rem; } .import-commit-bar { align-items: stretch; flex-direction: column; } .import-commit-bar button { width: 100%; } }
+@media (max-width: 768px) { .import-page { gap: 4rem; } .import-hero { grid-template-columns: 1fr; min-height: auto; } .import-hero aside { max-width: 28rem; } .import-section-heading { display: grid; } .import-types { grid-template-columns: repeat(2,1fr); } .import-summary-card, .import-notice-grid, .import-conflict-columns, .export-card-grid { grid-template-columns: 1fr; } .import-input-card textarea { min-height: 21rem; } .import-commit-panel { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .import-hero { margin-inline: -.5rem; padding: 1.4rem; border-radius: var(--radius-md); } .import-hero h1 { font-size: 3.6rem; } .import-types { grid-template-columns: 1fr; } .import-type { min-height: 6.8rem; } .import-input-card, .import-status-card, .import-commit-panel { padding: 1.1rem; border-radius: var(--radius-md); } .import-card-heading { display: grid; } .import-input-card textarea { min-height: 18rem; font-size: .75rem; } .import-input-actions { align-items: stretch; } .import-button, .import-button--primary { width: 100%; margin-left: 0; } .import-text-action { flex: 1; } .import-counts { grid-template-columns: repeat(2,1fr); } .import-summary-card dl div { grid-template-columns: 1fr; gap: .2rem; } .import-commit-bar { align-items: stretch; flex-direction: column; } .import-commit-bar button { width: 100%; } .export-card-grid .import-button { width: 100%; } }

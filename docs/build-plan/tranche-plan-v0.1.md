@@ -15,7 +15,7 @@ This delivery tracker summarises the intended tranche sequence. The authoritativ
 10. Local Database Foundation — complete
 11. Data-Driven Screens — complete
 12. Import Preview v0.1 — complete
-13. Import Commit and Export v0.1
+13. Import Commit and Export v0.1 — complete
 14. PWA and Offline Readiness
 15. GitHub Pages Deployment
 

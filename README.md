@@ -6,9 +6,9 @@ The product follows the **Ocean Luxe** direction established by the standalone p
 
 ## Project status
 
-**Local-first application stage - Tranche 12: Import Preview v0.1 complete.**
+**Local-first application stage - Tranche 13: Import Commit and Export v0.1 complete.**
 
-The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype, tested Ocean Luxe React experience, Zod-backed canonical data and a versioned Dexie/IndexedDB persistence foundation. Nine routes now include a premium, preview-only Import / Export workbench with five supported JSON shapes, field-level validation, read-only local conflict detection and protected-field warnings. Import commit, export downloads and live integrations remain deliberately deferred.
+The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype, tested Ocean Luxe React experience, Zod-backed canonical data and a versioned Dexie/IndexedDB persistence foundation. Nine routes now include a premium Import / Export workbench with five supported JSON shapes, field-level validation, ID-based local conflict detection, protected-field confirmation, transactional local commits, ImportBatch audit records and three browser-native JSON exports. Live integrations remain deliberately deferred.
 
 ## Start here
 
@@ -21,7 +21,7 @@ The repository contains the project foundations, governance, illustrative sample
 
 ```text
 complete-cruising/
-|-- app/               Ocean Luxe React app through Tranche 12
+|-- app/               Ocean Luxe React app through Tranche 13
 |-- docs/              Product foundations, decisions and delivery plans
 |-- enrichment/        Prompt, staged-import and reviewed-output workspaces
 |-- prototypes/        Preserved visual reference artefacts
@@ -45,4 +45,4 @@ Work proceeds in small, independently reviewable tranches. The MVP direction is 
 
 Sample data must remain illustrative and must never include sensitive family information, booking references, cabin details, passport data, insurance data, addresses or other private details.
 
-The app can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The next planned tranche is **Tranche 13: Import Commit and Export v0.1**.
+The app can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The next planned tranche is **Tranche 14: PWA and Offline Readiness**.
