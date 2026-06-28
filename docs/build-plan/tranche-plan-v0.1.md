@@ -20,6 +20,7 @@ This delivery tracker summarises the intended tranche sequence. The authoritativ
 15. GitHub Pages Deployment - complete
 16. Production Smoke Test and Release Hardening - complete
 17. Sailing Setup and Enrichment Request Workflow v0.1 - complete
+18A. Sailing Shell Enrichment Import Mapper v0.1 - complete; bridge from Tranche 17 return schemas to Real Sun Princess data onboarding
 18. Real Sun Princess 2026 Data Onboarding v0.1 - recommended next tranche
 19. Post-Release Visual QA and Content Accuracy Review
 

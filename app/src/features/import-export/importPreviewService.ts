@@ -2,6 +2,13 @@ import type { ImportPreviewResult, ImportType, PreviewNotice, ProtectedFieldImpa
 import type { CompleteCruisingDb } from "../../db/completeCruisingDb";
 import { db } from "../../db/completeCruisingDb";
 import { getImportRecordCandidates, getImportTable, importDefinitions } from "./importRecordMapping";
+import {
+  findReviewedSectionConflict,
+  getSailingShellEnrichmentCandidates,
+  parseSailingShellEnrichmentPayload,
+  sailingShellEnrichmentSchemaName,
+  sailingShellEnrichmentWarnings,
+} from "./sailingShellEnrichmentMapper";
 
 const protectedFields: Partial<Record<ImportType, string[]>> = {
   sailing_shell: ["departureDate", "returnDate", "cruiseLineId", "shipId", "cabinId", "voyageCode", "bookingReference"],
@@ -19,6 +26,8 @@ export const enrichmentReturnSchemaImportMap: Record<string, ImportType> = {
   "complete-cruising-day-guide-generation-v1": "day_guide",
 };
 
+const comparable = (value: any) => JSON.stringify(value, (key, entry) => key === "audit" ? undefined : entry);
+
 function blank(selectedImportType: ImportType): ImportPreviewResult {
   return { status: "idle", selectedImportType, summary: "Add a structured JSON file to begin a private, local preview.", recordsToCreate: [], recordsToUpdate: [], recordsUnchanged: [], protectedFieldImpacts: [], warnings: [], errors: [], previewOnly: true };
 }
@@ -35,6 +44,105 @@ function metadataWarnings(records: any[]): PreviewNotice[] {
   return notices;
 }
 
+async function createSailingShellEnrichmentPreview(raw: unknown, selectedImportType: ImportType, database: CompleteCruisingDb): Promise<ImportPreviewResult> {
+  let payload;
+  try {
+    payload = parseSailingShellEnrichmentPayload(raw);
+  } catch (error) {
+    return {
+      ...blank(selectedImportType),
+      status: "invalid",
+      detectedImportType: "sailing_shell",
+      schema: sailingShellEnrichmentSchemaName,
+      summary: "The sailing enrichment return is recognised, but its structure is not safe to map yet.",
+      errors: error instanceof Error ? [{ id: "sailing-enrichment-schema", title: "Sailing enrichment shape mismatch", message: error.message, fieldPath: "schema", code: "invalid_return_schema" }] : [{ id: "sailing-enrichment-schema", title: "Sailing enrichment shape mismatch", message: "Check the returned schema fields.", fieldPath: "schema", code: "invalid_return_schema" }],
+    };
+  }
+
+  const targetSailing = await database.sailings.get(payload.target.sailingId);
+  if (!targetSailing) {
+    return {
+      ...blank(selectedImportType),
+      status: "invalid",
+      detectedImportType: "sailing_shell",
+      schema: payload.schema,
+      schemaVersion: payload.schemaVersion,
+      sourceApp: payload.sourceApp,
+      targetType: "Sailing-level context enrichment",
+      targetId: payload.target.sailingId,
+      targetName: payload.target.sailingName,
+      summary: "This enrichment needs its sailing shell before it can be committed.",
+      warnings: sailingShellEnrichmentWarnings(payload),
+      errors: [{
+        id: "missing-target-sailing",
+        title: "Target sailing not found",
+        message: "Create or import the matching sailing shell first. Sailing-level enrichment must attach to an existing local sailing and will not create one for you.",
+        fieldPath: "target.sailingId",
+        code: "missing_target_sailing",
+      }],
+    };
+  }
+
+  const records = getSailingShellEnrichmentCandidates(payload, payload.generatedAt);
+  const protectedConflict = await findReviewedSectionConflict(database, records);
+  const create: string[] = [], update: string[] = [], unchanged: string[] = [];
+
+  for (const item of records) {
+    const current = await getImportTable(database, item.tableName).get(item.value.id);
+    if (!current) create.push(item.value.id);
+    else if (comparable(current) === comparable(item.value)) unchanged.push(item.value.id);
+    else update.push(item.value.id);
+  }
+
+  const warnings = [
+    ...sailingShellEnrichmentWarnings(payload),
+    ...metadataWarnings(records),
+    { id: "commit-gate", severity: "info" as const, title: "Commit gate", message: "Only the enrichment run and sailing-level enrichment sections from this validated preview can be committed." },
+  ];
+
+  if (protectedConflict) {
+    return {
+      status: "invalid",
+      selectedImportType,
+      detectedImportType: "sailing_shell",
+      schema: payload.schema,
+      schemaVersion: payload.schemaVersion,
+      sourceApp: payload.sourceApp,
+      targetType: "Sailing-level context enrichment",
+      targetId: targetSailing.id,
+      targetName: targetSailing.name,
+      summary: "A reviewed or verified local enrichment section would be overwritten.",
+      recordsToCreate: create,
+      recordsToUpdate: update,
+      recordsUnchanged: unchanged,
+      protectedFieldImpacts: [],
+      warnings,
+      errors: [protectedConflict],
+      previewOnly: true,
+    };
+  }
+
+  return {
+    status: "valid",
+    selectedImportType,
+    detectedImportType: "sailing_shell",
+    schema: payload.schema,
+    schemaVersion: payload.schemaVersion,
+    sourceApp: payload.sourceApp,
+    targetType: "Sailing-level context enrichment",
+    targetId: targetSailing.id,
+    targetName: targetSailing.name,
+    summary: `${records.length} sailing-level enrichment record${records.length === 1 ? "" : "s"} checked against local data. No itinerary, port, timing or booking fields will be changed.`,
+    recordsToCreate: create,
+    recordsToUpdate: update,
+    recordsUnchanged: unchanged,
+    protectedFieldImpacts: [],
+    warnings,
+    errors: [],
+    previewOnly: true,
+  };
+}
+
 export async function createImportPreview(json: string, selectedImportType: ImportType, database: CompleteCruisingDb = db): Promise<ImportPreviewResult> {
   if (!json.trim()) return blank(selectedImportType);
   let raw: any;
@@ -46,6 +154,9 @@ export async function createImportPreview(json: string, selectedImportType: Impo
   if (detected && detected !== selectedImportType) {
     return { ...blank(selectedImportType), status: "type_mismatch", detectedImportType: detected, schema: importDefinitions[detected].name, schemaVersion: raw.header?.schemaVersion, summary: `This looks like ${detected.replaceAll("_", " ")} data, not the selected import type.`, errors: [{ id: "type-mismatch", title: "Import type mismatch", message: `Choose ${detected.replaceAll("_", " ")} or use a matching payload.`, fieldPath: "kind", code: "type_mismatch" }] };
   }
+  if (raw?.schema === sailingShellEnrichmentSchemaName) {
+    return createSailingShellEnrichmentPreview(raw, selectedImportType, database);
+  }
   if (detectedFromReturnSchema) {
     return {
       ...blank(selectedImportType),
@@ -55,7 +166,7 @@ export async function createImportPreview(json: string, selectedImportType: Impo
       schemaVersion: raw.schemaVersion,
       sourceApp: raw.sourceApp,
       summary: "This recognised enrichment return schema needs import mapping before it can be committed.",
-      warnings: [{ id: "recognised-return-schema", severity: "info", title: "Recognised enrichment return", message: "Route this through Import / Export preview, but this tranche only recognises the schema and does not commit the returned shape yet." }],
+      warnings: [{ id: "recognised-return-schema", severity: "info", title: "Recognised enrichment return", message: "Route this through Import / Export preview, but only sailing shell enrichment has a safe mapper in this tranche." }],
       errors: [{ id: "return-schema-limitation", title: "Preview mapping incomplete", message: "The returned ChatGPT shape is recognised, but a safe field-level mapper is not implemented in this tranche.", fieldPath: "schema", code: "unsupported_return_schema" }],
     };
   }
@@ -72,7 +183,6 @@ export async function createImportPreview(json: string, selectedImportType: Impo
     if (!current) create.push(item.value.id);
     else {
       existing.set(item.value.id, current);
-      const comparable = (value: any) => JSON.stringify(value, (key, entry) => key === "audit" ? undefined : entry);
       if (comparable(current) === comparable(item.value)) unchanged.push(item.value.id); else update.push(item.value.id);
     }
   }

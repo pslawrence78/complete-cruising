@@ -33,11 +33,11 @@ export const ConfidenceMetadataSchema = z.object({
   reviewStatus: ReviewStatusSchema,
   sourceType: SourceTypeSchema,
   sourceSummary: z.string().trim().min(1).optional(),
-  lastReviewedAt: IsoDateTimeSchema.optional(),
+  lastReviewedAt: IsoDateTimeSchema.nullable().optional(),
   refreshRecommended: z.boolean(),
   refreshReason: z.string().trim().min(1).optional(),
-  validFrom: IsoDateSchema.optional(),
-  validUntil: IsoDateSchema.optional(),
+  validFrom: IsoDateSchema.nullable().optional(),
+  validUntil: IsoDateSchema.nullable().optional(),
 }).strict().refine(({ validFrom, validUntil }) => !validFrom || !validUntil || validFrom <= validUntil, {
   message: "validUntil must not be earlier than validFrom",
   path: ["validUntil"],
@@ -65,4 +65,7 @@ export const SampleCaveatSchema = z.object({
   dataCaveat: z.string().trim().min(1),
 }).strict();
 
-export const StructuredFactsSchema = z.record(z.string(), z.unknown());
+export const StructuredFactsSchema = z.union([
+  z.record(z.string(), z.unknown()),
+  z.array(z.record(z.string(), z.unknown())),
+]);

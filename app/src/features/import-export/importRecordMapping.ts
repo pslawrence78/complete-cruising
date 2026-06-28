@@ -24,6 +24,7 @@ export type ImportTableName =
   | "ports"
   | "attractions"
   | "enrichmentSections"
+  | "enrichmentRuns"
   | "dayGuides";
 
 export interface ImportRecordCandidate {

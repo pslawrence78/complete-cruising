@@ -4,11 +4,65 @@ import { seedSampleData } from "../db/seedDatabase";
 import { commitValidatedImport } from "../features/import-export/importCommitService";
 import { createImportPreview } from "../features/import-export/importPreviewService";
 import { getSampleImport } from "../features/import-export/sampleImports";
+import { sampleSailingRecord } from "../data/sampleSchemaData";
 
 function withDayGuideTitle(title: string) {
   const payload = JSON.parse(getSampleImport("day_guide"));
   payload.dayGuide.title = title;
   return JSON.stringify(payload);
+}
+
+function sailingShellEnrichmentPayload(summary = "Planning context that does not confirm operational timing.") {
+  return {
+    schema: "complete-cruising-sailing-shell-enrichment-v1",
+    schemaVersion: 1,
+    sourceApp: "ChatGPT",
+    generatedAt: "2026-06-28T12:30:00+01:00",
+    target: { sailingId: sampleSailingRecord.id, sailingName: sampleSailingRecord.name, shipName: "Sun Princess", cruiseLineName: "Princess Cruises" },
+    provenance: { userEnteredFieldsUsed: ["sailing.id"] },
+    enrichmentRun: {
+      id: "enrichment-run-sailing-shell-test",
+      name: "Sailing shell enrichment",
+      targetType: "sailing",
+      targetName: sampleSailingRecord.name,
+      enrichmentPackType: "sailing_shell_enrichment",
+      status: "generated",
+      sourceTypesUsed: ["user_entered", "inferred"],
+      validationWarnings: ["Do not treat this enrichment as booking confirmation."],
+      notes: "Sailing-level context only.",
+    },
+    sailingEnrichment: { planningSummary: "Context only." },
+    sections: [{
+      id: "section-sailing-shell-test",
+      parentType: "sailing",
+      parentId: sampleSailingRecord.id,
+      sectionType: "sailing_planning_summary",
+      title: "Sailing planning summary",
+      shortSummary: summary,
+      structuredFacts: [{ label: "Planning status", value: "Needs review", origin: "inferred" }],
+      practicalGuidance: ["Keep protected fields unchanged."],
+      familyRelevance: ["Useful for route planning."],
+      watchouts: ["No port times are confirmed."],
+      suggestedNextActions: ["Verify Princess material before day planning."],
+      confidence: {
+        confidence: "medium",
+        reviewStatus: "needs_user_review",
+        sourceType: "inferred",
+        sourceSummary: "Generated from a local sailing shell.",
+        lastReviewedAt: null,
+        refreshRecommended: true,
+        refreshReason: "Refresh after official itinerary confirmation.",
+        validFrom: null,
+        validUntil: null,
+      },
+    }],
+    importAdvice: {
+      safeToImport: true,
+      requiresUserReview: true,
+      protectedFieldWarnings: ["This JSON must not overwrite voyage code, sailing dates, itinerary rows or port times."],
+      recommendedImportType: "sailing_shell",
+    },
+  };
 }
 
 describe("import commit service", () => {
@@ -88,5 +142,67 @@ describe("import commit service", () => {
 
     expect(outcome.status).toBe("failed");
     expect(await database.dayGuides.get("day-guide-naples")).toEqual(before);
+  });
+
+  it("commits sailing shell enrichment without changing protected sailing or itinerary records", async () => {
+    const sailingBefore = await database.sailings.get(sampleSailingRecord.id);
+    const daysBefore = await database.itineraryDays.toArray();
+    const json = JSON.stringify(sailingShellEnrichmentPayload());
+    const preview = await createImportPreview(json, "sailing_shell", database);
+    const outcome = await commitValidatedImport(json, "sailing_shell", preview, false, database);
+
+    expect(outcome.status).toBe("committed");
+    expect(await database.enrichmentRuns.get("enrichment-run-sailing-shell-test")).toMatchObject({
+      targetEntityType: "sailing",
+      targetEntityId: sampleSailingRecord.id,
+      validationWarnings: ["Do not treat this enrichment as booking confirmation."],
+    });
+    expect(await database.enrichmentSections.get("section-sailing-shell-test")).toMatchObject({
+      entityType: "sailing",
+      entityId: sampleSailingRecord.id,
+      practicalGuidance: ["Keep protected fields unchanged."],
+      confidence: { reviewStatus: "needs_user_review", refreshRecommended: true },
+    });
+    expect(await database.sailings.get(sampleSailingRecord.id)).toEqual(sailingBefore);
+    expect(await database.itineraryDays.toArray()).toEqual(daysBefore);
+    expect((await database.importBatches.toArray())[0]).toMatchObject({
+      schema: "complete-cruising-sailing-shell-enrichment-v1",
+      sourceApp: "ChatGPT",
+      recordsCreated: 2,
+      protectedFieldWarningCount: 1,
+    });
+  });
+
+  it("re-imports sailing shell enrichment idempotently without duplicate sections", async () => {
+    const json = JSON.stringify(sailingShellEnrichmentPayload());
+    let preview = await createImportPreview(json, "sailing_shell", database);
+    await commitValidatedImport(json, "sailing_shell", preview, false, database);
+
+    preview = await createImportPreview(json, "sailing_shell", database);
+    const outcome = await commitValidatedImport(json, "sailing_shell", preview, false, database);
+
+    expect(outcome.status).toBe("committed");
+    expect(preview.recordsUnchanged).toEqual(expect.arrayContaining(["enrichment-run-sailing-shell-test", "section-sailing-shell-test"]));
+    expect(await database.enrichmentSections.where("id").equals("section-sailing-shell-test").count()).toBe(1);
+    expect(await database.enrichmentRuns.where("id").equals("enrichment-run-sailing-shell-test").count()).toBe(1);
+  });
+
+  it("blocks reviewed sailing enrichment sections from silent overwrite", async () => {
+    const json = JSON.stringify(sailingShellEnrichmentPayload());
+    const preview = await createImportPreview(json, "sailing_shell", database);
+    await commitValidatedImport(json, "sailing_shell", preview, false, database);
+    const existing = await database.enrichmentSections.get("section-sailing-shell-test");
+    await database.enrichmentSections.put({
+      ...existing!,
+      confidence: { ...existing!.confidence, reviewStatus: "reviewed" },
+    });
+
+    const changedJson = JSON.stringify(sailingShellEnrichmentPayload("A changed summary that should not overwrite reviewed content."));
+    const blockedPreview = await createImportPreview(changedJson, "sailing_shell", database);
+    const outcome = await commitValidatedImport(changedJson, "sailing_shell", blockedPreview, false, database);
+
+    expect(blockedPreview.status).toBe("invalid");
+    expect(outcome.status).toBe("blocked");
+    expect((await database.enrichmentSections.get("section-sailing-shell-test"))?.summary).toBe("Planning context that does not confirm operational timing.");
   });
 });

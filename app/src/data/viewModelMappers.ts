@@ -18,7 +18,8 @@ type Resolved<T extends (...args: never[]) => unknown> = NonNullable<Awaited<Ret
 const titleCase = (value: string) => value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 const dateLabel = (value: string) => new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(new Date(`${value}T12:00:00`));
 const longDateLabel = (value: string) => new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(`${value}T12:00:00`));
-const reviewedLabel = (value?: string) => value ? `Illustrative review · ${new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(new Date(value))}` : "Not yet reviewed";
+const reviewedLabel = (value?: string | null) => value ? `Illustrative review · ${new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(new Date(value))}` : "Not yet reviewed";
+const factsObject = (facts: EnrichmentSection["structuredFacts"]) => facts && !Array.isArray(facts) ? facts : undefined;
 
 function statusFromConfidence(confidence?: ConfidenceMetadata) {
   if (!confidence) return { label: "Not yet reviewed", tone: "review" as const };
@@ -129,12 +130,14 @@ export function mapShipGuide(bundle: Resolved<typeof getActiveShipGuideBundle>):
   const mapped = sections.map((section, index) => {
     const presentation = shipSectionPresentation[section.sectionType] ?? { id: "identity" as const, accent: "mist" as const, nextStep: "Complete and review this guidebook section." };
     const status = statusFromConfidence(section.confidence);
-    return { id: presentation.id, index: String(index + 1).padStart(2, "0"), title: section.title, watchword: String(section.structuredFacts?.watchword ?? "Guide in progress"), summary: section.summary ?? "This local section has not yet been enriched.", nextStep: String(section.structuredFacts?.nextStep ?? presentation.nextStep), status, confidence: { level: section.confidence.confidence }, accent: presentation.accent };
+    const facts = factsObject(section.structuredFacts);
+    return { id: presentation.id, index: String(index + 1).padStart(2, "0"), title: section.title, watchword: String(facts?.watchword ?? "Guide in progress"), summary: section.summary ?? "This local section has not yet been enriched.", nextStep: String(facts?.nextStep ?? presentation.nextStep), status, confidence: { level: section.confidence.confidence }, accent: presentation.accent };
   });
   const confidence = ship.confidence;
+  const identityFacts = factsObject(sections.find((s) => s.sectionType === "identity")?.structuredFacts);
   return {
     hero: { name: ship.name, cruiseLine: cruiseLine?.name ?? "Cruise line not recorded", guideLabel: "Illustrative ship handbook · local edition", character: ship.shipOverview ?? "Ship overview not yet enriched." },
-    facts: [{ label: "Ship family", value: ship.shipClass ?? "Not recorded" }, { label: "Style", value: String(sections.find((s) => s.sectionType === "identity")?.structuredFacts?.style ?? "Guide in progress") }, { label: "Guide lens", value: "Lawrence family" }, { label: "Record type", value: "Reusable ship guide" }],
+    facts: [{ label: "Ship family", value: ship.shipClass ?? "Not recorded" }, { label: "Style", value: String(identityFacts?.style ?? "Guide in progress") }, { label: "Guide lens", value: "Lawrence family" }, { label: "Record type", value: "Reusable ship guide" }],
     enrichment: { completed: sections.length, total: 7, summary: `${sections.length} locally stored guidebook sections retain their own trust metadata.`, nextPriority: sections.find((section) => section.confidence.refreshRecommended)?.title ?? "Review complete" },
     metadata: { confidence: confidence?.confidence ?? "unknown", reviewStatus: titleCase(confidence?.reviewStatus ?? "not_reviewed"), refreshStatus: confidence?.refreshRecommended ? "Refresh before sailing" : "No refresh requested", lastReviewed: reviewedLabel(confidence?.lastReviewedAt), recordScope: "Ship guidebook · not sailing-specific" },
     sections: mapped,
@@ -143,7 +146,8 @@ export function mapShipGuide(bundle: Resolved<typeof getActiveShipGuideBundle>):
 }
 
 function mapPortSection(section: EnrichmentSection | undefined, fallback: { id: PortGuideSectionData["id"]; eyebrow: string; title: string; body?: string }): PortGuideSectionData {
-  return { id: fallback.id, eyebrow: fallback.eyebrow, title: section?.title ?? fallback.title, body: section?.summary ?? fallback.body ?? "This guidebook section is not yet enriched.", note: String(section?.structuredFacts?.note ?? "Review current practical detail before travel."), status: statusFromConfidence(section?.confidence), confidence: { level: section?.confidence.confidence ?? "unknown" } };
+  const facts = factsObject(section?.structuredFacts);
+  return { id: fallback.id, eyebrow: fallback.eyebrow, title: section?.title ?? fallback.title, body: section?.summary ?? fallback.body ?? "This guidebook section is not yet enriched.", note: String(facts?.note ?? "Review current practical detail before travel."), status: statusFromConfidence(section?.confidence), confidence: { level: section?.confidence.confidence ?? "unknown" } };
 }
 
 export function mapPortGuide(bundle: Resolved<typeof getActivePortGuideBundle>): PortGuideData | undefined {
@@ -158,8 +162,8 @@ export function mapPortGuide(bundle: Resolved<typeof getActivePortGuideBundle>):
     metadata: { confidence: confidence?.confidence ?? "unknown", reviewStatus: titleCase(confidence?.reviewStatus ?? "not_reviewed"), refreshStatus: confidence?.refreshRecommended ? "Refresh before travel" : "No refresh requested", lastReviewed: reviewedLabel(confidence?.lastReviewedAt), recordScope: "Reusable port guidebook · not an itinerary day" },
     sections: [mapPortSection(section("logistics"), { id: "logistics", eyebrow: "Practical arrival", title: "Cruise logistics", body: port.cruiseLogisticsSummary }), mapPortSection(section("getting-around"), { id: "getting-around", eyebrow: "Finding a rhythm", title: "Getting around", body: port.gettingAroundSummary }), mapPortSection(section("food-culture"), { id: "food-culture", eyebrow: "A city with appetite", title: "Food and culture", body: port.foodCultureSummary })],
     attractions: mappedAttractions,
-    familyLens: { title: "A family day with room to breathe", bestBalance: port.familySuitabilitySummary ?? "Choose one strong story and preserve a generous return margin.", sebDiscovery: String(section("family-discovery")?.structuredFacts?.thingToSpot ?? "Look for one landscape clue that explains the port."), status: statusFromConfidence(section("family-discovery")?.confidence ?? confidence), confidence: { level: section("family-discovery")?.confidence.confidence ?? confidence?.confidence ?? "unknown", label: "Family lens" } },
-    photoPrompt: { prompt: port.photographySummary ?? "Choose a safe frame that captures the character of the port day.", caption: String(section("photography")?.structuredFacts?.caption ?? "A local story in one frame."), status: statusFromConfidence(section("photography")?.confidence ?? confidence), confidence: { level: section("photography")?.confidence.confidence ?? confidence?.confidence ?? "unknown" } },
+    familyLens: { title: "A family day with room to breathe", bestBalance: port.familySuitabilitySummary ?? "Choose one strong story and preserve a generous return margin.", sebDiscovery: String(factsObject(section("family-discovery")?.structuredFacts)?.thingToSpot ?? "Look for one landscape clue that explains the port."), status: statusFromConfidence(section("family-discovery")?.confidence ?? confidence), confidence: { level: section("family-discovery")?.confidence.confidence ?? confidence?.confidence ?? "unknown", label: "Family lens" } },
+    photoPrompt: { prompt: port.photographySummary ?? "Choose a safe frame that captures the character of the port day.", caption: String(factsObject(section("photography")?.structuredFacts)?.caption ?? "A local story in one frame."), status: statusFromConfidence(section("photography")?.confidence ?? confidence), confidence: { level: section("photography")?.confidence.confidence ?? confidence?.confidence ?? "unknown" } },
     hints: { items: (port.hintsTipsSummary ?? "Keep a clear turnaround point. Verify transport and opening details. Use Today for sailing-specific times.").split("|").map((item) => item.trim()), status: statusFromConfidence(confidence), confidence: { level: confidence?.confidence ?? "unknown" } },
     caveat: port.dataCaveat ?? "Local guidebook details should be reviewed before travel.",
   };
