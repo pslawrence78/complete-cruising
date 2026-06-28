@@ -23,7 +23,10 @@ This delivery tracker summarises the intended tranche sequence. The authoritativ
 18A. Sailing Shell Enrichment Import Mapper v0.1 - complete; bridge from Tranche 17 return schemas to Real Sun Princess data onboarding
 18B. MVP Recovery, Real Sailing Onboarding and Guidebook Mode v0.1 - complete
 19. MVP Cruise Usability and Visual Polish v0.1 - complete
-20. Content Accuracy Review and Offline Guidebook QA v0.1 - recommended next tranche
+20. Cartographic Port Atlas and Map Context v0.1 - complete
+21. Cruise Weather Intelligence v0.1 - recommended next tranche
+22. Cruise Conditions and Day Readiness v0.1 - planned
+23. Content Accuracy Review and Offline Guidebook QA v0.1 - planned
 
 This sequence may be refined as the product matures. Any change should preserve small, independently reviewable tranches and be reflected in the project knowledge index.
 

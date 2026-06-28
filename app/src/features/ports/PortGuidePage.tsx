@@ -1,21 +1,33 @@
 import { LocalDataState } from "../../components/states/LocalDataState";
 import { mapPortGuide } from "../../data/viewModelMappers";
-import { usePortGuide } from "../../hooks/useLocalData";
+import { usePortGuide, useSailingDashboard } from "../../hooks/useLocalData";
+import { useMemo } from "react";
+import { PortAtlasMap } from "../maps/PortAtlasMap";
+import { getAtlasSummary } from "../maps/mapUtils";
 import { AttractionHighlightCard } from "./components/AttractionHighlightCard";
 import { FamilyLensCard } from "./components/FamilyLensCard";
 import { HintsWatchoutsCard } from "./components/HintsWatchoutsCard";
 import { PhotoPromptCard } from "./components/PhotoPromptCard";
 import { PortGuideSection } from "./components/PortGuideSection";
 import { PortPostcard } from "./components/PortPostcard";
+import { buildAtlasCaption, buildPortFallbackMetadata, buildVoyageAtlasPoints } from "./portAtlasViewModel";
 import "./PortGuidePage.css";
 
 export function PortGuidePage() {
   const query = usePortGuide();
-  if (query.loading) return <LocalDataState kind="loading" />;
-  if (query.error) return <LocalDataState kind="error" />;
+  const sailingQuery = useSailingDashboard();
+  const atlasPoints = useMemo(
+    () => sailingQuery.data ? buildVoyageAtlasPoints(sailingQuery.data.itinerary) : [],
+    [sailingQuery.data],
+  );
+  if (query.loading || sailingQuery.loading) return <LocalDataState kind="loading" />;
+  if (query.error || sailingQuery.error) return <LocalDataState kind="error" />;
   if (!query.data) return <LocalDataState kind="empty" />;
   const port = mapPortGuide(query.data);
   if (!port) return <LocalDataState kind="empty" detail="The selected day does not have a local port guide yet." />;
+  const selectedPointId = "day" in query.data && query.data.day ? query.data.day.id : undefined;
+  const fallbackMetadata = "guide" in query.data ? buildPortFallbackMetadata(query.data.guide?.port, query.data.guide?.country) : undefined;
+  const atlasSummary = getAtlasSummary(atlasPoints);
   return (
     <div className="port-page">
       <PortPostcard
@@ -23,6 +35,17 @@ export function PortGuidePage() {
         identity={port.identity}
         metadata={port.metadata}
       />
+
+      <div className="port-page__atlas">
+        <PortAtlasMap
+          caption={buildAtlasCaption(atlasSummary.missingCount)}
+          fallbackMetadata={fallbackMetadata}
+          mode="overview"
+          points={atlasPoints}
+          selectedPointId={selectedPointId}
+          title="Cartographic Port Atlas"
+        />
+      </div>
 
       <section className="port-practical" aria-label="Port practical guide">
         {port.sections.slice(0, 2).map((section) => (
@@ -50,6 +73,15 @@ export function PortGuidePage() {
 
       <div className="port-page__editorial">
         <FamilyLensCard family={port.familyLens} />
+        <PortAtlasMap
+          caption="Where this port sits. Approximate port area, not exact terminal."
+          fallbackMetadata={fallbackMetadata}
+          interaction="curated"
+          mode="single-port"
+          points={atlasPoints.filter((point) => point.id === selectedPointId)}
+          selectedPointId={selectedPointId}
+          title={`Where ${port.identity.name} sits`}
+        />
         <PortGuideSection section={port.sections[2]} />
       </div>
 

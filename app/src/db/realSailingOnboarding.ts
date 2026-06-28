@@ -38,18 +38,34 @@ const countries = CountrySchema.array().parse([
   { id: "country-spain", name: "Spain", isoCode: "ES", primaryLanguage: "Spanish", currencyCode: "EUR", currencyName: "Euro", audit, confidence: needsReviewConfidence },
 ]);
 
+const approximatePortGeo = {
+  civitavecchia: { latitude: 42.0933, longitude: 11.7967, mapLabel: "Civitavecchia", locationNotes: "Approximate public port-area position for visual orientation only; terminal details are not confirmed." },
+  naples: { latitude: 40.841, longitude: 14.263, mapLabel: "Naples", locationNotes: "Approximate port-city area for visual orientation only; berth and terminal details are not confirmed." },
+  chania: { latitude: 35.493, longitude: 24.066, mapLabel: "Souda Bay / Chania", locationNotes: "Approximate Souda Bay / Chania area for visual orientation only; shuttle and docking details are not confirmed." },
+  kusadasi: { latitude: 37.858, longitude: 27.263, mapLabel: "Kusadasi", locationNotes: "Approximate Kusadasi port area for visual orientation only; excursion start points are not confirmed." },
+  mykonos: { latitude: 37.4467, longitude: 25.3289, mapLabel: "Mykonos", locationNotes: "Approximate Mykonos port/island area for visual orientation only; tender or shuttle arrangements are not confirmed." },
+  piraeus: { latitude: 37.942, longitude: 23.646, mapLabel: "Piraeus", locationNotes: "Approximate Piraeus port area for visual orientation only; Athens transfer details are not confirmed." },
+  santorini: { latitude: 36.393, longitude: 25.461, mapLabel: "Santorini", locationNotes: "Approximate Santorini island area for visual orientation only; tender landing details are not confirmed." },
+  bar: { latitude: 42.093, longitude: 19.089, mapLabel: "Bar", locationNotes: "Approximate Bar port area for visual orientation only; local logistics are not confirmed." },
+  corfu: { latitude: 39.624, longitude: 19.922, mapLabel: "Corfu", locationNotes: "Approximate Corfu port-town area for visual orientation only; arrival details are not confirmed." },
+  messina: { latitude: 38.193, longitude: 15.556, mapLabel: "Messina", locationNotes: "Approximate Messina port-city area for visual orientation only; berth details are not confirmed." },
+  barcelona: { latitude: 41.352, longitude: 2.173, mapLabel: "Barcelona", locationNotes: "Approximate Barcelona cruise port area for visual orientation only; terminal and onward travel details are not confirmed." },
+} as const;
+
+const visualGeoConfidence = { geocodeConfidence: "medium" as const };
+
 const ports = PortSchema.array().parse([
-  { id: "port-civitavecchia", name: "Civitavecchia", countryId: "country-italy", portType: "city", returnRiskDefault: "unknown", overview: "Rome's cruise gateway for embarkation. Terminal and transfer details still need review.", audit, confidence: needsReviewConfidence },
-  { id: "port-naples", name: "Naples", countryId: "country-italy", portType: "city", returnRiskDefault: "medium", overview: "A Mediterranean gateway for Naples, Vesuvius and Pompeii planning.", audit, confidence: needsReviewConfidence },
-  { id: "port-chania", name: "Souda Bay / Chania", countryId: "country-greece", portType: "mixed", returnRiskDefault: "unknown", overview: "Crete port call shell. Docking, shuttle and timings are not confirmed.", audit, confidence: needsReviewConfidence },
-  { id: "port-kusadasi", name: "Kusadasi / Ephesus", countryId: "country-turkiye", portType: "city", returnRiskDefault: "unknown", overview: "Turkiye port call shell for Ephesus planning. Excursion and return details need review.", audit, confidence: needsReviewConfidence },
-  { id: "port-mykonos", name: "Mykonos", countryId: "country-greece", portType: "island", returnRiskDefault: "unknown", overview: "Island port shell. Tender or shuttle status is not confirmed locally.", audit, confidence: needsReviewConfidence },
-  { id: "port-piraeus", name: "Athens / Piraeus", countryId: "country-greece", portType: "city", returnRiskDefault: "unknown", overview: "Athens gateway shell. Transport and timing decisions need review.", audit, confidence: needsReviewConfidence },
-  { id: "port-santorini", name: "Santorini", countryId: "country-greece", portType: "tender", returnRiskDefault: "unknown", overview: "Santorini port shell. Tender status must remain user-confirmed only.", audit, confidence: needsReviewConfidence },
-  { id: "port-bar", name: "Bar", countryId: "country-montenegro", portType: "mixed", returnRiskDefault: "unknown", overview: "Montenegro port shell. Local logistics remain unverified.", audit, confidence: needsReviewConfidence },
-  { id: "port-corfu", name: "Corfu", countryId: "country-greece", portType: "mixed", returnRiskDefault: "unknown", overview: "Corfu port shell. Keep Taranto/Corfu uncertainty visible where imported later.", audit, confidence: needsReviewConfidence },
-  { id: "port-messina", name: "Messina", countryId: "country-italy", portType: "city", returnRiskDefault: "unknown", overview: "Sicily port shell. Local route options need enrichment and review.", audit, confidence: needsReviewConfidence },
-  { id: "port-barcelona", name: "Barcelona", countryId: "country-spain", portType: "city", returnRiskDefault: "unknown", overview: "Disembarkation gateway shell. Terminal and onward travel details need review.", audit, confidence: needsReviewConfidence },
+  { id: "port-civitavecchia", name: "Civitavecchia", countryId: "country-italy", portType: "city", returnRiskDefault: "unknown", overview: "Rome's cruise gateway for embarkation. Terminal and transfer details still need review.", geo: { ...approximatePortGeo.civitavecchia, ...visualGeoConfidence }, audit, confidence: needsReviewConfidence },
+  { id: "port-naples", name: "Naples", countryId: "country-italy", portType: "city", returnRiskDefault: "medium", overview: "A Mediterranean gateway for Naples, Vesuvius and Pompeii planning.", geo: { ...approximatePortGeo.naples, ...visualGeoConfidence }, audit, confidence: needsReviewConfidence },
+  { id: "port-chania", name: "Souda Bay / Chania", countryId: "country-greece", portType: "mixed", returnRiskDefault: "unknown", overview: "Crete port call shell. Docking, shuttle and timings are not confirmed.", geo: { ...approximatePortGeo.chania, ...visualGeoConfidence }, audit, confidence: needsReviewConfidence },
+  { id: "port-kusadasi", name: "Kusadasi / Ephesus", countryId: "country-turkiye", portType: "city", returnRiskDefault: "unknown", overview: "Turkiye port call shell for Ephesus planning. Excursion and return details need review.", geo: { ...approximatePortGeo.kusadasi, ...visualGeoConfidence }, audit, confidence: needsReviewConfidence },
+  { id: "port-mykonos", name: "Mykonos", countryId: "country-greece", portType: "island", returnRiskDefault: "unknown", overview: "Island port shell. Tender or shuttle status is not confirmed locally.", geo: { ...approximatePortGeo.mykonos, ...visualGeoConfidence }, audit, confidence: needsReviewConfidence },
+  { id: "port-piraeus", name: "Athens / Piraeus", countryId: "country-greece", portType: "city", returnRiskDefault: "unknown", overview: "Athens gateway shell. Transport and timing decisions need review.", geo: { ...approximatePortGeo.piraeus, ...visualGeoConfidence }, audit, confidence: needsReviewConfidence },
+  { id: "port-santorini", name: "Santorini", countryId: "country-greece", portType: "tender", returnRiskDefault: "unknown", overview: "Santorini port shell. Tender status must remain user-confirmed only.", geo: { ...approximatePortGeo.santorini, ...visualGeoConfidence }, audit, confidence: needsReviewConfidence },
+  { id: "port-bar", name: "Bar", countryId: "country-montenegro", portType: "mixed", returnRiskDefault: "unknown", overview: "Montenegro port shell. Local logistics remain unverified.", geo: { ...approximatePortGeo.bar, ...visualGeoConfidence }, audit, confidence: needsReviewConfidence },
+  { id: "port-corfu", name: "Corfu", countryId: "country-greece", portType: "mixed", returnRiskDefault: "unknown", overview: "Corfu port shell. Keep Taranto/Corfu uncertainty visible where imported later.", geo: { ...approximatePortGeo.corfu, ...visualGeoConfidence }, audit, confidence: needsReviewConfidence },
+  { id: "port-messina", name: "Messina", countryId: "country-italy", portType: "city", returnRiskDefault: "unknown", overview: "Sicily port shell. Local route options need enrichment and review.", geo: { ...approximatePortGeo.messina, ...visualGeoConfidence }, audit, confidence: needsReviewConfidence },
+  { id: "port-barcelona", name: "Barcelona", countryId: "country-spain", portType: "city", returnRiskDefault: "unknown", overview: "Disembarkation gateway shell. Terminal and onward travel details need review.", geo: { ...approximatePortGeo.barcelona, ...visualGeoConfidence }, audit, confidence: needsReviewConfidence },
 ]);
 
 const daySpecs = [

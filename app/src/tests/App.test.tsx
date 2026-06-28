@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "../App";
 import { db } from "../db/completeCruisingDb";
 import { ACTIVE_SAILING_SETTING, seedSampleData } from "../db/seedDatabase";
@@ -31,6 +31,8 @@ describe("data-driven application screens", () => {
 
   it("renders all 15 real sailing itinerary days in order", async () => {
     await renderRoute("#/itinerary");
+    expect(await screen.findByRole("heading", { name: "Voyage map context" })).toBeInTheDocument();
+    expect(screen.getByText(/Voyage context line - visual sequence, not navigational routing/i)).toBeInTheDocument();
     const timeline = await screen.findByRole("region", { name: "Scrollable day-by-day itinerary" });
     const cards = within(timeline).getAllByRole("listitem");
     expect(cards).toHaveLength(15);
@@ -43,6 +45,8 @@ describe("data-driven application screens", () => {
     await renderRoute("#/today");
     expect(await screen.findByRole("heading", { level: 1, name: "Civitavecchia, Italy" })).toBeInTheDocument();
     expect(screen.getByText("Pre-cruise Today")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Today's port orientation" })).toBeInTheDocument();
+    expect(screen.getByText("Today's port orientation will appear here when the sailing is active.")).toBeInTheDocument();
     expect(screen.getByText(/Your cruise day companion is preparing for embarkation/)).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 2, name: /Pending/ }).length).toBeGreaterThan(0);
     expect(screen.getByText("Not set")).toBeInTheDocument();
@@ -54,7 +58,7 @@ describe("data-driven application screens", () => {
     await renderRoute("#/today");
     const checklist = (await screen.findByRole("heading", { name: "Take ashore" })).closest("section")!;
     expect(within(checklist).queryAllByRole("checkbox")).toHaveLength(4);
-    expect(screen.getByText("Italian")).toBeInTheDocument();
+    expect(screen.getAllByText("Italian").length).toBeGreaterThan(0);
     expect(screen.getByText("Euro")).toBeInTheDocument();
     expect(screen.getAllByText("Needs refresh").length).toBeGreaterThan(0);
   });
@@ -71,7 +75,19 @@ describe("data-driven application screens", () => {
   it("renders the active sailing port guide without mixing in itinerary timings", async () => {
     await renderRoute("#/ports");
     expect(await screen.findByRole("heading", { level: 1, name: "Civitavecchia, Italy" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Cartographic Port Atlas" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Where Civitavecchia sits" })).toBeInTheDocument();
+    expect(screen.getAllByText(/OpenFreeMap/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Reusable port guidebook .* not an itinerary day/).length).toBeGreaterThan(0);
+  });
+
+  it("does not request browser geolocation for atlas surfaces", async () => {
+    const geolocation = { getCurrentPosition: vi.fn(), watchPosition: vi.fn(), clearWatch: vi.fn() };
+    Object.defineProperty(navigator, "geolocation", { configurable: true, value: geolocation });
+    await renderRoute("#/ports");
+    await screen.findByRole("heading", { name: "Cartographic Port Atlas" });
+    expect(geolocation.getCurrentPosition).not.toHaveBeenCalled();
+    expect(geolocation.watchPosition).not.toHaveBeenCalled();
   });
 
   it("shows a local-first empty state when real sailing shore plans are not prepared", async () => {

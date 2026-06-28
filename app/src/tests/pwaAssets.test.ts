@@ -43,5 +43,7 @@ describe("PWA assets", () => {
     expect(serviceWorker).toContain("request.mode === \"navigate\"");
     expect(serviceWorker).toContain("[...new Set(shellAssetUrls)]");
     expect(serviceWorker).not.toMatch(/fetch\(["'`]https?:/);
+    expect(serviceWorker).not.toContain("openfreemap");
+    expect(serviceWorker).not.toContain("tiles.openfreemap.org");
   });
 });

@@ -6,9 +6,9 @@ The product follows the **Ocean Luxe** direction established by the standalone p
 
 ## Project status
 
-**Local-first application stage - Tranche 19: MVP Cruise Usability and Visual Polish v0.1 complete.**
+**Local-first application stage - Tranche 20: Cartographic Port Atlas and Map Context v0.1 complete.**
 
-The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype, tested Ocean Luxe React experience, Zod-backed canonical data and a versioned Dexie/IndexedDB persistence foundation. The app defaults to the real local Sun Princess 2026 Eastern Mediterranean Cruise shell, with Day 1 to Day 15 generated for 2026-08-15 to 2026-08-29 and operational times left empty pending review. Tranche 19 polishes the primary cruise experience: Dashboard presents the sailing as a live voyage, Today has a useful pre-cruise mode, Itinerary is easier to scan, Ports and Ship read more like guidebook pages, and More/Manage tooling is framed as backstage Data Safety and guidebook support. The first returned ChatGPT shape, `complete-cruising-sailing-shell-enrichment-v1`, retains its safe sailing-level import mapper for enrichment runs and sections only. Live integrations remain deliberately deferred.
+The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype, tested Ocean Luxe React experience, Zod-backed canonical data and a versioned Dexie/IndexedDB persistence foundation. The app defaults to the real local Sun Princess 2026 Eastern Mediterranean Cruise shell, with Day 1 to Day 15 generated for 2026-08-15 to 2026-08-29 and operational times left empty pending review. Tranche 20 adds a MapLibre-powered Port Atlas using a centralised OpenFreeMap no-key style configuration, visible attribution, approximate port-area coordinates, missing-coordinate fallback states and no geocoding, routing, weather overlays, geolocation or tile caching. The first returned ChatGPT shape, `complete-cruising-sailing-shell-enrichment-v1`, retains its safe sailing-level import mapper for enrichment runs and sections only. Live integrations remain deliberately deferred.
 
 ## Start here
 
@@ -21,7 +21,7 @@ The repository contains the project foundations, governance, illustrative sample
 
 ```text
 complete-cruising/
-|-- app/               Ocean Luxe React app through Tranche 19
+|-- app/               Ocean Luxe React app through Tranche 20
 |-- docs/              Product foundations, decisions and delivery plans
 |-- enrichment/        Prompt, staged-import and reviewed-output workspaces
 |-- prototypes/        Preserved visual reference artefacts
@@ -45,4 +45,4 @@ Work proceeds in small, independently reviewable tranches. The MVP direction is 
 
 Sample data must remain illustrative and must never include sensitive family information, booking references, cabin details, passport data, insurance data, addresses or other private details.
 
-The app can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The recommended next tranche is **Tranche 20: Content Accuracy Review and Offline Guidebook QA v0.1**.
+The app can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The recommended next tranche is **Tranche 21: Cruise Weather Intelligence v0.1**.

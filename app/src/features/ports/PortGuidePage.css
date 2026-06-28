@@ -199,6 +199,9 @@
 }
 
 .port-practical { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.port-page__atlas {
+  min-width: 0;
+}
 
 .port-guide-section,
 .family-lens-card,
@@ -383,7 +386,15 @@
 .attraction-card__family p { margin: var(--space-2) 0; }
 .attraction-card .port-card__metadata { margin-top: var(--space-5); }
 
-.port-page__editorial { grid-template-columns: minmax(0, 1.15fr) minmax(20rem, 0.85fr); }
+.port-page__editorial { grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.82fr); }
+
+.port-page__editorial .cruise-map-card {
+  min-height: 100%;
+}
+
+.port-page__editorial .cruise-map-card__viewport {
+  min-height: 25rem;
+}
 
 .family-lens-card {
   position: relative;
