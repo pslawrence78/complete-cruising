@@ -12,6 +12,15 @@ export function TopNavigation({
   onNavigate,
   routes,
 }: TopNavigationProps) {
+  const primaryRoutes = routes
+    .filter((route) => route.navigationGroup === "primary")
+    .sort((a, b) => a.order - b.order);
+  const moreRoutes = routes
+    .filter((route) => route.navigationGroup === "more")
+    .sort((a, b) => a.order - b.order);
+  const activeRoute = routes.find((route) => route.id === activeRouteId);
+  const moreIsActive = activeRoute?.navigationGroup === "more";
+
   return (
     <header className="top-navigation card-surface card-surface--glass">
       <a className="brand-lockup" href="#main-content" aria-label="Complete Cruising home">
@@ -26,7 +35,7 @@ export function TopNavigation({
 
       <nav className="top-navigation__nav" aria-label="Primary navigation">
         <ul className="navigation-list">
-          {routes.map((route) => {
+          {primaryRoutes.map((route) => {
             const isActive = route.id === activeRouteId;
             const isAvailable = route.status === "implemented";
 
@@ -55,6 +64,28 @@ export function TopNavigation({
               </li>
             );
           })}
+          <li>
+            <details className="navigation-more" open={moreIsActive}>
+              <summary className="navigation-item" aria-current={moreIsActive ? "page" : undefined}>More</summary>
+              <div className="navigation-more__menu">
+                {moreRoutes.map((route) => {
+                  const isAvailable = route.status === "implemented";
+                  return <button
+                    key={route.id}
+                    className="navigation-more__item"
+                    type="button"
+                    aria-current={route.id === activeRouteId ? "page" : undefined}
+                    aria-disabled={!isAvailable}
+                    onClick={() => {
+                      if (isAvailable) onNavigate(route.id);
+                    }}
+                  >
+                    {route.title}
+                  </button>;
+                })}
+              </div>
+            </details>
+          </li>
         </ul>
       </nav>
 
@@ -62,7 +93,7 @@ export function TopNavigation({
         <span className="active-sailing__signal" aria-hidden="true" />
         <span>
           <small>Active sailing</small>
-          <strong>Sun Princess Mediterranean 2026</strong>
+          <strong>Eastern Mediterranean Cruise</strong>
         </span>
       </div>
     </header>

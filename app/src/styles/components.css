@@ -148,6 +148,62 @@
   transform: translateY(-1px);
 }
 
+.navigation-more {
+  position: relative;
+}
+
+.navigation-more summary {
+  list-style: none;
+}
+
+.navigation-more summary::-webkit-details-marker {
+  display: none;
+}
+
+.navigation-more__menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  z-index: calc(var(--layer-header) + 1);
+  display: grid;
+  min-width: 14rem;
+  padding: 0.55rem;
+  border: 1px solid rgba(142, 228, 225, 0.2);
+  border-radius: var(--radius-lg);
+  background: rgba(6, 31, 44, 0.96);
+  box-shadow: var(--shadow-card);
+}
+
+.navigation-more__item,
+.mobile-navigation__more-item {
+  width: 100%;
+  min-height: 2.4rem;
+  padding: 0.55rem 0.75rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  color: var(--text-on-ocean-soft);
+  background: transparent;
+  font-size: 0.76rem;
+  font-weight: 750;
+  text-align: left;
+}
+
+.navigation-more__item:hover,
+.navigation-more__item:focus-visible,
+.navigation-more__item[aria-current="page"],
+.mobile-navigation__more-item:hover,
+.mobile-navigation__more-item:focus-visible,
+.mobile-navigation__more-item[aria-current="page"] {
+  color: var(--colour-warm-ivory);
+  background: rgba(142, 228, 225, 0.12);
+}
+
+.navigation-more__item[aria-disabled="true"],
+.mobile-navigation__more-item[aria-disabled="true"] {
+  color: var(--text-on-ocean-muted);
+  opacity: 0.45;
+}
+
 .navigation-item[aria-current="page"]::before {
   display: inline-block;
   width: 0.32rem;
@@ -251,6 +307,33 @@
   border-radius: var(--radius-pill);
   background: currentColor;
   opacity: 0.66;
+}
+
+.mobile-navigation__more {
+  position: relative;
+}
+
+.mobile-navigation__more summary {
+  list-style: none;
+}
+
+.mobile-navigation__more summary::-webkit-details-marker {
+  display: none;
+}
+
+.mobile-navigation__more-menu {
+  position: fixed;
+  right: var(--space-3);
+  bottom: 5.3rem;
+  left: var(--space-3);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem;
+  padding: 0.55rem;
+  border: 1px solid rgba(142, 228, 225, 0.2);
+  border-radius: var(--radius-lg);
+  background: rgba(6, 31, 44, 0.97);
+  box-shadow: var(--shadow-card);
 }
 
 .route-motif {

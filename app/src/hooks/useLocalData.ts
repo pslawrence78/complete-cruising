@@ -1,6 +1,6 @@
 import { liveQuery } from "dexie";
 import { useEffect, useState, type DependencyList } from "react";
-import { seedSampleData } from "../db/seedDatabase";
+import { ensureRealSunPrincessSailing } from "../db/realSailingOnboarding";
 import {
   getActivePortGuideBundle,
   getActiveSailingMemoriesBundle,
@@ -34,7 +34,7 @@ export function useDatabaseBootstrap() {
   const [state, setState] = useState<LocalQueryState<true>>({ loading: true });
   useEffect(() => {
     let active = true;
-    seedSampleData()
+    ensureRealSunPrincessSailing()
       .then(() => active && setState({ data: true, loading: false }))
       .catch((error) => active && setState({ error: error instanceof Error ? error : new Error("Local database setup failed"), loading: false }));
     return () => { active = false; };

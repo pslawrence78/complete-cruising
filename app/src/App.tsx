@@ -11,6 +11,7 @@ import { TodayPage } from "./features/today/TodayPage";
 import { ImportExportPage } from "./features/import-export/ImportExportPage";
 import { SailingSetupPage } from "./features/sailing-setup/SailingSetupPage";
 import { EnrichmentRequestsPage } from "./features/enrichment-requests/EnrichmentRequestsPage";
+import { DataManagementPage } from "./features/data-management/DataManagementPage";
 import { routeConfig } from "./routes/routeConfig";
 import { LocalDataState } from "./components/states/LocalDataState";
 import { useDatabaseBootstrap } from "./hooks/useLocalData";
@@ -59,6 +60,8 @@ function App() {
       <EnrichmentRequestsPage />
     ) : activeRouteId === "import-export" ? (
       <ImportExportPage />
+    ) : activeRouteId === "data-management" ? (
+      <DataManagementPage />
     ) : activeRouteId === "plans" ? (
       <PlansPage />
     ) : activeRouteId === "family" ? (

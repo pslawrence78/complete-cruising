@@ -19,15 +19,15 @@ describe("data-driven application screens", () => {
     window.history.replaceState(null, "", "#/");
   });
 
-  it("renders the dashboard from seeded local sailing data", async () => {
+  it("renders the dashboard from the real active sailing data", async () => {
     await renderRoute();
-    expect(await screen.findByRole("heading", { level: 1, name: "Sun Princess Mediterranean 2026" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Eastern Mediterranean Cruise" })).toBeInTheDocument();
     expect(screen.getByText(/Princess Cruises/)).toBeInTheDocument();
     expect(screen.getByText("7 / 7")).toBeInTheDocument();
     expect(screen.getByText("Calculated from the local sailing date")).toBeInTheDocument();
   });
 
-  it("renders all 15 local itinerary days in order", async () => {
+  it("renders all 15 real sailing itinerary days in order", async () => {
     await renderRoute("#/itinerary");
     const timeline = await screen.findByRole("region", { name: "Scrollable day-by-day itinerary" });
     const cards = within(timeline).getAllByRole("listitem");
@@ -37,20 +37,20 @@ describe("data-driven application screens", () => {
     expect(within(timeline).getAllByText("At sea")).toHaveLength(4);
   });
 
-  it("renders the selected Naples Today record with a prominent all-aboard time", async () => {
+  it("renders the real sailing preview Today record without fabricated all-aboard time", async () => {
     await renderRoute("#/today");
-    expect(await screen.findByRole("heading", { level: 1, name: "Naples, Italy" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 2, name: "17:30" })).toBeInTheDocument();
-    expect(screen.getByText("16:45")).toBeInTheDocument();
-    expect(screen.getByText("Warm and dry")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Civitavecchia, Italy" })).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { level: 2, name: /—|-/ }).length).toBeGreaterThan(0);
+    expect(screen.getByText("Not set")).toBeInTheDocument();
+    expect(screen.getByText("No snapshot")).toBeInTheDocument();
   });
 
-  it("loads the local take-ashore list, context and trust metadata", async () => {
+  it("loads the real sailing Today context and trust metadata", async () => {
     await renderRoute("#/today");
     const checklist = (await screen.findByRole("heading", { name: "Take ashore" })).closest("section")!;
-    expect(within(checklist).getAllByRole("checkbox")).toHaveLength(9);
+    expect(within(checklist).queryAllByRole("checkbox")).toHaveLength(0);
     expect(screen.getByText("Italian")).toBeInTheDocument();
-    expect(screen.getByText("Euro (EUR)")).toBeInTheDocument();
+    expect(screen.getByText("Euro")).toBeInTheDocument();
     expect(screen.getAllByText("Needs refresh").length).toBeGreaterThan(0);
   });
 
@@ -60,41 +60,34 @@ describe("data-driven application screens", () => {
     for (const heading of ["Identity and character", "Layout and orientation", "Dining", "Family and Seb suitability", "Pools and recreation", "Entertainment", "Tips and watchouts"]) {
       expect(screen.getByRole("heading", { name: heading })).toBeInTheDocument();
     }
-    expect(screen.getByText("Ship guidebook · not sailing-specific")).toBeInTheDocument();
+    expect(screen.getByText(/Ship guidebook .* not sailing-specific/)).toBeInTheDocument();
   });
 
-  it("renders Naples and four separately stored attractions", async () => {
+  it("renders the active sailing port guide without mixing in itinerary timings", async () => {
     await renderRoute("#/ports");
-    expect(await screen.findByRole("heading", { level: 1, name: "Naples, Italy" })).toBeInTheDocument();
-    const highlights = screen.getByRole("region", { name: "Four possible Naples stories." });
-    expect(within(highlights).getAllByRole("article")).toHaveLength(4);
-    expect(within(highlights).getByRole("heading", { name: "Pompeii" })).toBeInTheDocument();
-    expect(screen.getAllByText("Reusable port guidebook · not an itinerary day").length).toBeGreaterThan(0);
+    expect(await screen.findByRole("heading", { level: 1, name: "Civitavecchia, Italy" })).toBeInTheDocument();
+    expect(screen.getAllByText(/Reusable port guidebook .* not an itinerary day/).length).toBeGreaterThan(0);
   });
 
-  it("renders three comparable local Naples shore plans", async () => {
+  it("shows a local-first empty state when real sailing shore plans are not prepared", async () => {
     await renderRoute("#/plans");
-    expect(await screen.findByRole("heading", { name: "3 ways to meet Naples." })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Stories, volcanoes and pizza" })).toBeInTheDocument();
-    expect(screen.getByText("Selected recommendation")).toBeInTheDocument();
-    expect(screen.getAllByText("Refresh before sailing")).toHaveLength(3);
+    expect(await screen.findByRole("heading", { name: "No local sailing data found yet." })).toBeInTheDocument();
+    expect(screen.getByText("No local shore plans have been prepared for the selected day.")).toBeInTheDocument();
   });
 
-  it("renders local family discovery content", async () => {
+  it("renders real sailing family guidance as reviewable placeholders", async () => {
     await renderRoute("#/family");
     expect(await screen.findByLabelText("Italy flag")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Buongiorno" })).toBeInTheDocument();
-    expect(screen.getByText(/Which ancient Roman town/)).toBeInTheDocument();
-    expect(screen.getByText("Pompeii.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Not recorded" })).toBeInTheDocument();
+    expect(screen.getByText("Choose one local detail to spot.")).toBeInTheDocument();
+    expect(screen.getByText("Phrase meaning not yet enriched")).toBeInTheDocument();
   });
 
-  it("renders illustrative local memory entries without implying completed travel", async () => {
+  it("renders the real sailing memories page without sample prompts", async () => {
     await renderRoute("#/memories");
     expect(await screen.findByRole("heading", { name: "Keep the feeling, not just the facts." })).toBeInTheDocument();
-    expect(screen.getByText("Seb Favourite")).toBeInTheDocument();
-    expect(screen.getByText("Family Highlight")).toBeInTheDocument();
-    expect(screen.getByText(/not a recorded family answer/i)).toBeInTheDocument();
-    expect(screen.getAllByText("Draft preview · memories required").length).toBeGreaterThan(0);
+    expect(screen.getByText("No memories have been captured for this sailing. Your local journal is ready when you are.")).toBeInTheDocument();
+    expect(screen.getAllByText(/Draft .* memories required/).length).toBeGreaterThan(0);
   });
 
   it("shows an on-brand empty state when the active sailing setting is missing", async () => {
@@ -107,8 +100,20 @@ describe("data-driven application screens", () => {
     await renderRoute();
     const navigation = screen.getByRole("navigation", { name: "Primary navigation" });
     fireEvent.click(within(navigation).getByRole("button", { name: "Today" }));
-    expect(await screen.findByRole("heading", { level: 1, name: "Naples, Italy" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Civitavecchia, Italy" })).toBeInTheDocument();
     expect(window.location.hash).toBe("#/today");
+  });
+
+  it("places guidebook routes before admin routes in primary navigation", async () => {
+    await renderRoute();
+    const navigation = screen.getByRole("navigation", { name: "Primary navigation" });
+    const labels = within(navigation).getAllByRole("button").map((button) => button.textContent);
+    expect(labels.slice(0, 5)).toEqual(["Dashboard", "Today", "Itinerary", "Ports", "Ship"]);
+    fireEvent.click(within(navigation).getByText("More"));
+    expect(within(navigation).getByRole("button", { name: "Setup" })).toBeInTheDocument();
+    expect(within(navigation).getByRole("button", { name: "Enrichment Requests" })).toBeInTheDocument();
+    expect(within(navigation).getByRole("button", { name: "Import / Export" })).toBeInTheDocument();
+    expect(within(navigation).getByRole("button", { name: "Data Management" })).toBeInTheDocument();
   });
 
   it("shows app-shell offline readiness and local update status", async () => {
@@ -119,7 +124,7 @@ describe("data-driven application screens", () => {
     expect(within(readiness).getByText("Offline shell")).toBeInTheDocument();
     expect(within(readiness).getByText("Browser storage only")).toBeInTheDocument();
     expect(within(readiness).getByText("Last local update")).toBeInTheDocument();
-    expect(await within(readiness).findByText("20 Jun 2026")).toBeInTheDocument();
+    expect(await within(readiness).findByText("28 Jun 2026")).toBeInTheDocument();
   });
 
   it("renders the safe Import / Export workbench", async () => {

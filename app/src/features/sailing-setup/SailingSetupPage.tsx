@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { ConfidenceChip } from "../../components/status/ConfidenceChip";
-import { createSailingShell, summariseSetup, type SailingSetupInput, type SailingSetupItineraryDayInput, type SetupDayType, type SetupTenderStatus } from "./sailingSetupService";
+import { applyPortLabelsToRows, createSailingShell, generateItineraryRowsFromDates, summariseSetup, type SailingSetupInput, type SailingSetupItineraryDayInput, type SetupDayType, type SetupTenderStatus } from "./sailingSetupService";
 import "./SailingSetupPage.css";
 
 const emptyDay = (dayNumber: number): SailingSetupItineraryDayInput => ({
@@ -34,6 +34,7 @@ const stepLabels = ["Sailing basics", "Ship and cruise line", "Dates and voyage 
 export function SailingSetupPage() {
   const [input, setInput] = useState<SailingSetupInput>(initialInput);
   const [message, setMessage] = useState<string>();
+  const [pastedPorts, setPastedPorts] = useState("");
   const [saving, setSaving] = useState(false);
   const [createdSailingName, setCreatedSailingName] = useState<string>();
   const summary = useMemo(() => summariseSetup(input), [input]);
@@ -44,6 +45,14 @@ export function SailingSetupPage() {
     itineraryDays: current.itineraryDays.map((day, dayIndex) => dayIndex === index ? { ...day, ...patch } : day),
   }));
   const addDay = () => setInput((current) => ({ ...current, itineraryDays: [...current.itineraryDays, emptyDay(current.itineraryDays.length + 1)] }));
+  const generateDays = () => setInput((current) => ({
+    ...current,
+    itineraryDays: generateItineraryRowsFromDates(current.departureDate, current.returnDate),
+  }));
+  const applyPastedPorts = () => setInput((current) => ({
+    ...current,
+    itineraryDays: applyPortLabelsToRows(current.itineraryDays, pastedPorts),
+  }));
   const removeDay = (index: number) => setInput((current) => ({
     ...current,
     itineraryDays: current.itineraryDays.filter((_, dayIndex) => dayIndex !== index).map((day, dayIndex) => ({ ...day, dayNumber: dayIndex + 1 })),
@@ -112,6 +121,7 @@ export function SailingSetupPage() {
           <label>Return date<input type="date" value={input.returnDate} onChange={(event) => update({ returnDate: event.target.value })} /></label>
           <label>Voyage code <span>optional local-only</span><input value={input.voyageCode} onChange={(event) => update({ voyageCode: event.target.value })} /></label>
         </div>
+        <button type="button" className="setup-secondary" onClick={generateDays} disabled={!input.departureDate || !input.returnDate}>Generate itinerary dates</button>
         <div className="setup-inline">
           <label>Embarkation port <span>optional</span><input value={input.embarkationPortName} onChange={(event) => update({ embarkationPortName: event.target.value })} /></label>
           <label>Disembarkation port <span>optional</span><input value={input.disembarkationPortName} onChange={(event) => update({ disembarkationPortName: event.target.value })} /></label>
@@ -120,7 +130,11 @@ export function SailingSetupPage() {
     </section>
 
     <section className="setup-panel setup-panel--wide">
-      <div className="setup-section-heading"><div><p className="section-kicker">04 - Itinerary shell</p><h2>Manual day entries</h2></div><button type="button" onClick={addDay}>Add day</button></div>
+      <div className="setup-section-heading"><div><p className="section-kicker">04 - Itinerary shell</p><h2>Generated day entries</h2></div><button type="button" onClick={addDay}>Add day</button></div>
+      <div className="setup-paste-panel">
+        <label>Paste ports or sea days <span>one per day, commas also work</span><textarea value={pastedPorts} onChange={(event) => setPastedPorts(event.target.value)} placeholder={"Civitavecchia\nNaples\nAt sea\nSouda Bay / Chania"} /></label>
+        <button type="button" onClick={applyPastedPorts} disabled={!input.itineraryDays.length || !pastedPorts.trim()}>Apply labels</button>
+      </div>
       <div className="setup-days">
         {input.itineraryDays.map((day, index) => <article key={index} className="setup-day-card">
           <header><strong>Day {day.dayNumber}</strong><div><button type="button" onClick={() => moveDay(index, -1)} disabled={index === 0}>Up</button><button type="button" onClick={() => moveDay(index, 1)} disabled={index === input.itineraryDays.length - 1}>Down</button><button type="button" onClick={() => removeDay(index)} disabled={input.itineraryDays.length === 1}>Remove</button></div></header>

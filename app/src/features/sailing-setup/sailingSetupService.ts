@@ -89,6 +89,44 @@ export function calculateNights(departureDate: string, returnDate: string) {
   return Math.round((end - start) / 86_400_000);
 }
 
+function addDays(date: string, offset: number) {
+  const value = new Date(`${date}T00:00:00Z`);
+  value.setUTCDate(value.getUTCDate() + offset);
+  return value.toISOString().slice(0, 10);
+}
+
+export function generateItineraryRowsFromDates(departureDate: string, returnDate: string): SailingSetupItineraryDayInput[] {
+  const nights = calculateNights(departureDate, returnDate);
+  if (!nights && departureDate !== returnDate) return [];
+  return Array.from({ length: nights + 1 }, (_, index) => {
+    const dayNumber = index + 1;
+    const finalDay = index === nights;
+    return {
+      dayNumber,
+      date: addDays(departureDate, index),
+      dayType: dayNumber === 1 ? "embarkation" : finalDay ? "disembarkation" : "port",
+      portName: "",
+      countryName: "",
+      arrivalTime: "",
+      departureTime: "",
+      allAboardTime: "",
+      tenderStatus: finalDay ? "not_applicable" : "unknown",
+      userConfirmed: false,
+    };
+  });
+}
+
+export function applyPortLabelsToRows(rows: SailingSetupItineraryDayInput[], labelsText: string): SailingSetupItineraryDayInput[] {
+  const labels = labelsText.split(/\r?\n|,/).map((value) => value.trim()).filter(Boolean);
+  return rows.map((row, index) => {
+    const label = labels[index];
+    if (!label) return row;
+    const lower = label.toLowerCase();
+    if (lower === "sea" || lower === "sea day" || lower === "at sea") return { ...row, dayType: "sea", portName: "", tenderStatus: "not_applicable" };
+    return { ...row, portName: label, dayType: row.dayType === "embarkation" || row.dayType === "disembarkation" ? row.dayType : "port" };
+  });
+}
+
 export function summariseSetup(input: SailingSetupInput) {
   const portDays = input.itineraryDays.filter((day) => day.dayType === "port" || day.dayType === "overnight_port").length;
   const seaDays = input.itineraryDays.filter((day) => day.dayType === "sea" || day.dayType === "scenic_cruising").length;

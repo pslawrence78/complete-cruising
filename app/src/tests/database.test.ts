@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { CompleteCruisingDb } from "../db/completeCruisingDb";
 import { clearSampleData, resetSampleData } from "../db/resetDatabase";
+import { ensureRealSunPrincessSailing, REAL_SUN_PRINCESS_SAILING_ID } from "../db/realSailingOnboarding";
 import { seedSampleData } from "../db/seedDatabase";
 import {
   getActiveSailing,
@@ -58,6 +59,42 @@ describe("local database foundation", () => {
     expect(active?.name).toBe("Sun Princess Mediterranean 2026");
     expect(days).toHaveLength(15);
     expect(days[1].portId).toBe("port-naples");
+  });
+
+  it("onboards the real Sun Princess sailing as active without duplication", async () => {
+    await seedSampleData(database);
+    await ensureRealSunPrincessSailing(database);
+    await ensureRealSunPrincessSailing(database);
+    const active = await getActiveSailing(database);
+    const days = await getItineraryDaysForSailing(REAL_SUN_PRINCESS_SAILING_ID, database);
+    expect(active?.id).toBe(REAL_SUN_PRINCESS_SAILING_ID);
+    expect(active?.name).toBe("Eastern Mediterranean Cruise");
+    expect(active?.departureDate).toBe("2026-08-15");
+    expect(active?.returnDate).toBe("2026-08-29");
+    expect(active?.voyageCode).toBeUndefined();
+    expect(days).toHaveLength(15);
+    expect(days[0].date).toBe("2026-08-15");
+    expect(days[14].date).toBe("2026-08-29");
+    expect(days.every((day) => !day.arrivalTime && !day.departureTime && !day.allAboardTime)).toBe(true);
+    expect(days.every((day) => day.confidence?.reviewStatus === "needs_user_review")).toBe(true);
+    expect((await database.sailings.where("id").equals(REAL_SUN_PRINCESS_SAILING_ID).count())).toBe(1);
+  });
+
+  it("does not overwrite protected real sailing fields during onboarding", async () => {
+    await ensureRealSunPrincessSailing(database);
+    await database.sailings.update(REAL_SUN_PRINCESS_SAILING_ID, {
+      voyageCode: "U632A",
+      routeSummary: "User-reviewed route",
+      departureDate: "2026-08-15",
+    });
+    await database.itineraryDays.update(`${REAL_SUN_PRINCESS_SAILING_ID}-day-07`, { tenderStatus: "confirmed", allAboardTime: "17:30" });
+    await ensureRealSunPrincessSailing(database);
+    const sailing = await database.sailings.get(REAL_SUN_PRINCESS_SAILING_ID);
+    const day = await database.itineraryDays.get(`${REAL_SUN_PRINCESS_SAILING_ID}-day-07`);
+    expect(sailing?.voyageCode).toBe("U632A");
+    expect(sailing?.routeSummary).toBe("User-reviewed route");
+    expect(day?.tenderStatus).toBe("confirmed");
+    expect(day?.allAboardTime).toBe("17:30");
   });
 
   it("loads the reusable Naples guide separately from sailing plans", async () => {

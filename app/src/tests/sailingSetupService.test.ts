@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { CompleteCruisingDb } from "../db/completeCruisingDb";
 import { seedSampleData } from "../db/seedDatabase";
-import { calculateNights, createSailingShell, summariseSetup, type SailingSetupInput } from "../features/sailing-setup/sailingSetupService";
+import { applyPortLabelsToRows, calculateNights, createSailingShell, generateItineraryRowsFromDates, summariseSetup, type SailingSetupInput } from "../features/sailing-setup/sailingSetupService";
 
 const setupInput: SailingSetupInput = {
   sailingName: "Test Mediterranean Sailing",
@@ -38,6 +38,22 @@ describe("sailing setup service", () => {
   it("calculates nights and setup review counts", () => {
     expect(calculateNights("2026-08-15", "2026-08-22")).toBe(7);
     expect(summariseSetup(setupInput)).toMatchObject({ nights: 7, itineraryDayCount: 3, portDays: 1, seaDays: 1 });
+  });
+
+  it("auto-generates every cruise day from departure and return dates", () => {
+    const rows = generateItineraryRowsFromDates("2026-08-15", "2026-08-29");
+    expect(rows).toHaveLength(15);
+    expect(rows[0]).toMatchObject({ dayNumber: 1, date: "2026-08-15", dayType: "embarkation" });
+    expect(rows[14]).toMatchObject({ dayNumber: 15, date: "2026-08-29", dayType: "disembarkation" });
+    expect(rows.every((row) => !row.arrivalTime && !row.departureTime && !row.allAboardTime)).toBe(true);
+  });
+
+  it("applies pasted port labels and sea days efficiently", () => {
+    const rows = generateItineraryRowsFromDates("2026-08-15", "2026-08-17");
+    const labelled = applyPortLabelsToRows(rows, "Civitavecchia\nNaples\nAt sea");
+    expect(labelled[0].portName).toBe("Civitavecchia");
+    expect(labelled[1]).toMatchObject({ dayType: "port", portName: "Naples" });
+    expect(labelled[2]).toMatchObject({ dayType: "sea", portName: "" });
   });
 
   it("creates a sailing shell with manual itinerary days", async () => {
