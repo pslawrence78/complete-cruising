@@ -10,6 +10,15 @@ const protectedFields: Partial<Record<ImportType, string[]>> = {
   port_enrichment: ["name", "countryId", "timezone", "cruiseLogisticsSummary"],
 };
 
+export const enrichmentReturnSchemaImportMap: Record<string, ImportType> = {
+  "complete-cruising-sailing-shell-enrichment-v1": "sailing_shell",
+  "complete-cruising-itinerary-verification-v1": "itinerary",
+  "complete-cruising-ship-pack-enrichment-v1": "ship_enrichment",
+  "complete-cruising-port-pack-enrichment-v1": "port_enrichment",
+  "complete-cruising-shore-plan-generation-v1": "itinerary",
+  "complete-cruising-day-guide-generation-v1": "day_guide",
+};
+
 function blank(selectedImportType: ImportType): ImportPreviewResult {
   return { status: "idle", selectedImportType, summary: "Add a structured JSON file to begin a private, local preview.", recordsToCreate: [], recordsToUpdate: [], recordsUnchanged: [], protectedFieldImpacts: [], warnings: [], errors: [], previewOnly: true };
 }
@@ -32,9 +41,23 @@ export async function createImportPreview(json: string, selectedImportType: Impo
   try { raw = JSON.parse(json); } catch (error) {
     return { ...blank(selectedImportType), status: "parse_error", summary: "The text is not valid JSON.", errors: [{ id: "parse", title: "JSON could not be read", message: error instanceof Error ? error.message : "Check brackets, commas and quotation marks.", code: "invalid_json" }] };
   }
-  const detected = typeof raw?.kind === "string" && raw.kind in importDefinitions ? raw.kind as ImportType : undefined;
+  const detectedFromReturnSchema = typeof raw?.schema === "string" ? enrichmentReturnSchemaImportMap[raw.schema] : undefined;
+  const detected = typeof raw?.kind === "string" && raw.kind in importDefinitions ? raw.kind as ImportType : detectedFromReturnSchema;
   if (detected && detected !== selectedImportType) {
     return { ...blank(selectedImportType), status: "type_mismatch", detectedImportType: detected, schema: importDefinitions[detected].name, schemaVersion: raw.header?.schemaVersion, summary: `This looks like ${detected.replaceAll("_", " ")} data, not the selected import type.`, errors: [{ id: "type-mismatch", title: "Import type mismatch", message: `Choose ${detected.replaceAll("_", " ")} or use a matching payload.`, fieldPath: "kind", code: "type_mismatch" }] };
+  }
+  if (detectedFromReturnSchema) {
+    return {
+      ...blank(selectedImportType),
+      status: "invalid",
+      detectedImportType: detectedFromReturnSchema,
+      schema: raw.schema,
+      schemaVersion: raw.schemaVersion,
+      sourceApp: raw.sourceApp,
+      summary: "This recognised enrichment return schema needs import mapping before it can be committed.",
+      warnings: [{ id: "recognised-return-schema", severity: "info", title: "Recognised enrichment return", message: "Route this through Import / Export preview, but this tranche only recognises the schema and does not commit the returned shape yet." }],
+      errors: [{ id: "return-schema-limitation", title: "Preview mapping incomplete", message: "The returned ChatGPT shape is recognised, but a safe field-level mapper is not implemented in this tranche.", fieldPath: "schema", code: "unsupported_return_schema" }],
+    };
   }
   const parsed = importDefinitions[selectedImportType].schema.safeParse(raw);
   if (!parsed.success) {

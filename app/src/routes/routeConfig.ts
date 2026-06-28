@@ -19,6 +19,18 @@ export const routeConfig: readonly RouteDefinition[] = [
     status: "implemented",
   },
   {
+    id: "sailing-setup",
+    path: "/sailing-setup",
+    title: "Setup",
+    status: "implemented",
+  },
+  {
+    id: "enrichment-requests",
+    path: "/enrichment-requests",
+    title: "Enrichment",
+    status: "implemented",
+  },
+  {
     id: "today",
     path: "/today",
     title: "Today",

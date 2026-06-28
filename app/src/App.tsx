@@ -9,6 +9,8 @@ import { PortGuidePage } from "./features/ports/PortGuidePage";
 import { ShipPage } from "./features/ship/ShipPage";
 import { TodayPage } from "./features/today/TodayPage";
 import { ImportExportPage } from "./features/import-export/ImportExportPage";
+import { SailingSetupPage } from "./features/sailing-setup/SailingSetupPage";
+import { EnrichmentRequestsPage } from "./features/enrichment-requests/EnrichmentRequestsPage";
 import { routeConfig } from "./routes/routeConfig";
 import { LocalDataState } from "./components/states/LocalDataState";
 import { useDatabaseBootstrap } from "./hooks/useLocalData";
@@ -51,7 +53,11 @@ function App() {
   };
 
   const activePage =
-    activeRouteId === "import-export" ? (
+    activeRouteId === "sailing-setup" ? (
+      <SailingSetupPage />
+    ) : activeRouteId === "enrichment-requests" ? (
+      <EnrichmentRequestsPage />
+    ) : activeRouteId === "import-export" ? (
       <ImportExportPage />
     ) : activeRouteId === "plans" ? (
       <PlansPage />

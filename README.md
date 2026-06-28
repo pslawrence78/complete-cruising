@@ -6,9 +6,9 @@ The product follows the **Ocean Luxe** direction established by the standalone p
 
 ## Project status
 
-**Local-first application stage - Tranche 16: Production Smoke Test and Release Hardening v0.1 complete.**
+**Local-first application stage - Tranche 17: Sailing Setup and Enrichment Request Workflow v0.1 complete.**
 
-The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype, tested Ocean Luxe React experience, Zod-backed canonical data and a versioned Dexie/IndexedDB persistence foundation. Nine routes now include a premium Import / Export workbench with five supported JSON shapes, field-level validation, ID-based local conflict detection, protected-field confirmation, transactional local commits, ImportBatch audit records and three browser-native JSON exports. The app also has install metadata, Ocean Luxe icon placeholders, production service-worker registration, static app-shell caching, a visible offline readiness cue, a GitHub Pages Actions deployment workflow for `/complete-cruising/` and documented production-smoke release checks. Live integrations remain deliberately deferred.
+The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype, tested Ocean Luxe React experience, Zod-backed canonical data and a versioned Dexie/IndexedDB persistence foundation. Eleven routes now include a premium Import / Export workbench, a guided sailing setup flow and an Enrichment Requests area that generates structured request JSON plus copy-ready ChatGPT prompts for six controlled prompt types. Returned enrichment remains routed through preview and commit; recognised new return schemas are not silently accepted without safe mapping. The app also has install metadata, Ocean Luxe icon placeholders, production service-worker registration, static app-shell caching, a visible offline readiness cue, a GitHub Pages Actions deployment workflow for `/complete-cruising/` and documented production-smoke release checks. Live integrations remain deliberately deferred.
 
 ## Start here
 
@@ -21,7 +21,7 @@ The repository contains the project foundations, governance, illustrative sample
 
 ```text
 complete-cruising/
-|-- app/               Ocean Luxe React app through Tranche 16
+|-- app/               Ocean Luxe React app through Tranche 17
 |-- docs/              Product foundations, decisions and delivery plans
 |-- enrichment/        Prompt, staged-import and reviewed-output workspaces
 |-- prototypes/        Preserved visual reference artefacts
@@ -45,4 +45,4 @@ Work proceeds in small, independently reviewable tranches. The MVP direction is 
 
 Sample data must remain illustrative and must never include sensitive family information, booking references, cabin details, passport data, insurance data, addresses or other private details.
 
-The app can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The recommended next tranche is **Tranche 17: Post-Release Visual QA and Content Accuracy Review**.
+The app can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The recommended next tranche is **Tranche 18: Real Sun Princess 2026 Data Onboarding v0.1**.
