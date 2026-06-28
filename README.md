@@ -6,9 +6,9 @@ The product follows the **Ocean Luxe** direction established by the standalone p
 
 ## Project status
 
-**Local-first application stage - Tranche 14: PWA and Offline Readiness v0.1 complete.**
+**Local-first application stage - Tranche 15: GitHub Pages Deployment v0.1 complete.**
 
-The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype, tested Ocean Luxe React experience, Zod-backed canonical data and a versioned Dexie/IndexedDB persistence foundation. Nine routes now include a premium Import / Export workbench with five supported JSON shapes, field-level validation, ID-based local conflict detection, protected-field confirmation, transactional local commits, ImportBatch audit records and three browser-native JSON exports. The app also has install metadata, Ocean Luxe icon placeholders, production service-worker registration, static app-shell caching and a visible offline readiness cue. Live integrations remain deliberately deferred.
+The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype, tested Ocean Luxe React experience, Zod-backed canonical data and a versioned Dexie/IndexedDB persistence foundation. Nine routes now include a premium Import / Export workbench with five supported JSON shapes, field-level validation, ID-based local conflict detection, protected-field confirmation, transactional local commits, ImportBatch audit records and three browser-native JSON exports. The app also has install metadata, Ocean Luxe icon placeholders, production service-worker registration, static app-shell caching, a visible offline readiness cue and a GitHub Pages Actions deployment workflow for `/complete-cruising/`. Live integrations remain deliberately deferred.
 
 ## Start here
 
@@ -21,7 +21,7 @@ The repository contains the project foundations, governance, illustrative sample
 
 ```text
 complete-cruising/
-|-- app/               Ocean Luxe React app through Tranche 14
+|-- app/               Ocean Luxe React app through Tranche 15
 |-- docs/              Product foundations, decisions and delivery plans
 |-- enrichment/        Prompt, staged-import and reviewed-output workspaces
 |-- prototypes/        Preserved visual reference artefacts
@@ -45,4 +45,4 @@ Work proceeds in small, independently reviewable tranches. The MVP direction is 
 
 Sample data must remain illustrative and must never include sensitive family information, booking references, cabin details, passport data, insurance data, addresses or other private details.
 
-The app can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The next planned tranche is **Tranche 15: GitHub Pages Deployment**.
+The app can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The recommended next tranche is **Tranche 16: Production Smoke Test and Release Hardening**.

@@ -2,19 +2,21 @@
 
 This is the entry point for project knowledge in the Complete Cruising repository. It inventories the current project files, explains which document to consult for each kind of decision, and records gaps between the documented target and the repository as it exists.
 
-Last inventoried: 27 June 2026.
+Last inventoried: 28 June 2026.
 
 ## Repository at a glance
 
 Complete Cruising is a documentation-first project for a premium, local-first Lawrence Family Series PWA. The intended experience is a rich cruise guidebook and companion, not a plain administration or CRUD interface.
 
-The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Ocean Luxe application through Tranche 14. Core records have TypeScript types, strict Zod schemas, canonical illustrative fixtures and versioned import/export validation. A version 1 Dexie database provides validated sample seeding, reset utilities and repository access; eight core screens subscribe to local repository queries, while a ninth route provides JSON parsing, validation, conflict preview, protected-field confirmation, transactional local import commits, ImportBatch auditing and browser-native JSON exports. Production PWA install metadata, app icon placeholders, service-worker registration, static app-shell caching and an offline readiness indicator are present. Live APIs and deployment workflow remain absent.
+The repository currently contains project governance, seven v0.1 foundation documents, the standalone Ocean Luxe HTML prototype, the delivery tracker, illustrative sample records, reserved enrichment workspaces and the tested Ocean Luxe application through Tranche 15. Core records have TypeScript types, strict Zod schemas, canonical illustrative fixtures and versioned import/export validation. A version 1 Dexie database provides validated sample seeding, reset utilities and repository access; eight core screens subscribe to local repository queries, while a ninth route provides JSON parsing, validation, conflict preview, protected-field confirmation, transactional local import commits, ImportBatch auditing and browser-native JSON exports. Production PWA install metadata, app icon placeholders, service-worker registration, static app-shell caching, an offline readiness indicator and a GitHub Pages Actions deployment workflow are present. Live APIs remain absent.
 
 ```text
 complete-cruising/
 |-- .git/                             Git repository metadata; not project knowledge
 |-- .gitattributes                    Text-file normalisation configuration
 |-- .gitignore                        Future app and local-tool exclusions
+|-- .github/
+|   `-- workflows/deploy.yml          GitHub Pages deployment workflow
 |-- AGENTS.md                         Mandatory project-working instructions
 |-- README.md                         Contributor-facing project introduction
 |-- app/
@@ -129,6 +131,9 @@ complete-cruising/
 |       |   |-- components.css        Shared component treatments
 |       |   `-- responsive.css        Responsive shell behaviour
 |       |-- tests/App.test.tsx        View, trust metadata, import/export and routing tests
+|       |-- tests/deploymentReadiness.test.ts
+|       |                                  GitHub Pages deployment readiness checks
+|       |-- tests/pwaAssets.test.ts   PWA manifest and service-worker asset checks
 |       |-- tests/schemas.test.ts     Valid and invalid schema coverage
 |       `-- tests/setup.ts            Testing Library setup and cleanup
 |-- docs/
@@ -145,6 +150,8 @@ complete-cruising/
 |   |                                  Tranche 13 implementation record
 |   |-- 14-pwa-and-offline-readiness-v0.1.md
 |   |                                  Tranche 14 implementation record
+|   |-- 15-github-pages-deployment-v0.1.md
+|   |                                  Tranche 15 implementation record
 |   |-- build-plan/
 |   |   `-- tranche-plan-v0.1.md
 |   `-- decisions/
@@ -170,6 +177,7 @@ complete-cruising/
 | [../README.md](../README.md) | Project introduction | Concise contributor entry point covering status, repository structure, current artefacts, development approach, sample-data safety and the next tranche. |
 | [../.gitattributes](../.gitattributes) | Repository configuration | Enables automatic text detection and LF normalisation. |
 | [../.gitignore](../.gitignore) | Repository configuration | Excludes dependency folders, build output, local environment files, editor settings, logs and coverage output without hiding project artefacts. |
+| [../.github/workflows/deploy.yml](../.github/workflows/deploy.yml) | Deployment workflow | Builds, validates, uploads and deploys `app/dist` to GitHub Pages through GitHub Actions. |
 | [README.md](README.md) | Project knowledge | Living repository inventory, knowledge router, current-state summary and gap register. |
 | [01-product-specification-v0.1.md](01-product-specification-v0.1.md) | Product foundation | Defines the vision, audience, journeys, scope, information architecture, product-level data concepts, enrichment philosophy, visual ambition and success criteria. |
 | [02-enrichment-framework-v0.1.md](02-enrichment-framework-v0.1.md) | Trust and content foundation | Defines targeted enrichment packs, source hierarchy, confidence, review and refresh metadata, review workflow, family lenses, import standards and anti-patterns. |
@@ -181,6 +189,7 @@ complete-cruising/
 | [12-import-preview-v0.1.md](12-import-preview-v0.1.md) | Tranche record | Documents supported JSON import previews, validation, protected-field handling, safety boundaries, testing and limitations. |
 | [13-import-commit-and-export-v0.1.md](13-import-commit-and-export-v0.1.md) | Tranche record | Documents safe validated import commits, ImportBatch auditing, protected-field confirmation, full backup export, sailing export and Adventure Almanac draft export. |
 | [14-pwa-and-offline-readiness-v0.1.md](14-pwa-and-offline-readiness-v0.1.md) | Tranche record | Documents install metadata, app icon placeholders, conservative app-shell service-worker caching, offline fallback, readiness UI, validation and limitations. |
+| [15-github-pages-deployment-v0.1.md](15-github-pages-deployment-v0.1.md) | Tranche record | Documents the GitHub Pages target path, Vite base-path handling, hash routing, Pages workflow, PWA publication checks, local validation and limitations. |
 | [build-plan/tranche-plan-v0.1.md](build-plan/tranche-plan-v0.1.md) | Delivery tracker | Concise 16-tranche sequence for implementation; subordinate to the detailed Build Plan v0.1 and intended to evolve transparently. |
 | [decisions/0001-project-start.md](decisions/0001-project-start.md) | Decision record | Records the accepted local-first static PWA, prototype-reference, tranche-delivery, no-live-API MVP and sample-data privacy decisions. |
 | [../prototypes/v0.1/complete-cruising-prototype-v0.1.html](../prototypes/v0.1/complete-cruising-prototype-v0.1.html) | Authoritative visual reference | Standalone Ocean Luxe concept prototype. Use it to preserve the proven visual direction during production implementation; it is reference material, not production code. |
@@ -190,8 +199,8 @@ complete-cruising/
 | [../enrichment/prompts/README.md](../enrichment/prompts/README.md) | Enrichment workspace guidance | Reserves the prompt area for small, structured packs while preserving trust metadata and record boundaries. |
 | [../enrichment/imports/README.md](../enrichment/imports/README.md) | Enrichment workspace guidance | Reserves the import staging area and states that staged files are neither trusted nor committed data. |
 | [../enrichment/reviewed/README.md](../enrichment/reviewed/README.md) | Enrichment workspace guidance | Reserves the reviewed-output area without allowing reviewed content to overwrite trusted data silently. |
-| [../app/README.md](../app/README.md) | App guidance | Records scaffold commands, current scope and the `/complete-cruising/` GitHub Pages base-path decision. |
-| [../app/package.json](../app/package.json) and [package-lock.json](../app/package-lock.json) | App configuration | Define sandbox-compatible development and validation scripts plus locked React, TypeScript, Vite, Vitest and Testing Library dependencies. |
+| [../app/README.md](../app/README.md) | App guidance | Records scaffold commands, current scope, local preview usage and the `/complete-cruising/` GitHub Pages base-path decision. |
+| [../app/package.json](../app/package.json) and [package-lock.json](../app/package-lock.json) | App configuration | Define sandbox-compatible development, preview and validation scripts plus locked React, TypeScript, Vite, Vitest and Testing Library dependencies. |
 | [../app/index.html](../app/index.html) | App entry point | Provides the static Vite document shell using British English document metadata, manifest link, theme colour and app icons. |
 | [../app/public/manifest.webmanifest](../app/public/manifest.webmanifest), [sw.js](../app/public/sw.js), [offline.html](../app/public/offline.html) and [icons](../app/public/icons/complete-cruising-icon.svg) | PWA assets | Define install metadata, Ocean Luxe icon placeholders, production static app-shell caching and the offline fallback document without live API dependencies. |
 | [../app/vite.config.ts](../app/vite.config.ts) and [vitest.config.ts](../app/vitest.config.ts) | Tooling configuration | Configure React builds, the documented GitHub Pages base path and jsdom component tests. |
@@ -218,7 +227,7 @@ complete-cruising/
 | [../app/src/features/ports/PortGuidePage.tsx](../app/src/features/ports/PortGuidePage.tsx), [PortGuidePage.css](../app/src/features/ports/PortGuidePage.css) and [Port Guide components](../app/src/features/ports/components/PortPostcard.tsx) | Port guide feature | Implement the warm postcard hero, practical guide sections, separate attraction cards, restrained family lens, photography prompt and uncertainty notes without mixing port knowledge into itinerary-day timings. |
 | [../app/src/features/plans/PlansPage.tsx](../app/src/features/plans/PlansPage.tsx), [family/FamilyGuidePage.tsx](../app/src/features/family/FamilyGuidePage.tsx), [memories/MemoriesPage.tsx](../app/src/features/memories/MemoriesPage.tsx) and [experience-pages.css](../app/src/features/experience-pages.css) | Tranche 8 experience features | Implement three premium Naples experience routes, selected plan comparison, Seb discovery, reflective memory prompts and a non-functional Adventure Almanac export preview. |
 | [../app/src/styles/tokens.css](../app/src/styles/tokens.css), [base.css](../app/src/styles/base.css), [app-shell.css](../app/src/styles/app-shell.css), [components.css](../app/src/styles/components.css) and [responsive.css](../app/src/styles/responsive.css) | App styles | Translate Ocean Luxe into shared tokens, atmospheric backgrounds, reusable surfaces, accessible focus states and responsive layouts. |
-| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx), [pwaAssets.test.ts](../app/src/tests/pwaAssets.test.ts), [importPreviewService.test.ts](../app/src/tests/importPreviewService.test.ts), [importCommitService.test.ts](../app/src/tests/importCommitService.test.ts), [exportService.test.ts](../app/src/tests/exportService.test.ts), [database.test.ts](../app/src/tests/database.test.ts), [schemas.test.ts](../app/src/tests/schemas.test.ts) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify nine routes, local data flows, repository separation, schema validity, preview safety, transactional import commits, ImportBatch auditing, local JSON export payloads and PWA app-shell assets. |
+| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx), [deploymentReadiness.test.ts](../app/src/tests/deploymentReadiness.test.ts), [pwaAssets.test.ts](../app/src/tests/pwaAssets.test.ts), [importPreviewService.test.ts](../app/src/tests/importPreviewService.test.ts), [importCommitService.test.ts](../app/src/tests/importCommitService.test.ts), [exportService.test.ts](../app/src/tests/exportService.test.ts), [database.test.ts](../app/src/tests/database.test.ts), [schemas.test.ts](../app/src/tests/schemas.test.ts) and [setup.ts](../app/src/tests/setup.ts) | App tests | Verify nine routes, local data flows, repository separation, schema validity, preview safety, transactional import commits, ImportBatch auditing, local JSON export payloads, PWA app-shell assets and GitHub Pages deployment readiness. |
 
 ## Knowledge routing
 
@@ -273,7 +282,6 @@ The following are described by the foundation documents but are not present in t
 
 - production routing beyond the nine implemented views;
 - automated visual regression references;
-- GitHub Pages deployment workflow;
 
 ## Maintenance rules
 
