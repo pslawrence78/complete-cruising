@@ -6,13 +6,18 @@ import { AllAboardCard } from "./AllAboardCard";
 
 interface TodayAshorePanelProps {
   currentDay: TodayData["currentDay"];
+  mode: TodayData["mode"];
+  nextStep: TodayData["nextStep"];
   returnPlan: TodayData["returnPlan"];
 }
 
 export function TodayAshorePanel({
   currentDay,
+  mode,
+  nextStep,
   returnPlan,
 }: TodayAshorePanelProps) {
+  const isPreCruise = mode === "pre-cruise";
   return (
     <CardSurface
       as="section"
@@ -22,9 +27,9 @@ export function TodayAshorePanel({
     >
       <RouteMotif className="today-ashore-panel__route" />
       <div className="today-ashore-panel__identity">
-        <p className="eyebrow">Today ashore · illustrative day</p>
+        <p className="eyebrow">{isPreCruise ? "Pre-cruise Today" : "Today ashore"}</p>
         <p className="today-ashore-panel__day">
-          Day {currentDay.dayNumber} · Port day · {currentDay.dateLabel}
+          Day {currentDay.dayNumber} - {isPreCruise ? "Embarkation preparing" : "Port day"} - {currentDay.dateLabel}
         </p>
         <h1 id="today-title">
           {currentDay.port}, <em>{currentDay.country}</em>
@@ -32,7 +37,7 @@ export function TodayAshorePanel({
         <p className="today-ashore-panel__summary">
           {currentDay.portSummary}
         </p>
-        <StatusChip label="Sample operational view" tone="review" />
+        <StatusChip label={isPreCruise ? "Companion preparing" : "Operational view"} tone="review" />
 
         <dl className="today-ashore-panel__times" aria-label="Today's key port times">
           <div>
@@ -50,6 +55,11 @@ export function TodayAshorePanel({
         allAboardTime={currentDay.allAboardTime}
         returnPlan={returnPlan}
       />
+      <a className="today-next-step" href={nextStep.href}>
+        <span>{nextStep.label}</span>
+        <strong>{nextStep.title}</strong>
+        <small>{nextStep.body}</small>
+      </a>
     </CardSurface>
   );
 }

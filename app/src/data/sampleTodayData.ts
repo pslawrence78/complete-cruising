@@ -40,6 +40,13 @@ export interface TodayData {
     port: string;
     portSummary: string;
   };
+  mode: "pre-cruise" | "cruise-day";
+  nextStep: {
+    label: string;
+    title: string;
+    body: string;
+    href: string;
+  };
   local: {
     currency: string;
     language: string;
@@ -85,6 +92,13 @@ export const sampleTodayData = {
     arrivalTime: "07:00",
     allAboardTime: "17:30",
     departureTime: "18:30",
+  },
+  mode: "cruise-day",
+  nextStep: {
+    label: "Open next",
+    title: "Explore itinerary",
+    body: "See the route shape and day-by-day review notes.",
+    href: "#/itinerary",
   },
   returnPlan: {
     latestSafeReturn: "16:45",

@@ -43,9 +43,9 @@ export function SailingHero({ route, sailing }: SailingHeroProps) {
       <div className="dashboard-hero__content">
         <div className="dashboard-hero__main">
           <div>
-            <p className="eyebrow">Illustrative sailing · {sailing.dateLabel}</p>
+            <p className="eyebrow">Active sailing - {sailing.dateLabel}</p>
             <p className="dashboard-hero__lineage">
-              {sailing.cruiseLine} <span aria-hidden="true">·</span> {sailing.ship}
+              {sailing.cruiseLine} <span aria-hidden="true">-</span> {sailing.ship}
             </p>
             <h1 id="dashboard-title">{sailing.name}</h1>
             <p className="dashboard-hero__route-summary">
@@ -54,7 +54,7 @@ export function SailingHero({ route, sailing }: SailingHeroProps) {
               <span>{sailing.routeEnd}</span>
             </p>
             <p className="dashboard-hero__description">
-              A personalised guide to every port, plan and possibility.
+              A local-first cruise companion for every port, plan and possibility, with review notes kept visible until operational details are checked.
             </p>
 
             <div className="dashboard-hero__actions" aria-label="Dashboard actions">
@@ -89,19 +89,20 @@ export function SailingHero({ route, sailing }: SailingHeroProps) {
             <span>{sailing.nights} nights</span>
             <span>{sailing.ports} ports</span>
             <span>{sailing.seaDays} sea days</span>
+            <span>{sailing.departureLabel}</span>
+            <span>{sailing.returnLabel}</span>
           </div>
         </div>
 
-        <CardSurface as="aside" className="countdown-card" variant="paper" aria-label="Illustrative embarkation countdown">
+        <CardSurface as="aside" className="countdown-card" variant="paper" aria-label="Embarkation countdown">
           <div className="countdown-card__status">
             <p>Embarkation countdown</p>
             <StatusChip label="Upcoming" tone="confirmed" />
           </div>
           <strong>{sailing.daysToEmbarkation}</strong>
-          <span>illustrative days</span>
+          <span>days to embarkation</span>
           <p>
-            A fixed placeholder until confirmed sailing dates power the live
-            countdown in a later data tranche.
+            Sun Princess awaits. Dates come from the local sailing shell; terminal, all-aboard and port operations still need checking before travel.
           </p>
           <div className="countdown-card__bearing" aria-hidden="true">
             <span>N</span>

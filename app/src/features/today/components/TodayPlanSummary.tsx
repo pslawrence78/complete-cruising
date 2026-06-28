@@ -12,22 +12,22 @@ export function TodayPlanSummary({ plans }: TodayPlanSummaryProps) {
     <CardSurface as="section" className="today-plan" variant="glass" aria-labelledby="today-plan-title">
       <div className="today-card__heading">
         <div>
-          <p className="section-kicker">Our likely plan</p>
-          <h2 id="today-plan-title">Naples at a family pace.</h2>
+          <p className="section-kicker">Today's useful next step</p>
+          <h2 id="today-plan-title">Prepare the day without pretending it is confirmed.</h2>
         </div>
         <StatusChip label={plans.status.label} tone={plans.status.tone} />
       </div>
 
       <div className="today-plan__options">
         <article className="today-plan__option" data-plan="likely">
-          <span>Likely plan</span>
-          <h3>Historic centre and harbour</h3>
+          <span>Worth reviewing</span>
+          <h3>Guidebook readiness</h3>
           <p>{plans.likely}</p>
           <ConfidenceChip level="medium" />
         </article>
         <article className="today-plan__option" data-plan="backup">
-          <span>Plan B</span>
-          <h3>Shorter seafront reset</h3>
+          <span>Later onboard</span>
+          <h3>Live day companion</h3>
           <p>{plans.backup}</p>
           <StatusChip label="Heat and energy fallback" tone="confirmed" />
         </article>

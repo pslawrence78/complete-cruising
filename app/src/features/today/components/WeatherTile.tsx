@@ -12,14 +12,14 @@ export function WeatherTile({ weather }: WeatherTileProps) {
     <CardSurface as="article" className="weather-tile" variant="paper">
       <div className="weather-tile__header">
         <div>
-          <p className="paper-kicker">Illustrative weather</p>
+          <p className="paper-kicker">Weather readiness</p>
           <h2>{weather.condition}</h2>
         </div>
         <span className="weather-tile__sun" aria-hidden="true" />
       </div>
       <div className="weather-tile__reading">
         <strong>{weather.highTemperature}</strong>
-        <span>Sample high</span>
+        <span>Expected high</span>
       </div>
       <dl className="weather-tile__facts">
         <div>

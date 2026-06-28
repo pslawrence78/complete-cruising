@@ -20,6 +20,8 @@ export function TodayPage() {
     <div className="today-page">
       <TodayAshorePanel
         currentDay={today.currentDay}
+        mode={today.mode}
+        nextStep={today.nextStep}
         returnPlan={today.returnPlan}
       />
 

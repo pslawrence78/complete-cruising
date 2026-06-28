@@ -52,6 +52,8 @@ export interface DashboardData {
     cruiseLine: string;
     dateLabel: string;
     daysToEmbarkation: number;
+    departureLabel: string;
+    returnLabel: string;
     name: string;
     nights: number;
     ports: number;
@@ -73,6 +75,8 @@ export const sampleDashboardData = {
     routeEnd: "Barcelona",
     dateLabel: "August 2026",
     nights: 14,
+    departureLabel: "15 Aug 2026",
+    returnLabel: "29 Aug 2026",
     ports: 9,
     seaDays: 4,
     daysToEmbarkation: 58,

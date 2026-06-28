@@ -2,7 +2,7 @@ type StateKind = "loading" | "empty" | "error";
 
 const copy: Record<StateKind, { eyebrow: string; title: string; message: string }> = {
   loading: { eyebrow: "Local voyage library", title: "Opening the guidebook...", message: "Reading the sailing records held on this device." },
-  empty: { eyebrow: "Local voyage library", title: "No local sailing data found yet.", message: "Seed sample data from the local database utilities before reviewing this screen." },
+  empty: { eyebrow: "Local voyage library", title: "Guide pending.", message: "This section is ready for its first cruise-relevant guidebook layer." },
   error: { eyebrow: "Local voyage library", title: "The guidebook could not be opened.", message: "Your local records have not been changed. Try reopening this screen." },
 };
 

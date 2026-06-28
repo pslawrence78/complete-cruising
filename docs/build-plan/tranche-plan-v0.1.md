@@ -22,8 +22,8 @@ This delivery tracker summarises the intended tranche sequence. The authoritativ
 17. Sailing Setup and Enrichment Request Workflow v0.1 - complete
 18A. Sailing Shell Enrichment Import Mapper v0.1 - complete; bridge from Tranche 17 return schemas to Real Sun Princess data onboarding
 18B. MVP Recovery, Real Sailing Onboarding and Guidebook Mode v0.1 - complete
-19. MVP Cruise Usability and Visual Polish v0.1 - recommended next tranche
-20. Post-Release Visual QA and Content Accuracy Review
+19. MVP Cruise Usability and Visual Polish v0.1 - complete
+20. Content Accuracy Review and Offline Guidebook QA v0.1 - recommended next tranche
 
 This sequence may be refined as the product matures. Any change should preserve small, independently reviewable tranches and be reflected in the project knowledge index.
 

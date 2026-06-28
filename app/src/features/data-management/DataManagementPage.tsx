@@ -15,11 +15,11 @@ import "./DataManagementPage.css";
 type ActionKey = keyof typeof DATA_MANAGEMENT_CONFIRMATIONS;
 
 const actions: { key: ActionKey; title: string; body: string; destructive?: boolean }[] = [
-  { key: "seedReal", title: "Onboard Sun Princess 2026", body: "Create or select the real Eastern Mediterranean Cruise shell without duplicating an existing local record." },
+  { key: "seedReal", title: "Prepare Sun Princess 2026", body: "Create or select the Eastern Mediterranean Cruise shell without duplicating an existing local sailing." },
   { key: "resetActiveSailing", title: "Reset active sailing", body: "Remove the selected sailing and its sailing-specific itinerary, planning, memory and enrichment records.", destructive: true },
-  { key: "removeSample", title: "Remove sample data", body: "Clear records still marked as illustrative sample data so the real sailing leads the app.", destructive: true },
-  { key: "clearAll", title: "Clear Complete Cruising data", body: "Empty the local IndexedDB stores for a clean start on this browser.", destructive: true },
-  { key: "seedSample", title: "Reseed demo data", body: "Restore curated illustrative records for testing the app experience." },
+  { key: "removeSample", title: "Remove illustrative records", body: "Clear records still marked as sample material so the real sailing leads the guidebook.", destructive: true },
+  { key: "clearAll", title: "Clear this browser's guidebook", body: "Empty the local browser stores for a clean start on this device.", destructive: true },
+  { key: "seedSample", title: "Restore demo guidebook", body: "Restore curated illustrative records for checking the app experience." },
 ];
 
 export function DataManagementPage() {
@@ -58,23 +58,23 @@ export function DataManagementPage() {
   return <div className="data-management-page">
     <header className="data-management-hero">
       <div>
-        <p className="eyebrow">Data Management</p>
-        <h1>Local data, handled carefully.</h1>
-        <p>Reset, clear or reseed browser storage with explicit guardrails. Complete Cruising stays local-first: no account, backend or network connection is required.</p>
+        <p className="eyebrow">Backstage tools</p>
+        <h1>Manage sailing data carefully.</h1>
+        <p>Import, export, reset or reseed local guidebook records with explicit guardrails. Complete Cruising stays local-first: no account, backend or network connection is required.</p>
       </div>
       <aside>
-        <strong>Backup first</strong>
+        <strong>Data safety first</strong>
         <span>Export a full local JSON backup before any destructive change.</span>
         <button type="button" onClick={exportBackup}>Export full backup</button>
       </aside>
     </header>
 
     <section className="mvp-readiness" aria-label="MVP readiness">
-      <article><span>{summary?.realSailingPresent ? "Ready" : "Missing"}</span><strong>Sun Princess shell</strong></article>
+      <article><span>{summary?.realSailingPresent ? "Ready" : "Guide pending"}</span><strong>Sun Princess shell</strong></article>
       <article><span>{summary?.realSailingIsActive ? "Active" : "Not active"}</span><strong>Real sailing selected</strong></article>
       <article><span>{summary?.itineraryDayCount ?? "-"}</span><strong>Itinerary rows</strong></article>
-      <article><span>{summary?.sampleSailingCount ?? "-"}</span><strong>Sample sailings</strong></article>
-      <article><span>{summary?.importBatchCount ?? "-"}</span><strong>Import batches</strong></article>
+      <article><span>{summary?.sampleSailingCount ?? "-"}</span><strong>Illustrative sailings</strong></article>
+      <article><span>{summary?.importBatchCount ?? "-"}</span><strong>Import history</strong></article>
       <article><span>Protected</span><strong>Operational times</strong></article>
     </section>
 
@@ -85,7 +85,7 @@ export function DataManagementPage() {
         const disabled = confirmation.trim() !== phrase || (action.destructive && !backupExported);
         return <article key={action.key} className={action.destructive ? "data-action data-action--destructive" : "data-action"}>
           <div>
-            <p className="section-kicker">{action.destructive ? "Guarded action" : "Local setup"}</p>
+            <p className="section-kicker">{action.destructive ? "Data safety" : "Sailing setup"}</p>
             <h2>{action.title}</h2>
             <p>{action.body}</p>
           </div>

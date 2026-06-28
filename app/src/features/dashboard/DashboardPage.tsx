@@ -26,8 +26,8 @@ export function DashboardPage() {
             <h2 id="dashboard-metrics-title">The shape of the sailing.</h2>
           </div>
           <p>
-            A deliberately small set of signals—enough to orient the family
-            without turning the dashboard into a control panel.
+            The essential voyage bearings: dates, duration, ports, sea days and
+            guidebook readiness without drowning the sailing in admin.
           </p>
         </div>
         <div className="dashboard-metrics__grid">

@@ -75,7 +75,7 @@ export const routeConfig: readonly RouteDefinition[] = [
   {
     id: "sailing-setup",
     path: "/sailing-setup",
-    title: "Setup",
+    title: "Sailing Setup",
     status: "implemented",
     navigationGroup: "more",
     order: 20,
@@ -83,7 +83,7 @@ export const routeConfig: readonly RouteDefinition[] = [
   {
     id: "enrichment-requests",
     path: "/enrichment-requests",
-    title: "Enrichment Requests",
+    title: "Guidebook Tools",
     status: "implemented",
     navigationGroup: "more",
     order: 21,
@@ -99,7 +99,7 @@ export const routeConfig: readonly RouteDefinition[] = [
   {
     id: "data-management",
     path: "/data-management",
-    title: "Data Management",
+    title: "Data Safety",
     status: "implemented",
     navigationGroup: "more",
     order: 23,

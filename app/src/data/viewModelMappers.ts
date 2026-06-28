@@ -49,23 +49,24 @@ export function mapDashboard(bundle: Resolved<typeof getDashboardBundle>): Dashb
   const nextPort = portDays.find(({ day }) => day.dayNumber > 1) ?? portDays[0];
   const weather = bundle.weather[0];
   const confidence = sailing.confidence;
+  const nextMilestone = daysToEmbarkation > 0 ? "Embarkation is the next voyage milestone" : "The sailing is active in the local guidebook";
   const cards: DashboardStatusCard[] = [
-    { id: "next-port", label: "Next port to review", title: nextPort?.port?.name ?? "Port guide pending", description: nextPort?.port?.overview ?? "The next local port guide has not yet been enriched.", surface: "paper", status: statusFromConfidence(nextPort?.day.confidence), confidence: { level: nextPort?.day.confidence?.confidence ?? "unknown" } },
-    { id: "weather", label: "Weather refresh window", title: weather?.condition ?? "Forecasts pending", description: weather?.dataCaveat ?? "No local weather snapshot is stored for this sailing yet.", surface: "glass", status: statusFromConfidence(weather?.confidence), confidence: { level: weather?.confidence.confidence ?? "unknown", label: weather?.snapshotType === "climate" ? "Climate guidance only" : undefined } },
-    { id: "documents", label: "Documents readiness", title: bundle.documents.length ? `${bundle.documents.length} readiness items` : "Readiness, without private data", description: "Cruise readiness is tracked locally without storing sensitive identity details.", surface: "glass", status: { label: bundle.documents.length ? "Planning started" : "No checklist yet", tone: "review" }, confidence: { level: "confirmed", label: "Scope confirmed" } },
-    { id: "enrichment", label: "Enrichment confidence", title: "Trust stays visible", description: `${shipSections.length} of 7 ship guide sections are held locally with their review and refresh states.`, surface: "paper", status: statusFromConfidence(shipSections[0]?.confidence), confidence: { level: shipSections[0]?.confidence.confidence ?? confidence?.confidence ?? "unknown" } },
-    { id: "family", label: "Family focus", title: "Seb discovery prompts ready", description: "Local day-guide records carry phrases, geography clues and things to spot.", surface: "glass", status: { label: "Prompts drafted", tone: "confirmed" }, confidence: { level: "medium", label: "Illustrative prompts" } },
-    { id: "memories", label: "Memory capture readiness", title: bundle.memories.length ? `${bundle.memories.length} local prompts prepared` : "Daily reflections waiting", description: "Local prompts support reflection without implying that illustrative travel has already happened.", surface: "glass", status: { label: bundle.memories.length ? "Ready to capture" : "No memories yet", tone: "confirmed" }, confidence: { level: "high" } },
+    { id: "next-port", label: "Next voyage milestone", title: nextPort?.port?.name ?? "Port guide pending", description: nextPort?.port?.overview ?? nextMilestone, surface: "paper", status: statusFromConfidence(nextPort?.day.confidence), confidence: { level: nextPort?.day.confidence?.confidence ?? "unknown" } },
+    { id: "weather", label: "Operational caveat", title: weather?.condition ?? "Weather will wake up later", description: weather?.dataCaveat ?? "Weather and port operations remain pending until closer to travel; no forecast is being invented here.", surface: "glass", status: statusFromConfidence(weather?.confidence), confidence: { level: weather?.confidence.confidence ?? "unknown", label: weather?.snapshotType === "climate" ? "Climate guidance only" : undefined } },
+    { id: "documents", label: "Travel readiness", title: bundle.documents.length ? `${bundle.documents.length} readiness items` : "Private details stay out", description: "Cruise readiness can be prepared locally without storing passports, booking references or identity details.", surface: "glass", status: { label: bundle.documents.length ? "Planning started" : "Guide pending", tone: "review" }, confidence: { level: "confirmed", label: "Scope confirmed" } },
+    { id: "enrichment", label: "Guidebook readiness", title: shipSections.length ? "Ship guide started" : "Guide pending", description: `${shipSections.length} of 7 ship handbook sections are held locally with their confidence, review and refresh states.`, surface: "paper", status: statusFromConfidence(shipSections[0]?.confidence), confidence: { level: shipSections[0]?.confidence.confidence ?? confidence?.confidence ?? "unknown" } },
+    { id: "family", label: "Family layer", title: "Seb discovery is ready to grow", description: "Port-day prompts can carry phrases, geography clues and things to spot once each guide is reviewed.", surface: "glass", status: { label: "Guide ready", tone: "confirmed" }, confidence: { level: "medium", label: "Review before travel" } },
+    { id: "memories", label: "Almanac readiness", title: bundle.memories.length ? `${bundle.memories.length} reflections prepared` : "Memories waiting for the voyage", description: "The journal is quiet until the sailing begins, then each day can become an Adventure Almanac note.", surface: "glass", status: { label: bundle.memories.length ? "Ready to capture" : "No memories yet", tone: "confirmed" }, confidence: { level: "high" } },
   ];
   return {
-    sailing: { name: sailing.name, cruiseLine: cruiseLine?.name ?? "Cruise line not recorded", ship: ship?.name ?? "Ship not recorded", routeStart: itinerary[0]?.port?.name ?? itinerary[0]?.day.title ?? "Embarkation", routeEnd: itinerary.at(-1)?.port?.name ?? itinerary.at(-1)?.day.title ?? "Disembarkation", dateLabel: new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(departure), nights, ports: portDays.length, seaDays: seaDays.length, daysToEmbarkation, status: "upcoming" },
+    sailing: { name: sailing.name, cruiseLine: cruiseLine?.name ?? "Cruise line not recorded", ship: ship?.name ?? "Ship not recorded", routeStart: itinerary[0]?.port?.name ?? itinerary[0]?.day.title ?? "Embarkation", routeEnd: itinerary.at(-1)?.port?.name ?? itinerary.at(-1)?.day.title ?? "Disembarkation", dateLabel: new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(departure), departureLabel: longDateLabel(sailing.departureDate), returnLabel: longDateLabel(sailing.returnDate), nights, ports: portDays.length, seaDays: seaDays.length, daysToEmbarkation, status: "upcoming" },
     route,
     metrics: [
-      { id: "countdown", value: String(daysToEmbarkation), label: "days to embarkation", detail: "Calculated from the local sailing date", accent: "gold" },
+      { id: "countdown", value: String(daysToEmbarkation), label: "days to embarkation", detail: "Live countdown from the local sailing date", accent: "gold" },
       { id: "nights", value: String(nights), label: "nights", detail: `Aboard ${ship?.name ?? "the ship"}`, accent: "aqua" },
       { id: "ports", value: String(portDays.length), label: "ports", detail: "Local guidebook calls", accent: "coral" },
       { id: "sea-days", value: String(seaDays.length), label: "sea days", detail: "Time for ship discovery", accent: "mist" },
-      { id: "ship-guide", value: `${shipSections.length} / 7`, label: "ship guide packs", detail: "Local enrichment sections", accent: "aqua" },
+      { id: "ship-guide", value: `${shipSections.length} / 7`, label: "ship guide sections", detail: "Handbook readiness", accent: "aqua" },
       { id: "documents", value: bundle.documents.length ? String(bundle.documents.length) : "Planning", label: "documents readiness", detail: "Sensitive identity details excluded", accent: "gold" },
     ],
     statusCards: cards,
@@ -73,17 +74,20 @@ export function mapDashboard(bundle: Resolved<typeof getDashboardBundle>): Dashb
 }
 
 export function mapItinerary(bundle: Resolved<typeof getDashboardBundle>): ItineraryData {
+  const todayIso = new Date().toISOString().slice(0, 10);
   const days: ItineraryDay[] = bundle.itinerary.map(({ day, port }, index) => {
     const metadataStatus = statusFromConfidence(day.confidence);
     const accent = day.dayType === "sea" ? "aqua" : day.dayType === "embarkation" || day.dayType === "disembarkation" ? "gold" : index % 2 ? "coral" : "mist";
+    const isOperationalTimesPending = day.dayType === "port" && !day.arrivalTime && !day.departureTime && !day.allAboardTime;
+    const guideStatus = port?.overview ? "Guide ready" : "Guide pending";
     return {
       id: day.id, dayNumber: day.dayNumber, dateLabel: dateLabel(day.date), dayType: day.dayType as ItineraryDay["dayType"],
       title: port?.name ?? day.title ?? titleCase(day.dayType), portName: port?.name, country: undefined,
       arrivalTime: day.arrivalTime, departureTime: day.departureTime, allAboardTime: day.allAboardTime,
-      planSummary: day.selectedShorePlanId ? "Selected shore plan held locally" : day.dayType === "port" ? "Shore plan not selected" : "A day for the ship and horizon",
-      enrichmentStatus: port?.overview ? "Guide started" : "Not yet enriched", isHighlighted: Boolean(day.dayGuideId), accent,
+      planSummary: day.selectedShorePlanId ? "Selected shore plan held locally" : day.dayType === "port" ? "No shore plan selected yet" : day.dayType === "embarkation" ? "Embarkation, ship orientation and first bearings" : day.dayType === "disembarkation" ? "Disembarkation and onward travel notes" : "A day for the ship and horizon",
+      enrichmentStatus: isOperationalTimesPending ? `${guideStatus} - Times need review` : guideStatus, isHighlighted: day.date >= todayIso && !bundle.itinerary.some(({ day: candidate }) => candidate.date >= todayIso && candidate.dayNumber < day.dayNumber), accent,
       confidence: { level: day.confidence?.confidence ?? "unknown" }, reviewStatus: metadataStatus,
-      refreshStatus: { label: day.confidence?.refreshRecommended ? "Refresh before travel" : "Current local record", tone: day.confidence?.refreshRecommended ? "refresh" : "confirmed" },
+      refreshStatus: { label: day.confidence?.refreshRecommended ? "Refresh before travel" : "Guide ready", tone: day.confidence?.refreshRecommended ? "refresh" : "confirmed" },
     };
   });
   const portDays = days.filter((day) => day.dayType === "port");
@@ -93,21 +97,30 @@ export function mapItinerary(bundle: Resolved<typeof getDashboardBundle>): Itine
 export function mapToday(bundle: Resolved<typeof getTodayGuideBundle>): TodayData | undefined {
   if (!("day" in bundle) || !bundle.day) return undefined;
   const { day, port, country, guide, weather, plans } = bundle;
+  const isPreCruise = new Date(`${bundle.sailing.departureDate}T00:00:00`).getTime() > Date.now();
   const selected = plans.find((plan) => plan.id === day.selectedShorePlanId || plan.status === "selected" || plan.status === "booked");
   const backup = plans.find((plan) => plan.id === day.backupShorePlanId) ?? plans.find((plan) => plan.id !== selected?.id);
   const planStatus = statusFromConfidence(selected?.confidence);
   const notes: TodayConfidenceNote[] = [
-    { id: "times", label: "Port times", description: day.confidence?.sourceSummary ?? "Times are held in the local itinerary record.", status: statusFromConfidence(day.confidence), confidence: { level: day.confidence?.confidence ?? "unknown" } },
-    { id: "weather", label: "Weather", description: weather?.dataCaveat ?? "No local weather snapshot is available.", status: statusFromConfidence(weather?.confidence), confidence: { level: weather?.confidence.confidence ?? "unknown", label: weather?.sampleOnly ? "Illustrative only" : undefined } },
-    { id: "plan", label: "Likely plan", description: selected?.dataCaveat ?? "No shore plan is selected.", status: planStatus, confidence: { level: selected?.confidence.confidence ?? "unknown" } },
-    { id: "terminal", label: "Terminal details", description: port?.geo?.locationNotes ?? port?.cruiseLogisticsSummary ?? "Terminal detail has not been enriched.", status: statusFromConfidence(port?.confidence), confidence: { level: port?.confidence?.confidence ?? "unknown" } },
+    { id: "times", label: "Operational times", description: day.confidence?.sourceSummary ?? "Arrival, departure and all-aboard times need review before travel.", status: statusFromConfidence(day.confidence), confidence: { level: day.confidence?.confidence ?? "unknown" } },
+    { id: "weather", label: "Weather", description: weather?.dataCaveat ?? "Weather will become useful closer to sailing; no forecast is stored yet.", status: statusFromConfidence(weather?.confidence), confidence: { level: weather?.confidence.confidence ?? "unknown", label: weather?.sampleOnly ? "Illustrative only" : undefined } },
+    { id: "plan", label: "Shore plan", description: selected?.dataCaveat ?? "No shore plan selected yet.", status: planStatus, confidence: { level: selected?.confidence.confidence ?? "unknown" } },
+    { id: "terminal", label: "Embarkation and terminal", description: port?.geo?.locationNotes ?? port?.cruiseLogisticsSummary ?? "Terminal and boarding detail remain pending.", status: statusFromConfidence(port?.confidence), confidence: { level: port?.confidence?.confidence ?? "unknown" } },
+  ];
+  const preCruiseChecklist: TodayData["checklist"] = [
+    { id: "princess-material", label: "Check Princess material", note: "Use current booking and cruise line sources before travel" },
+    { id: "terminal", label: "Confirm terminal", note: "Embarkation details are not confirmed here" },
+    { id: "port-times", label: "Review port times", note: "Arrival, departure and all-aboard remain pending" },
+    { id: "ship-guide", label: "Open ship guide", note: "Get first-day bearings before boarding" },
   ];
   return {
-    currentDay: { dayNumber: day.dayNumber, dateLabel: longDateLabel(day.date), port: port?.name ?? day.title ?? "Port not recorded", country: country?.name ?? "Country not recorded", portSummary: port?.overview ?? guide?.operationalSummary ?? "Local guide detail has not yet been enriched.", arrivalTime: day.arrivalTime ?? "—", allAboardTime: day.allAboardTime ?? "—", departureTime: day.departureTime ?? "—" },
-    returnPlan: { latestSafeReturn: guide?.latestSafeReturnTime ?? "Not set", riskLevel: "medium", note: guide?.latestSafeReturnTime && day.allAboardTime ? `Aim to return by ${guide.latestSafeReturnTime}, ahead of the ${day.allAboardTime} all-aboard time.` : "Set a safe local return time before leaving the ship." },
-    weather: { condition: weather?.condition ?? "No snapshot", highTemperature: weather?.highTemperatureC === undefined ? "—" : `${weather.highTemperatureC}°C`, rainChance: weather?.rainChancePercent === undefined ? "—" : `${weather.rainChancePercent}%`, planImpact: weather?.planImpact ?? "No local weather impact note is available.", refreshLabel: weather?.dataCaveat ?? "Weather snapshot not available", confidence: weather?.confidence.confidence ?? "unknown" },
-    plans: { likely: selected?.summary ?? guide?.operationalSummary ?? "No likely shore plan selected.", backup: backup?.summary ?? "No backup shore plan selected.", status: planStatus },
-    checklist: guide?.checklist ?? [],
+    currentDay: { dayNumber: day.dayNumber, dateLabel: longDateLabel(day.date), port: port?.name ?? day.title ?? "Port not recorded", country: country?.name ?? "Country not recorded", portSummary: isPreCruise ? `Your cruise day companion is preparing for embarkation on ${longDateLabel(bundle.sailing.departureDate)}. Guidebook areas are available now; operational details still need checking before travel.` : port?.overview ?? guide?.operationalSummary ?? "Local guide detail has not yet been enriched.", arrivalTime: day.arrivalTime ?? "Pending", allAboardTime: day.allAboardTime ?? "Pending", departureTime: day.departureTime ?? "Pending" },
+    mode: isPreCruise ? "pre-cruise" : "cruise-day",
+    nextStep: isPreCruise ? { label: "Worth opening next", title: "Explore the voyage route", body: "Scan every port call, sea day and review note before the sailing begins.", href: "#/itinerary" } : { label: "Worth opening next", title: "Open port guide", body: "Use the reusable guidebook for context, then rely on Today for sailing-specific timings.", href: "#/ports" },
+    returnPlan: { latestSafeReturn: guide?.latestSafeReturnTime ?? "Not set", riskLevel: "medium", note: guide?.latestSafeReturnTime && day.allAboardTime ? `Aim to return by ${guide.latestSafeReturnTime}, ahead of the ${day.allAboardTime} all-aboard time.` : isPreCruise ? "Return-buffer advice becomes useful once port times and shore plans are reviewed." : "Set a safe local return time before leaving the ship." },
+    weather: { condition: weather?.condition ?? (isPreCruise ? "Forecast pending" : "No snapshot"), highTemperature: weather?.highTemperatureC === undefined ? "Pending" : `${weather.highTemperatureC}C`, rainChance: weather?.rainChancePercent === undefined ? "Pending" : `${weather.rainChancePercent}%`, planImpact: weather?.planImpact ?? "Weather will become useful closer to sailing.", refreshLabel: weather?.dataCaveat ?? "Weather pending", confidence: weather?.confidence.confidence ?? "unknown" },
+    plans: { likely: selected?.summary ?? guide?.operationalSummary ?? (isPreCruise ? "Review guidebook readiness, port times, terminal arrangements and family priorities before travel." : "No likely shore plan selected."), backup: backup?.summary ?? (isPreCruise ? "Today becomes a live day companion once the sailing is active and a day plan exists." : "No backup shore plan selected."), status: planStatus },
+    checklist: guide?.checklist?.length ? guide.checklist : isPreCruise ? preCruiseChecklist : [],
     local: { language: guide?.localContext?.language ?? country?.primaryLanguage ?? "Not recorded", currency: guide?.localContext?.currency ?? country?.currencyName ?? "Not recorded", phrase: guide?.localContext?.phrase ?? "Not recorded", phraseMeaning: guide?.localContext?.phraseMeaning ?? "Local phrase not yet enriched" },
     sebDiscovery: { prompt: guide?.sebDiscovery?.prompt ?? "No discovery prompt has been added yet.", fact: guide?.sebDiscovery?.fact ?? country?.sebFact ?? "No local geography fact has been added yet.", photoPrompt: guide?.sebDiscovery?.photoPrompt ?? "Choose one detail that tells the story of the day." },
     confidenceNotes: notes,
@@ -136,9 +149,9 @@ export function mapShipGuide(bundle: Resolved<typeof getActiveShipGuideBundle>):
   const confidence = ship.confidence;
   const identityFacts = factsObject(sections.find((s) => s.sectionType === "identity")?.structuredFacts);
   return {
-    hero: { name: ship.name, cruiseLine: cruiseLine?.name ?? "Cruise line not recorded", guideLabel: "Illustrative ship handbook · local edition", character: ship.shipOverview ?? "Ship overview not yet enriched." },
-    facts: [{ label: "Ship family", value: ship.shipClass ?? "Not recorded" }, { label: "Style", value: String(identityFacts?.style ?? "Guide in progress") }, { label: "Guide lens", value: "Lawrence family" }, { label: "Record type", value: "Reusable ship guide" }],
-    enrichment: { completed: sections.length, total: 7, summary: `${sections.length} locally stored guidebook sections retain their own trust metadata.`, nextPriority: sections.find((section) => section.confidence.refreshRecommended)?.title ?? "Review complete" },
+    hero: { name: ship.name, cruiseLine: cruiseLine?.name ?? "Cruise line not recorded", guideLabel: "Local ship handbook", character: ship.shipOverview ?? "Ship character guide pending. Start with orientation, dining, family fit and watchouts." },
+    facts: [{ label: "Ship family", value: ship.shipClass ?? "Guide pending" }, { label: "Style", value: String(identityFacts?.style ?? "Guide in progress") }, { label: "Guide lens", value: "Lawrence family" }, { label: "Scope", value: "Reusable ship guide" }],
+    enrichment: { completed: sections.length, total: 7, summary: `${sections.length} ship handbook sections are available, each with its own review and refresh state.`, nextPriority: sections.find((section) => section.confidence.refreshRecommended)?.title ?? "Review complete" },
     metadata: { confidence: confidence?.confidence ?? "unknown", reviewStatus: titleCase(confidence?.reviewStatus ?? "not_reviewed"), refreshStatus: confidence?.refreshRecommended ? "Refresh before sailing" : "No refresh requested", lastReviewed: reviewedLabel(confidence?.lastReviewedAt), recordScope: "Ship guidebook · not sailing-specific" },
     sections: mapped,
     caveat: ship.dataCaveat ?? "Local ship guide details should be checked before sailing.",
@@ -147,7 +160,7 @@ export function mapShipGuide(bundle: Resolved<typeof getActiveShipGuideBundle>):
 
 function mapPortSection(section: EnrichmentSection | undefined, fallback: { id: PortGuideSectionData["id"]; eyebrow: string; title: string; body?: string }): PortGuideSectionData {
   const facts = factsObject(section?.structuredFacts);
-  return { id: fallback.id, eyebrow: fallback.eyebrow, title: section?.title ?? fallback.title, body: section?.summary ?? fallback.body ?? "This guidebook section is not yet enriched.", note: String(facts?.note ?? "Review current practical detail before travel."), status: statusFromConfidence(section?.confidence), confidence: { level: section?.confidence.confidence ?? "unknown" } };
+  return { id: fallback.id, eyebrow: fallback.eyebrow, title: section?.title ?? fallback.title, body: section?.summary ?? fallback.body ?? "Guide pending. This port is ready for a concise cruise-relevant guidebook layer.", note: String(facts?.note ?? "Review current practical detail before travel."), status: statusFromConfidence(section?.confidence), confidence: { level: section?.confidence.confidence ?? "unknown" } };
 }
 
 export function mapPortGuide(bundle: Resolved<typeof getActivePortGuideBundle>): PortGuideData | undefined {
@@ -155,7 +168,7 @@ export function mapPortGuide(bundle: Resolved<typeof getActivePortGuideBundle>):
   const { port, country, attractions, enrichmentSections } = bundle.guide;
   const confidence = port.confidence;
   const section = (type: string) => enrichmentSections.find((item) => item.sectionType === type);
-  const mappedAttractions: PortAttraction[] = attractions.map((attraction) => ({ id: attraction.id, name: attraction.name, category: titleCase(attraction.type ?? "possible story"), description: attraction.shortDescription ?? "Local attraction detail is not yet enriched.", familyNote: attraction.accessibilityNotes ?? `Family suitability: ${titleCase(attraction.familySuitability ?? "unknown")}.`, sebAngle: attraction.sebInterestSummary, status: { label: attraction.bookingRequired === "unknown" ? "Requirements unknown" : titleCase(attraction.bookingRequired ?? "needs review"), tone: attraction.bookingRequired === "unknown" ? "refresh" : "review" }, confidence: { level: attraction.confidence?.confidence ?? "unknown" } }));
+  const mappedAttractions: PortAttraction[] = attractions.map((attraction) => ({ id: attraction.id, name: attraction.name, category: titleCase(attraction.type ?? "possible story"), description: attraction.shortDescription ?? "Guide pending. Add a short family-relevant reason to consider this place.", familyNote: attraction.accessibilityNotes ?? `Family suitability: ${titleCase(attraction.familySuitability ?? "unknown")}.`, sebAngle: attraction.sebInterestSummary, status: { label: attraction.bookingRequired === "unknown" ? "Requirements unknown" : titleCase(attraction.bookingRequired ?? "needs review"), tone: attraction.bookingRequired === "unknown" ? "refresh" : "review" }, confidence: { level: attraction.confidence?.confidence ?? "unknown" } }));
   return {
     identity: { name: port.name, country: country?.name ?? "Country not recorded", region: port.region ?? "Region not recorded", flag: country?.flagEmoji ?? "🌍", guideLabel: "Illustrative port guidebook · local edition", overview: port.overview ?? "Port overview not yet enriched." },
     facts: [{ label: "Language", value: country?.primaryLanguage ?? "Not recorded" }, { label: "Currency", value: country?.currencyName ? `${country.currencyName}${country.currencyCode ? ` (${country.currencyCode})` : ""}` : "Not recorded" }, { label: "Port character", value: titleCase(port.portType ?? "unknown") }, { label: "Family pace", value: titleCase(port.returnRiskDefault ?? "unknown") }],

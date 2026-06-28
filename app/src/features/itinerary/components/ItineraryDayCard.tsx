@@ -9,8 +9,8 @@ interface ItineraryDayCardProps {
 
 const dayTypeLabels: Record<ItineraryDay["dayType"], string> = {
   embarkation: "Embarkation",
-  port: "Port day",
-  sea: "Sea day",
+  port: "Port call",
+  sea: "At sea",
   disembarkation: "Disembarkation",
 };
 
@@ -29,7 +29,7 @@ export function ItineraryDayCard({ day }: ItineraryDayCardProps) {
       aria-current={day.isHighlighted ? "step" : undefined}
     >
       {day.isHighlighted ? (
-        <span className="itinerary-day-card__active">Highlighted day</span>
+        <span className="itinerary-day-card__active">Next likely day</span>
       ) : null}
       <header className="itinerary-day-card__header">
         <span>Day {String(day.dayNumber).padStart(2, "0")}</span>
@@ -66,13 +66,13 @@ export function ItineraryDayCard({ day }: ItineraryDayCardProps) {
           </dl>
         ) : (
           <p className="itinerary-day-card__timing-pending">
-            Port timing to confirm
+            Times need review
           </p>
         )
       ) : null}
 
       <div className="itinerary-day-card__plan">
-        <span>{day.dayType === "sea" ? "Onboard rhythm" : "Suggested focus"}</span>
+        <span>{day.dayType === "sea" ? "Onboard rhythm" : day.dayType === "port" ? "Port focus" : "Voyage focus"}</span>
         <p>{day.planSummary}</p>
       </div>
 

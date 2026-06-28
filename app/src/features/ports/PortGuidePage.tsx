@@ -24,7 +24,7 @@ export function PortGuidePage() {
         metadata={port.metadata}
       />
 
-      <section className="port-practical" aria-label="Naples practical guide">
+      <section className="port-practical" aria-label="Port practical guide">
         {port.sections.slice(0, 2).map((section) => (
           <PortGuideSection key={section.id} section={section} />
         ))}
@@ -33,12 +33,12 @@ export function PortGuidePage() {
       <section className="port-highlights" aria-labelledby="port-highlights-title">
         <div className="port-section-heading">
           <div>
-            <p className="section-kicker">Separate attraction records</p>
-            <h2 id="port-highlights-title">Four possible Naples stories.</h2>
+            <p className="section-kicker">Guidebook highlights</p>
+            <h2 id="port-highlights-title">Possible port-day stories.</h2>
           </div>
           <p>
-            Illustrative ideas to compare—not a ranked plan, confirmed shortlist
-            or promise of access.
+            Short ideas to compare, not a ranked plan, confirmed shortlist or
+            promise of access.
           </p>
         </div>
         <div className="port-highlights__grid">
