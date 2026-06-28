@@ -1,4 +1,4 @@
-const CACHE_VERSION = "complete-cruising-shell-v1";
+const CACHE_VERSION = "complete-cruising-shell-v2";
 const SHELL_CACHE = `${CACHE_VERSION}-static`;
 const FALLBACK_PAGE = "offline.html";
 
@@ -21,13 +21,15 @@ async function cacheShell() {
     .map((match) => match[1])
     .filter((path) => !path.startsWith("http") && !path.startsWith("data:"));
 
-  await cache.addAll([
+  const shellAssetUrls = [
     scopedUrl("manifest.webmanifest"),
     scopedUrl(FALLBACK_PAGE),
     scopedUrl("icons/complete-cruising-icon.svg"),
     scopedUrl("icons/complete-cruising-maskable.svg"),
     ...assetPaths.map((path) => new URL(path, self.registration.scope).toString()),
-  ]);
+  ];
+
+  await cache.addAll([...new Set(shellAssetUrls)]);
 }
 
 self.addEventListener("install", (event) => {

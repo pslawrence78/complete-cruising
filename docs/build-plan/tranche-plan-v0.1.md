@@ -18,6 +18,8 @@ This delivery tracker summarises the intended tranche sequence. The authoritativ
 13. Import Commit and Export v0.1 - complete
 14. PWA and Offline Readiness - complete
 15. GitHub Pages Deployment - complete
+16. Production Smoke Test and Release Hardening - complete
+17. Post-Release Visual QA and Content Accuracy Review - recommended next tranche
 
 This sequence may be refined as the product matures. Any change should preserve small, independently reviewable tranches and be reflected in the project knowledge index.
 

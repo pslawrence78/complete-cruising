@@ -37,10 +37,11 @@ describe("PWA assets", () => {
   it("caches the static app shell without introducing live API dependencies", () => {
     const serviceWorker = readFileSync(join(appRoot, "public", "sw.js"), "utf8");
 
-    expect(serviceWorker).toContain("complete-cruising-shell-v1");
+    expect(serviceWorker).toContain("complete-cruising-shell-v2");
     expect(serviceWorker).toContain("manifest.webmanifest");
     expect(serviceWorker).toContain("offline.html");
     expect(serviceWorker).toContain("request.mode === \"navigate\"");
+    expect(serviceWorker).toContain("[...new Set(shellAssetUrls)]");
     expect(serviceWorker).not.toMatch(/fetch\(["'`]https?:/);
   });
 });
