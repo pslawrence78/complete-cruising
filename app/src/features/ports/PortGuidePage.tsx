@@ -14,12 +14,13 @@ import { buildAtlasCaption, buildPortFallbackMetadata, buildVoyageAtlasPoints } 
 import { WeatherSeasonalityPanel } from "../weather/components/WeatherSeasonalityPanel";
 import { buildWeatherCardModelFromSnapshot } from "../weather/weatherStateService";
 import { refreshCruiseWeatherForSailing } from "../weather/weatherRefreshService";
+import type { WeatherButtonState } from "../weather/weatherTypes";
 import "./PortGuidePage.css";
 
 export function PortGuidePage() {
   const query = usePortGuide();
   const sailingQuery = useSailingDashboard();
-  const [refreshingWeather, setRefreshingWeather] = useState(false);
+  const [weatherButtonState, setWeatherButtonState] = useState<WeatherButtonState>("idle");
   const [weatherMessage, setWeatherMessage] = useState<string | undefined>();
   const atlasPoints = useMemo(
     () => sailingQuery.data ? buildVoyageAtlasPoints(sailingQuery.data.itinerary) : [],
@@ -47,14 +48,18 @@ export function PortGuidePage() {
 
   const handleRefreshWeather = async () => {
     if (!query.data || !("sailing" in query.data)) return;
-    setRefreshingWeather(true);
     setWeatherMessage(undefined);
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      setWeatherButtonState("offline");
+      setWeatherMessage("Weather refresh needs a connection. Your existing local weather context has been preserved.");
+      return;
+    }
+    setWeatherButtonState("refreshing");
     const result = await refreshCruiseWeatherForSailing(query.data.sailing.id, undefined, {
       itineraryDayId: query.data.day?.id,
-      allowHistoricalLookup: weatherCard?.state === "day_locked" || weatherCard?.state === "historical_lookup_available",
     });
     setWeatherMessage(result.message);
-    setRefreshingWeather(false);
+    setWeatherButtonState(result.buttonState);
   };
 
   const weatherPanel = guidePort && weatherCard ? {
@@ -76,8 +81,8 @@ export function PortGuidePage() {
       {weatherPanel ? (
         <div className="port-page__weather">
           <WeatherSeasonalityPanel
+            buttonState={weatherButtonState}
             onRefresh={weatherPanel.canRefresh ? handleRefreshWeather : undefined}
-            refreshing={refreshingWeather}
             weather={weatherPanel}
           />
           {weatherMessage ? <p className="port-page__weather-message">{weatherMessage}</p> : null}

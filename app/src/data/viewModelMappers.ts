@@ -132,9 +132,18 @@ export function mapDashboard(bundle: Resolved<typeof getDashboardBundle>): Dashb
       privacyNote: "Weather refresh sends port coordinates and dates to Open-Meteo. It does not send family identity, booking details, cabin information or traveller details.",
       refreshLabel: featuredWeather?.refreshLabel ?? "Refresh cruise weather",
       refreshTone: featuredWeather?.badgeTone ?? "review",
+      refreshButtonState: featuredWeather?.buttonState ?? "idle",
       source: featuredWeather?.sourceLabel ?? "Open-Meteo",
+      attributionLabel: featuredWeather?.attributionLabel ?? "Weather data by Open-Meteo",
       stateLabel: weatherStateLabel,
       summary: featuredWeather?.summary ?? "Seasonal expectations and forecast windows are visible across the route.",
+      portName: featuredWeather?.portName ?? (featuredWeatherDay?.port?.name ?? "Next port"),
+      visitDateLabel: featuredWeather?.visitDateLabel ?? "Not set",
+      weatherDateLabel: featuredWeather?.weatherDateLabel ?? "Not refreshed yet",
+      weatherTypeLabel: featuredWeather?.weatherTypeLabel ?? "Weather context",
+      readinessLabel: featuredWeather?.readinessLabel ?? "Forecast pending",
+      expectedForecastFromLabel: featuredWeather?.forecastExpectedFromLabel,
+      contextMessage: featuredWeather?.contextMessage ?? "Weather context stays advisory until the visit-date forecast arrives.",
     },
     metrics: [
       { id: "countdown", value: String(daysToEmbarkation), label: "days to embarkation", detail: "Live countdown from the local sailing date", accent: "gold" },
@@ -173,7 +182,7 @@ export function mapItinerary(bundle: Resolved<typeof getDashboardBundle>): Itine
       planSummary: day.selectedShorePlanId ? "Selected shore plan held locally" : day.dayType === "port" ? "No shore plan selected yet" : day.dayType === "embarkation" ? "Embarkation, ship orientation and first bearings" : day.dayType === "disembarkation" ? "Disembarkation and onward travel notes" : "A day for the ship and horizon",
       enrichmentStatus: isOperationalTimesPending ? `${guideStatus} - Times need review` : guideStatus, isHighlighted: day.date >= todayIso && !bundle.itinerary.some(({ day: candidate }) => candidate.date >= todayIso && candidate.dayNumber < day.dayNumber), accent,
       confidence: { level: day.confidence?.confidence ?? "unknown" }, reviewStatus: metadataStatus,
-      refreshStatus: { label: weather.refreshLabel, tone: weather.badgeTone },
+      refreshStatus: { label: weather.readinessLabel, tone: weather.badgeTone },
       weather,
       readiness,
     };
@@ -193,7 +202,7 @@ export function mapToday(bundle: Resolved<typeof getTodayGuideBundle>): TodayDat
   const readiness = assessDayReadiness({ day, weather, guide, plans });
   const notes: TodayConfidenceNote[] = [
     { id: "times", label: "Operational times", description: day.confidence?.sourceSummary ?? "Arrival, departure and all-aboard times need review before travel.", status: statusFromConfidence(day.confidence), confidence: { level: day.confidence?.confidence ?? "unknown" } },
-    { id: "weather", label: "Weather", description: `${weatherCard.stateLabel}. ${weatherCard.updatedLabel}.`, status: { label: weatherCard.refreshLabel, tone: weatherCard.badgeTone }, confidence: { level: weatherCard.state === "forecast_recent" ? "high" : weatherCard.state === "climate_expectation" ? "inferred" : "unknown", label: weatherCard.sourceLabel } },
+    { id: "weather", label: "Weather", description: `${weatherCard.weatherTypeLabel}. ${weatherCard.contextMessage}`, status: { label: weatherCard.readinessLabel, tone: weatherCard.badgeTone }, confidence: { level: weatherCard.isVisitDateForecast ? "high" : weatherCard.weatherContext === "weather_now_in_port" ? "low" : "unknown", label: weatherCard.sourceLabel } },
     { id: "plan", label: "Shore plan", description: selected?.dataCaveat ?? "No shore plan selected yet.", status: planStatus, confidence: { level: selected?.confidence.confidence ?? "unknown" } },
     { id: "terminal", label: "Embarkation and terminal", description: port?.geo?.locationNotes ?? port?.cruiseLogisticsSummary ?? "Terminal and boarding detail remain pending.", status: statusFromConfidence(port?.confidence), confidence: { level: port?.confidence?.confidence ?? "unknown" } },
   ];

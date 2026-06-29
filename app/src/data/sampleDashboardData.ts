@@ -77,14 +77,23 @@ export interface DashboardData {
     status: "upcoming";
   };
   weatherOutlook: {
+    attributionLabel: string;
     canRefresh: boolean;
+    contextMessage: string;
+    expectedForecastFromLabel?: string;
     lastUpdated: string;
+    portName: string;
     privacyNote: string;
+    readinessLabel: string;
+    refreshButtonState: "idle" | "refreshing" | "refreshed" | "offline" | "unavailable" | "missing_coordinates" | "failed" | "blocked";
     refreshLabel: string;
     refreshTone: DashboardStatusTone;
     source: string;
     stateLabel: string;
     summary: string;
+    visitDateLabel: string;
+    weatherDateLabel: string;
+    weatherTypeLabel: string;
   };
   statusCards: readonly DashboardStatusCard[];
 }
@@ -176,14 +185,23 @@ export const sampleDashboardData = {
     },
   ],
   weatherOutlook: {
+    attributionLabel: "Weather data by Open-Meteo",
     canRefresh: true,
+    contextMessage: "This is current destination context only until the visit-date forecast becomes available.",
+    expectedForecastFromLabel: "30 July 2026",
     lastUpdated: "Updated 20 Jun 2026, 09:00",
+    portName: "Naples",
     privacyNote: "Weather refresh sends port coordinates and dates to Open-Meteo. It does not send family identity, booking details, cabin information or traveller details.",
+    readinessLabel: "Destination context only",
+    refreshButtonState: "idle",
     refreshLabel: "Refresh cruise weather",
     refreshTone: "confirmed",
-    source: "Open-Meteo forecast",
-    stateLabel: "Forecast recent",
-    summary: "Weather is available for the next practical port windows and can be refreshed locally when connectivity returns.",
+    source: "Open-Meteo",
+    stateLabel: "Context only",
+    summary: "Current port conditions",
+    visitDateLabel: "15 August 2026",
+    weatherDateLabel: "29 June 2026",
+    weatherTypeLabel: "Weather now in port",
   },
   statusCards: [
     {

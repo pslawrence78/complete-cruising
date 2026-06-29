@@ -16,6 +16,7 @@ export const ShorePlanTypeSchema = z.enum(["booked_excursion", "diy", "private_t
 export const ShorePlanStatusSchema = z.enum(["idea", "shortlisted", "selected", "booked", "completed", "cancelled", "rejected"]);
 export const WeatherSnapshotTypeSchema = z.enum(["climate", "forecast", "same_day", "observed", "manual"]);
 export const WeatherStateSchema = z.enum(["climate_expectation", "forecast_pending", "forecast_available", "forecast_recent", "forecast_stale", "day_locked", "historical_lookup_available", "missing_coordinates"]);
+export const WeatherContextSchema = z.enum(["visit_date_forecast", "weather_now_in_port", "same_day_check", "climate_context", "observed"]);
 export const WeatherRefreshStateSchema = z.enum(["ready", "refreshing", "updated", "skipped", "failed"]);
 
 const IsoDateTimeSchema = z.string().datetime({ offset: true });

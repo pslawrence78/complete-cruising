@@ -28,7 +28,9 @@ export async function getTodayGuideBundle(database: CompleteCruisingDb = db) {
   const [port, guide, weather, plans] = await Promise.all([
     day.portId ? database.ports.get(day.portId) : undefined,
     day.dayGuideId ? database.dayGuides.get(day.dayGuideId) : database.dayGuides.where("itineraryDayId").equals(day.id).first(),
-    day.weatherSnapshotId ? database.weatherSnapshots.get(day.weatherSnapshotId) : database.weatherSnapshots.where("itineraryDayId").equals(day.id).first(),
+    day.weatherSnapshotId
+      ? database.weatherSnapshots.get(day.weatherSnapshotId)
+      : database.weatherSnapshots.where("itineraryDayId").equals(day.id).sortBy("capturedAt").then((records) => records.at(-1)),
     database.shorePlans.where("itineraryDayId").equals(day.id).toArray(),
   ]);
   const country = port ? await database.countries.get(port.countryId) : undefined;

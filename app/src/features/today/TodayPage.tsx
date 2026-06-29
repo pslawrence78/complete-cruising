@@ -15,13 +15,14 @@ import { TakeAshoreChecklist } from "./components/TakeAshoreChecklist";
 import { TodayAshorePanel } from "./components/TodayAshorePanel";
 import { TodayPlanSummary } from "./components/TodayPlanSummary";
 import { WeatherTile } from "./components/WeatherTile";
+import type { WeatherButtonState } from "../weather/weatherTypes";
 import "../conditions/conditions.css";
 import "./TodayPage.css";
 
 export function TodayPage() {
   const query = useTodayGuide();
   const [weatherMessage, setWeatherMessage] = useState<string | undefined>();
-  const [refreshing, setRefreshing] = useState(false);
+  const [weatherButtonState, setWeatherButtonState] = useState<WeatherButtonState>("idle");
   if (query.loading) return <LocalDataState kind="loading" />;
   if (query.error) return <LocalDataState kind="error" />;
   if (!query.data) return <LocalDataState kind="empty" />;
@@ -29,14 +30,18 @@ export function TodayPage() {
   if (!today) return <LocalDataState kind="empty" detail="The active sailing has no selected Today itinerary day." />;
   const offline = typeof navigator !== "undefined" && !navigator.onLine;
   const handleRefreshWeather = async () => {
-    setRefreshing(true);
     setWeatherMessage(undefined);
+    if (offline) {
+      setWeatherButtonState("offline");
+      setWeatherMessage("Weather refresh needs a connection. Your existing local weather context has been preserved.");
+      return;
+    }
+    setWeatherButtonState("refreshing");
     const result = await refreshCruiseWeatherForSailing(query.data!.sailing.id, undefined, {
       itineraryDayId: query.data!.day?.id,
-      allowHistoricalLookup: today.weather.state === "day_locked" || today.weather.state === "historical_lookup_available",
     });
     setWeatherMessage(result.message);
-    setRefreshing(false);
+    setWeatherButtonState(result.buttonState);
   };
   const todayAtlasPoint = "day" in query.data && query.data.day && query.data.port ? [atlasPointFromPort(query.data.port, query.data.day)] : [];
   const todayFallback = "port" in query.data ? buildPortFallbackMetadata(query.data.port, query.data.country) : undefined;
@@ -53,8 +58,8 @@ export function TodayPage() {
         <div className="today-page__weather-stack">
           <DayReadinessPanel readiness={today.readiness} />
           <WeatherTile
-            onRefresh={offline ? undefined : handleRefreshWeather}
-            refreshDisabled={refreshing}
+            buttonState={weatherButtonState}
+            onRefresh={today.weather.canRefresh ? handleRefreshWeather : undefined}
             weather={today.weather}
           />
           {weatherMessage ? <p className="today-page__weather-message">{weatherMessage}</p> : null}

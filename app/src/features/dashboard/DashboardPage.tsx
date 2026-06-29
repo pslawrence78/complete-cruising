@@ -8,12 +8,13 @@ import { SailingHero } from "./components/SailingHero";
 import { VoyageStatusGrid } from "./components/VoyageStatusGrid";
 import { refreshCruiseWeatherForSailing } from "../weather/weatherRefreshService";
 import { ConditionsSummaryCard } from "../conditions/ConditionsSummaryCard";
+import type { WeatherButtonState } from "../weather/weatherTypes";
 import "../conditions/conditions.css";
 import "./DashboardPage.css";
 
 export function DashboardPage() {
   const query = useSailingDashboard();
-  const [refreshing, setRefreshing] = useState(false);
+  const [weatherButtonState, setWeatherButtonState] = useState<WeatherButtonState>("idle");
   const [weatherMessage, setWeatherMessage] = useState<string | undefined>();
   if (query.loading) return <LocalDataState kind="loading" />;
   if (query.error) return <LocalDataState kind="error" />;
@@ -21,11 +22,16 @@ export function DashboardPage() {
   const dashboard = mapDashboard(query.data);
   const offline = typeof navigator !== "undefined" && !navigator.onLine;
   const handleRefreshWeather = async () => {
-    setRefreshing(true);
     setWeatherMessage(undefined);
+    if (offline) {
+      setWeatherButtonState("offline");
+      setWeatherMessage("Weather refresh needs a connection. Your existing local weather context has been preserved.");
+      return;
+    }
+    setWeatherButtonState("refreshing");
     const result = await refreshCruiseWeatherForSailing(query.data!.sailing.id);
     setWeatherMessage(result.message);
-    setRefreshing(false);
+    setWeatherButtonState(result.buttonState);
   };
   return (
     <div className="dashboard-page">
@@ -35,10 +41,8 @@ export function DashboardPage() {
       />
 
       <CruiseWeatherOutlookCard
-        offline={offline}
         onRefresh={offline ? undefined : handleRefreshWeather}
-        refreshing={refreshing}
-        weather={dashboard.weatherOutlook}
+        weather={{ ...dashboard.weatherOutlook, refreshButtonState: weatherButtonState }}
       />
       <ConditionsSummaryCard summary={dashboard.conditionsSummary} />
       {weatherMessage ? <p className="dashboard-page__weather-message">{weatherMessage}</p> : null}

@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import type { AuditMetadataSchema, ConfidenceMetadataSchema, GeoMetadataSchema, VisualMetadataSchema, WeatherRefreshStateSchema, WeatherSnapshotTypeSchema, WeatherStateSchema } from "../schemas";
+import type { AuditMetadataSchema, ConfidenceMetadataSchema, GeoMetadataSchema, VisualMetadataSchema, WeatherContextSchema, WeatherRefreshStateSchema, WeatherSnapshotTypeSchema, WeatherStateSchema } from "../schemas";
 
 export type AuditMetadata = z.infer<typeof AuditMetadataSchema>;
 export type ConfidenceMetadata = z.infer<typeof ConfidenceMetadataSchema>;
@@ -10,4 +10,5 @@ export type ReviewStatus = ConfidenceMetadata["reviewStatus"];
 export type SourceType = ConfidenceMetadata["sourceType"];
 export type WeatherSnapshotType = z.infer<typeof WeatherSnapshotTypeSchema>;
 export type WeatherState = z.infer<typeof WeatherStateSchema>;
+export type WeatherContext = z.infer<typeof WeatherContextSchema>;
 export type WeatherRefreshState = z.infer<typeof WeatherRefreshStateSchema>;

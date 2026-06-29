@@ -1,13 +1,14 @@
 import type { ItineraryDay } from "../../../data/sampleItineraryData";
+import type { WeatherButtonState } from "../../weather/weatherTypes";
 import { ItineraryDayCard } from "./ItineraryDayCard";
 
 interface ItineraryTimelineProps {
+  buttonStates?: Record<string, WeatherButtonState>;
   days: readonly ItineraryDay[];
   onRefreshWeather?: (dayId: string) => void | Promise<void>;
-  refreshingDayId?: string;
 }
 
-export function ItineraryTimeline({ days, onRefreshWeather, refreshingDayId }: ItineraryTimelineProps) {
+export function ItineraryTimeline({ buttonStates, days, onRefreshWeather }: ItineraryTimelineProps) {
   return (
     <section className="itinerary-timeline" aria-labelledby="itinerary-timeline-title">
       <div className="itinerary-section-heading">
@@ -36,9 +37,9 @@ export function ItineraryTimeline({ days, onRefreshWeather, refreshingDayId }: I
             >
               <span className="itinerary-timeline__node" aria-hidden="true" />
               <ItineraryDayCard
+                buttonState={buttonStates?.[day.id] ?? "idle"}
                 day={day}
                 onRefreshWeather={onRefreshWeather}
-                refreshing={refreshingDayId === day.id}
               />
             </li>
           ))}

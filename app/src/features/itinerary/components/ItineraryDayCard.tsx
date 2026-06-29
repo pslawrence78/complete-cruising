@@ -4,11 +4,13 @@ import { ConfidenceChip } from "../../../components/status/ConfidenceChip";
 import { StatusChip } from "../../../components/status/StatusChip";
 import { ConditionBadge } from "../../conditions/ConditionBadge";
 import { toneFromSeverity } from "../../conditions/conditionViewModels";
+import { WeatherRefreshButton } from "../../weather/WeatherRefreshButton";
+import type { WeatherButtonState } from "../../weather/weatherTypes";
 
 interface ItineraryDayCardProps {
+  buttonState?: WeatherButtonState;
   day: ItineraryDay;
   onRefreshWeather?: (dayId: string) => void | Promise<void>;
-  refreshing?: boolean;
 }
 
 const dayTypeLabels: Record<ItineraryDay["dayType"], string> = {
@@ -18,7 +20,7 @@ const dayTypeLabels: Record<ItineraryDay["dayType"], string> = {
   disembarkation: "Disembarkation",
 };
 
-export function ItineraryDayCard({ day, onRefreshWeather, refreshing }: ItineraryDayCardProps) {
+export function ItineraryDayCard({ buttonState = "idle", day, onRefreshWeather }: ItineraryDayCardProps) {
   const hasTimes = Boolean(day.arrivalTime || day.departureTime || day.allAboardTime);
   const weather = day.weather;
   const readiness = day.readiness;
@@ -62,11 +64,13 @@ export function ItineraryDayCard({ day, onRefreshWeather, refreshing }: Itinerar
       {weather ? (
         <div className="itinerary-day-card__weather">
           <div className="itinerary-day-card__weather-line">
-            <span>{weather.stateLabel}</span>
+            <span>{weather.weatherTypeLabel ?? weather.stateLabel}</span>
             <StatusChip label={weather.badgeLabel ?? weather.summary ?? weather.stateLabel ?? "Weather pending"} tone={weather.badgeTone ?? "review"} />
           </div>
-          <p>{weather.summary}</p>
-          <small>{weather.sourceLabel} - {weather.updatedLabel}</small>
+          <p>{weather.contextMessage ?? weather.summary}</p>
+          <small>Visit date {weather.visitDateLabel} · Weather data {weather.weatherDateLabel}</small>
+          <small>{weather.sourceLabel} · {weather.attributionLabel}</small>
+          {weather.forecastExpectedFromLabel ? <small>Visit forecast expected from {weather.forecastExpectedFromLabel}</small> : null}
         </div>
       ) : null}
 
@@ -131,14 +135,11 @@ export function ItineraryDayCard({ day, onRefreshWeather, refreshing }: Itinerar
           tone={day.refreshStatus.tone}
         />
         {weather && onRefreshWeather && weather.canRefresh ? (
-          <button
+          <WeatherRefreshButton
             className="itinerary-day-card__refresh"
-            type="button"
-            disabled={refreshing}
             onClick={() => onRefreshWeather(day.id)}
-          >
-            {refreshing ? "Refreshing" : weather.refreshLabel ?? "Refresh weather"}
-          </button>
+            state={buttonState}
+          />
         ) : null}
       </div>
     </CardSurface>

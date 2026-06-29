@@ -2,6 +2,8 @@ import type { WeatherCardModel } from "../weatherTypes";
 import { CardSurface } from "../../../components/surfaces/CardSurface";
 import { ConfidenceChip } from "../../../components/status/ConfidenceChip";
 import { StatusChip } from "../../../components/status/StatusChip";
+import { WeatherRefreshButton } from "../WeatherRefreshButton";
+import type { WeatherButtonState } from "../weatherTypes";
 
 type WeatherSeasonalityModel = WeatherCardModel & {
   coordinatesLabel: string;
@@ -9,27 +11,35 @@ type WeatherSeasonalityModel = WeatherCardModel & {
 };
 
 interface WeatherSeasonalityPanelProps {
+  buttonState: WeatherButtonState;
   weather: WeatherSeasonalityModel;
   onRefresh?: () => void;
-  refreshing?: boolean;
 }
 
-export function WeatherSeasonalityPanel({ weather, onRefresh, refreshing }: WeatherSeasonalityPanelProps) {
+export function WeatherSeasonalityPanel({ buttonState, weather, onRefresh }: WeatherSeasonalityPanelProps) {
   return (
     <CardSurface as="section" className="weather-seasonality-panel" variant="glass" aria-labelledby="weather-seasonality-title">
       <div className="weather-seasonality-panel__header">
         <div>
           <p className="section-kicker">Weather and seasonality</p>
-          <h2 id="weather-seasonality-title">{weather.stateLabel}</h2>
-          <p>{weather.seasonalitySummary}</p>
+          <h2 id="weather-seasonality-title">{weather.portName}</h2>
+          <p>{weather.contextMessage}</p>
         </div>
-        <StatusChip label={weather.refreshLabel} tone={weather.badgeTone} />
+        <StatusChip label={weather.readinessLabel} tone={weather.badgeTone} />
       </div>
 
       <div className="weather-seasonality-panel__grid">
         <div>
-          <span>Weather</span>
-          <strong>{weather.badgeLabel}</strong>
+          <span>Visit date</span>
+          <strong>{weather.visitDateLabel}</strong>
+        </div>
+        <div>
+          <span>Weather data</span>
+          <strong>{weather.weatherDateLabel}</strong>
+        </div>
+        <div>
+          <span>Type</span>
+          <strong>{weather.weatherTypeLabel}</strong>
         </div>
         <div>
           <span>Coordinates</span>
@@ -43,9 +53,12 @@ export function WeatherSeasonalityPanel({ weather, onRefresh, refreshing }: Weat
           <span>Updated</span>
           <strong>{weather.updatedLabel}</strong>
         </div>
+        {weather.forecastExpectedFromLabel ? <div><span>Visit forecast</span><strong>Expected from {weather.forecastExpectedFromLabel}</strong></div> : null}
       </div>
 
       <div className="weather-seasonality-panel__summary">
+        <p>{weather.seasonalitySummary}</p>
+        <p>{weather.summary}</p>
         <p>{weather.comfortSummary}</p>
         <p>{weather.clothingGuidance}</p>
         <p>{weather.planImpact}</p>
@@ -53,20 +66,16 @@ export function WeatherSeasonalityPanel({ weather, onRefresh, refreshing }: Weat
 
       <div className="weather-seasonality-panel__metadata">
         <ConfidenceChip label={weather.confidenceLabel} level={weather.confidenceLevel} />
-        <StatusChip label={weather.stateLabel} tone={weather.badgeTone} />
+        <StatusChip label={weather.attributionLabel} tone="review" />
       </div>
 
       {onRefresh ? (
-        <button
+        <WeatherRefreshButton
           className="weather-seasonality-panel__button"
-          type="button"
-          disabled={refreshing || !weather.canRefresh}
           onClick={onRefresh}
-        >
-          {refreshing ? "Refreshing" : weather.refreshLabel}
-        </button>
+          state={buttonState}
+        />
       ) : null}
     </CardSurface>
   );
 }
-

@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { PortAtlasMap } from "../maps/PortAtlasMap";
 import { getAtlasSummary } from "../maps/mapUtils";
 import { buildAtlasCaption, buildVoyageAtlasPoints } from "../ports/portAtlasViewModel";
+import type { WeatherButtonState } from "../weather/weatherTypes";
 import { ItineraryLegend } from "./components/ItineraryLegend";
 import { ItinerarySummaryPanel } from "./components/ItinerarySummaryPanel";
 import { ItineraryTimeline } from "./components/ItineraryTimeline";
@@ -14,7 +15,7 @@ import "./ItineraryPage.css";
 
 export function ItineraryPage() {
   const query = useSailingDashboard();
-  const [refreshingDayId, setRefreshingDayId] = useState<string | undefined>();
+  const [buttonStates, setButtonStates] = useState<Record<string, WeatherButtonState>>({});
   const [weatherMessage, setWeatherMessage] = useState<string | undefined>();
   const atlasPoints = useMemo(
     () => query.data ? buildVoyageAtlasPoints(query.data.itinerary) : [],
@@ -27,13 +28,18 @@ export function ItineraryPage() {
   const atlasSummary = getAtlasSummary(atlasPoints);
   const selectedPointId = query.data.itinerary.find(({ day }) => day.dayType !== "sea")?.day.id;
   const handleRefreshWeather = async (dayId: string) => {
-    setRefreshingDayId(dayId);
     setWeatherMessage(undefined);
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      setButtonStates((current) => ({ ...current, [dayId]: "offline" }));
+      setWeatherMessage("Weather refresh needs a connection. Your existing local weather context has been preserved.");
+      return;
+    }
+    setButtonStates((current) => ({ ...current, [dayId]: "refreshing" }));
     const result = await refreshCruiseWeatherForSailing(query.data!.sailing.id, undefined, {
       itineraryDayId: dayId,
     });
     setWeatherMessage(result.message);
-    setRefreshingDayId(undefined);
+    setButtonStates((current) => ({ ...current, [dayId]: result.buttonState }));
   };
   return (
     <div className="itinerary-page">
@@ -50,9 +56,9 @@ export function ItineraryPage() {
       />
       <ItineraryLegend />
       <ItineraryTimeline
+        buttonStates={buttonStates}
         days={itinerary.days}
         onRefreshWeather={handleRefreshWeather}
-        refreshingDayId={refreshingDayId}
       />
       {weatherMessage ? <p className="itinerary-page__weather-message">{weatherMessage}</p> : null}
     </div>
