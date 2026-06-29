@@ -5,18 +5,53 @@
 
 .weather-review-page__hero,
 .weather-review-page__empty,
+.weather-review-page__section,
 .weather-review-card {
   display: grid;
   gap: 1rem;
+  min-width: 0;
 }
 
 .weather-review-page__hero h1,
+.weather-review-page__section h2,
 .weather-review-card h2,
 .weather-review-card h3 {
   margin: 0;
 }
 
+.weather-review-page__hero-copy,
+.weather-review-page__section-header,
+.weather-review-card__header-copy,
+.weather-review-card__summary,
+.weather-review-audit-item,
+.weather-review-snapshot__title {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.weather-review-page__hero-copy p,
+.weather-review-page__section-header p,
+.weather-review-page__message,
+.weather-review-card__header-copy p,
+.weather-review-card__summary p,
+.weather-review-card__differences p,
+.weather-review-card__audit p,
+.weather-review-audit-item p,
+.weather-review-snapshot p {
+  margin: 0;
+}
+
+.weather-review-page__hero-note,
+.weather-review-page__section-header p,
+.weather-review-card__meta,
+.weather-review-snapshot__title span,
+.weather-review-audit-item span,
+.weather-review-snapshot dt {
+  color: var(--colour-ink-soft);
+}
+
 .weather-review-page__hero-chips,
+.weather-review-page__actions,
 .weather-review-snapshot__chips,
 .weather-review-card__meta,
 .weather-review-card__footer {
@@ -25,69 +60,127 @@
   gap: 0.75rem;
 }
 
+.weather-review-page__actions {
+  margin-top: 0.25rem;
+}
+
+.weather-review-page__action,
+.weather-review-snapshot__action,
+.weather-review-card__acknowledge {
+  min-height: 2.9rem;
+  padding: 0.8rem 1.15rem;
+  border: 1px solid color-mix(in srgb, var(--colour-champagne-gold) 22%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--colour-deep-ocean) 78%, transparent);
+  color: var(--colour-warm-ivory);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform var(--transition-standard),
+    border-color var(--transition-standard),
+    background var(--transition-standard);
+}
+
+.weather-review-page__action:hover,
+.weather-review-page__action:focus-visible,
+.weather-review-snapshot__action:hover,
+.weather-review-snapshot__action:focus-visible,
+.weather-review-card__acknowledge:hover,
+.weather-review-card__acknowledge:focus-visible {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--colour-sea-glass-aqua) 36%, transparent);
+}
+
+.weather-review-page__action--secondary {
+  background: color-mix(in srgb, var(--surface-glass) 88%, transparent);
+}
+
 .weather-review-page__message {
-  margin: 0;
-  color: var(--color-ink);
+  padding: 0.9rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--colour-sea-glass-aqua) 22%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--surface-glass) 88%, transparent);
 }
 
 .weather-review-page__list,
-.weather-review-card__snapshots {
+.weather-review-card__snapshots,
+.weather-review-audit-list {
   display: grid;
   gap: 1rem;
 }
 
-.weather-review-card__header {
+.weather-review-page__section-header {
+  padding: 0 0.1rem;
+}
+
+.weather-review-card {
+  overflow: hidden;
+}
+
+.weather-review-card__header,
+.weather-review-snapshot header,
+.weather-review-audit-item__header {
   display: flex;
   justify-content: space-between;
   align-items: start;
   gap: 1rem;
+  min-width: 0;
 }
 
 .weather-review-card__meta {
-  color: var(--color-muted-ink);
   font-size: 0.95rem;
+}
+
+.weather-review-card__meta span,
+.weather-review-audit-item p,
+.weather-review-snapshot dd {
+  overflow-wrap: anywhere;
+}
+
+.weather-review-card__summary {
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--colour-champagne-gold) 16%, transparent);
+  border-radius: 1.1rem;
+  background: color-mix(in srgb, var(--colour-warm-ivory) 84%, transparent);
+}
+
+.weather-review-card__summary h3 {
+  color: var(--colour-ink);
 }
 
 .weather-review-snapshot {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.85rem;
+  min-width: 0;
   padding: 1rem;
-  border: 1px solid color-mix(in srgb, var(--color-gold-400) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--colour-champagne-gold) 18%, transparent);
   border-radius: 1.25rem;
-  background: color-mix(in srgb, var(--color-surface-glass) 85%, transparent);
+  background: color-mix(in srgb, var(--surface-glass) 85%, transparent);
 }
 
 .weather-review-snapshot[data-preferred="true"] {
-  border-color: color-mix(in srgb, var(--color-teal-300) 40%, transparent);
+  border-color: color-mix(in srgb, var(--colour-sea-glass-aqua) 40%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--colour-sea-glass-aqua) 16%, transparent);
 }
 
-.weather-review-snapshot header {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.weather-review-snapshot p,
-.weather-review-card__differences p,
-.weather-review-card__audit p {
-  margin: 0;
+.weather-review-snapshot__title strong {
+  font-size: 1rem;
 }
 
 .weather-review-snapshot dl {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.85rem;
   margin: 0;
 }
 
 .weather-review-snapshot dl div {
   display: grid;
-  gap: 0.15rem;
+  gap: 0.18rem;
 }
 
 .weather-review-snapshot dt {
-  color: var(--color-muted-ink);
   font-size: 0.82rem;
 }
 
@@ -95,28 +188,45 @@
   margin: 0;
 }
 
-.weather-review-snapshot__action,
-.weather-review-card__acknowledge {
-  width: fit-content;
-  padding: 0.8rem 1.1rem;
-  border: 1px solid color-mix(in srgb, var(--color-gold-400) 22%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--color-deep-ocean) 72%, transparent);
-  color: var(--color-ivory-050);
-  font: inherit;
-  cursor: pointer;
+.weather-review-card__differences ul {
+  margin: 0;
+  padding-left: 1.1rem;
 }
 
-.weather-review-card__differences ul,
-.weather-review-card__audit ul {
-  margin: 0;
-  padding-left: 1.25rem;
+.weather-review-card__audit {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.weather-review-audit-item {
+  padding: 0.95rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--colour-sea-glass-aqua) 16%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--surface-glass) 62%, transparent);
 }
 
 @media (max-width: 767px) {
   .weather-review-card__header,
-  .weather-review-snapshot header {
-    grid-template-columns: 1fr;
+  .weather-review-snapshot header,
+  .weather-review-audit-item__header {
     display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .weather-review-card__summary,
+  .weather-review-snapshot,
+  .weather-review-audit-item {
+    padding: 0.9rem;
+  }
+
+  .weather-review-snapshot dl {
+    grid-template-columns: 1fr;
+  }
+
+  .weather-review-page__action,
+  .weather-review-snapshot__action,
+  .weather-review-card__acknowledge {
+    width: 100%;
+    justify-content: center;
   }
 }

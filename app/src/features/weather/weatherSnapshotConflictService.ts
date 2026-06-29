@@ -161,6 +161,7 @@ export function buildWeatherSnapshotConflicts(input: {
       ? competingSnapshots.flatMap((snapshot) => compareWeatherSnapshots(preferredSnapshot, snapshot, input.thresholds))
       : [];
     const hasMaterialDifference = materialDifferences.some((difference) => difference.material);
+    const hasExplicitPreferredSnapshot = Boolean(day.weatherSnapshotId && candidates.some((snapshot) => snapshot.id === day.weatherSnapshotId));
     const newerCompetingSnapshot = preferredSnapshot
       ? competingSnapshots.some((snapshot) => snapshot.capturedAt > preferredSnapshot.capturedAt)
       : false;
@@ -171,12 +172,14 @@ export function buildWeatherSnapshotConflicts(input: {
         ? "no_conflict"
         : preferredSnapshot && newerCompetingSnapshot && hasMaterialDifference
           ? "stale_preferred"
-          : preferredSnapshot && !hasMaterialDifference
+          : preferredSnapshot && hasExplicitPreferredSnapshot
             ? "preferred_selected"
             : "review_recommended";
 
     return {
       itineraryDayId: day.id,
+      dayNumber: day.dayNumber,
+      itineraryDate: day.date,
       forecastDate: preferredSnapshot?.forecastDate ?? preferredSnapshot?.date ?? day.date,
       dayTitle: port?.name ?? day.title ?? `Day ${day.dayNumber}`,
       dayType: day.dayType,

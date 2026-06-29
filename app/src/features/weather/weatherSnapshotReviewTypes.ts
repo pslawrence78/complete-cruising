@@ -10,6 +10,8 @@ export interface WeatherSnapshotDifference {
 
 export interface WeatherSnapshotConflict {
   itineraryDayId: string;
+  dayNumber: number;
+  itineraryDate: string;
   forecastDate: string;
   dayTitle: string;
   dayType: ItineraryDayRecord["dayType"];
