@@ -4,73 +4,28 @@ import { seedSampleData } from "../db/seedDatabase";
 import { createImportPreview } from "../features/import-export/importPreviewService";
 import { getSampleImport } from "../features/import-export/sampleImports";
 import { sampleSailingRecord } from "../data/sampleSchemaData";
-
-function sailingShellEnrichmentPayload(sailingId: string = sampleSailingRecord.id) {
-  return {
-    schema: "complete-cruising-sailing-shell-enrichment-v1",
-    schemaVersion: 1,
-    sourceApp: "ChatGPT",
-    generatedAt: "2026-06-28T12:30:00+01:00",
-    target: { sailingId, sailingName: "Sun Princess Mediterranean 2026", shipName: "Sun Princess", cruiseLineName: "Princess Cruises" },
-    provenance: { userEnteredFieldsUsed: ["sailing.id"] },
-    enrichmentRun: {
-      id: "enrichment-run-sailing-shell-test",
-      name: "Sailing shell enrichment",
-      targetType: "sailing",
-      targetName: "Sun Princess Mediterranean 2026",
-      enrichmentPackType: "sailing_shell_enrichment",
-      status: "generated",
-      sourceTypesUsed: ["user_entered", "inferred"],
-      validationWarnings: ["Do not treat this enrichment as booking confirmation."],
-      notes: "Sailing-level context only.",
-    },
-    sailingEnrichment: { planningSummary: "Context only." },
-    sections: [{
-      id: "section-sailing-shell-test",
-      parentType: "sailing",
-      parentId: sailingId,
-      sectionType: "sailing_planning_summary",
-      title: "Sailing planning summary",
-      shortSummary: "Planning context that does not confirm operational timing.",
-      structuredFacts: [{ label: "Planning status", value: "Needs review", origin: "inferred" }],
-      practicalGuidance: ["Keep protected fields unchanged."],
-      familyRelevance: ["Useful for route planning."],
-      watchouts: ["No port times are confirmed."],
-      suggestedNextActions: ["Verify Princess material before day planning."],
-      confidence: {
-        confidence: "medium",
-        reviewStatus: "needs_user_review",
-        sourceType: "inferred",
-        sourceSummary: "Generated from a local sailing shell.",
-        lastReviewedAt: null,
-        refreshRecommended: true,
-        refreshReason: "Refresh after official itinerary confirmation.",
-        validFrom: null,
-        validUntil: null,
-      },
-    }],
-    importAdvice: {
-      safeToImport: true,
-      requiresUserReview: true,
-      protectedFieldWarnings: ["This JSON must not overwrite voyage code, sailing dates, itinerary rows or port times."],
-      recommendedImportType: "sailing_shell",
-    },
-  };
-}
+import {
+  dayGuideGenerationReturn,
+  itineraryVerificationReturn,
+  portPackEnrichmentReturn,
+  sailingShellEnrichmentReturn,
+  shipPackEnrichmentReturn,
+  shorePlanGenerationReturn,
+} from "./enrichmentReturnFixtures";
 
 describe("import preview service", () => {
   beforeEach(async () => { await db.delete(); await db.open(); await seedSampleData(); });
 
   it.each([
-    ["sailing_shell", "Sailing"], ["itinerary", "Sailing itinerary"], ["ship_enrichment", "Reusable ship guidebook"], ["port_enrichment", "Reusable port guidebook"], ["day_guide", "Sailing-specific itinerary day"],
+    ["sailing_shell", "Sailing"], ["itinerary", "Sailing itinerary"], ["ship_enrichment", "Reusable ship guidebook"], ["port_enrichment", "Reusable port guidebook"], ["day_guide", "Sailing-specific itinerary day"], ["shore_plan", "Sailing-specific shore plan"],
   ] as const)("produces a valid %s preview", async (type, targetType) => {
-    const before = await db.table(type === "itinerary" ? "itineraryDays" : type === "day_guide" ? "dayGuides" : type === "ship_enrichment" ? "ships" : type === "port_enrichment" ? "ports" : "sailings").count();
+    const before = await db.table(type === "itinerary" ? "itineraryDays" : type === "day_guide" ? "dayGuides" : type === "ship_enrichment" ? "ships" : type === "port_enrichment" ? "ports" : type === "shore_plan" ? "shorePlans" : "sailings").count();
     const preview = await createImportPreview(getSampleImport(type), type);
     expect(preview.status).toBe("valid");
     expect(preview.targetType).toBe(targetType);
     expect(preview.previewOnly).toBe(true);
     expect(preview.warnings.length).toBeGreaterThan(0);
-    expect(await db.table(type === "itinerary" ? "itineraryDays" : type === "day_guide" ? "dayGuides" : type === "ship_enrichment" ? "ships" : type === "port_enrichment" ? "ports" : "sailings").count()).toBe(before);
+    expect(await db.table(type === "itinerary" ? "itineraryDays" : type === "day_guide" ? "dayGuides" : type === "ship_enrichment" ? "ships" : type === "port_enrichment" ? "ports" : type === "shore_plan" ? "shorePlans" : "sailings").count()).toBe(before);
   });
 
   it("returns a parse error for malformed JSON", async () => {
@@ -103,7 +58,7 @@ describe("import preview service", () => {
   });
 
   it("previews recognised sailing shell enrichment as committable context", async () => {
-    const result = await createImportPreview(JSON.stringify(sailingShellEnrichmentPayload()), "sailing_shell");
+    const result = await createImportPreview(JSON.stringify(sailingShellEnrichmentReturn()), "sailing_shell");
     expect(result.status).toBe("valid");
     expect(result.schema).toBe("complete-cruising-sailing-shell-enrichment-v1");
     expect(result.targetType).toBe("Sailing-level context enrichment");
@@ -115,8 +70,57 @@ describe("import preview service", () => {
   });
 
   it("blocks sailing shell enrichment when the target sailing does not exist", async () => {
-    const result = await createImportPreview(JSON.stringify(sailingShellEnrichmentPayload("missing-sailing")), "sailing_shell");
+    const payload = sailingShellEnrichmentReturn() as any;
+    payload.target.sailingId = "missing-sailing";
+    const result = await createImportPreview(JSON.stringify(payload), "sailing_shell");
     expect(result.status).toBe("invalid");
     expect(result.errors[0]).toMatchObject({ code: "missing_target_sailing", fieldPath: "target.sailingId" });
+  });
+
+  it("previews all governed enrichment return schemas through their supported import routes", async () => {
+    const itinerary = await createImportPreview(JSON.stringify(itineraryVerificationReturn()), "itinerary");
+    const ship = await createImportPreview(JSON.stringify(shipPackEnrichmentReturn()), "ship_enrichment");
+    const port = await createImportPreview(JSON.stringify(portPackEnrichmentReturn()), "port_enrichment");
+    const dayGuide = await createImportPreview(JSON.stringify(dayGuideGenerationReturn()), "day_guide");
+    const shorePlan = await createImportPreview(JSON.stringify(shorePlanGenerationReturn()), "shore_plan");
+
+    expect(itinerary.status).toBe("valid");
+    expect(ship.status).toBe("valid");
+    expect(port.status).toBe("valid");
+    expect(dayGuide.status).toBe("valid");
+    expect(shorePlan.status).toBe("valid");
+    expect(shorePlan.recordsToCreate).toContain("shore-plan-return-balanced");
+  });
+
+  it("reports an invalid schema name clearly", async () => {
+    const result = await createImportPreview(JSON.stringify({ schema: "complete-cruising-unknown-v1" }), "sailing_shell");
+    expect(result.status).toBe("invalid");
+    expect(result.errors[0].code).toBe("invalid_schema_name");
+  });
+
+  it("blocks mapped returns when a required target is missing", async () => {
+    const payload = shorePlanGenerationReturn() as any;
+    payload.target.itineraryDayId = null;
+    const result = await createImportPreview(JSON.stringify(payload), "shore_plan");
+
+    expect(result.status).toBe("invalid");
+    expect(result.errors[0]).toMatchObject({ code: "missing_target", fieldPath: "target.itineraryDayId" });
+  });
+
+  it("surfaces missing required metadata from mapped return schemas", async () => {
+    const payload = shipPackEnrichmentReturn();
+    delete (payload.section as Partial<typeof payload.section>).confidence;
+    const result = await createImportPreview(JSON.stringify(payload), "ship_enrichment");
+
+    expect(result.status).toBe("invalid");
+    expect(result.errors.some((error) => error.fieldPath?.includes("section.confidence"))).toBe(true);
+  });
+
+  it("preserves protected-field warnings from itinerary verification returns", async () => {
+    const result = await createImportPreview(JSON.stringify(itineraryVerificationReturn()), "itinerary");
+
+    expect(result.status).toBe("valid");
+    expect(result.warnings.some((warning) => warning.code === "protected_field_warning")).toBe(true);
+    expect(result.protectedFieldImpacts.map((impact) => impact.fieldPath)).toContain("allAboardTime");
   });
 });

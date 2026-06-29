@@ -21,13 +21,7 @@ const initialResult = (selectedImportType: ImportType): ImportPreviewResult => (
   previewOnly: true,
 });
 
-const labels: Record<ImportType, string> = {
-  sailing_shell: "Sailing shell",
-  itinerary: "Itinerary",
-  ship_enrichment: "Ship enrichment",
-  port_enrichment: "Port enrichment",
-  day_guide: "Day guide",
-};
+const labels = Object.fromEntries(importTypeOptions.map((option) => [option.value, option.label])) as Record<ImportType, string>;
 
 function CountTile({ value, label, tone = "default" }: { value: number; label: string; tone?: string }) {
   return <div className="import-count" data-tone={tone}><strong>{value}</strong><span>{label}</span></div>;

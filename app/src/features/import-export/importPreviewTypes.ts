@@ -1,4 +1,6 @@
-export type ImportType = "sailing_shell" | "itinerary" | "ship_enrichment" | "port_enrichment" | "day_guide";
+import type { ImportType } from "../enrichment-requests/enrichmentRequestTypes";
+
+export type { ImportType };
 
 export type PreviewStatus = "idle" | "valid" | "invalid" | "parse_error" | "type_mismatch";
 
@@ -38,4 +40,3 @@ export interface ImportPreviewResult {
   errors: PreviewNotice[];
   previewOnly: true;
 }
-

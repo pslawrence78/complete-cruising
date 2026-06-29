@@ -2,6 +2,7 @@ import { ImportBatchSchema } from "../../schemas";
 import { db, type CompleteCruisingDb, type ImportBatch } from "../../db/completeCruisingDb";
 import type { ImportPreviewResult, ImportType } from "./importPreviewTypes";
 import { getImportRecordCandidates, getImportTable, importDefinitions, parseImportPayload } from "./importRecordMapping";
+import { convertEnrichmentReturnToImportPayload } from "./enrichmentReturnConverters";
 import {
   findReviewedSectionConflict,
   getSailingShellEnrichmentCandidates,
@@ -31,6 +32,69 @@ function normaliseImportedRecord(record: any, existing: any, now: string) {
 
 function batchId(type: ImportType, now: string) {
   return `import-${type}-${now.replace(/[^0-9]/g, "")}`;
+}
+
+async function commitCanonicalPayload(
+  payload: any,
+  selectedImportType: ImportType,
+  preview: ImportPreviewResult,
+  protectedFieldsConfirmed: boolean,
+  database: CompleteCruisingDb,
+  batchOptions?: {
+    schema?: string;
+    schemaVersion?: number;
+    sourceApp?: string;
+    receivedAt?: string;
+    rawContent?: unknown;
+    notes?: string;
+    protectedFieldWarningCount?: number;
+    skipRecordIds?: string[];
+  },
+): Promise<ImportCommitResult> {
+  const now = new Date().toISOString();
+  const records = getImportRecordCandidates(selectedImportType, payload);
+  const batch = ImportBatchSchema.parse({
+    id: batchId(selectedImportType, now),
+    schema: batchOptions?.schema ?? importDefinitions[selectedImportType].name,
+    schemaVersion: batchOptions?.schemaVersion ?? payload.header.schemaVersion,
+    kind: selectedImportType,
+    importType: selectedImportType,
+    status: "committed",
+    receivedAt: batchOptions?.receivedAt ?? payload.header.importedAt,
+    committedAt: now,
+    sourceApp: batchOptions?.sourceApp ?? payload.header.sourceApp,
+    rawContent: batchOptions?.rawContent ?? payload,
+    validationWarnings: preview.warnings.map((warning) => warning.message),
+    recordsCreated: preview.recordsToCreate.length,
+    recordsUpdated: preview.recordsToUpdate.length,
+    recordsSkipped: preview.recordsUnchanged.length,
+    warningCount: preview.warnings.length,
+    protectedFieldWarningCount: batchOptions?.protectedFieldWarningCount ?? preview.protectedFieldImpacts.length,
+    protectedFieldsConfirmed,
+    validationSummary: preview.summary,
+    targetSummary: [preview.targetType, preview.targetName ?? preview.targetId].filter(Boolean).join(": "),
+    notes: batchOptions?.notes ?? "Committed from a validated local preview.",
+    audit: { createdAt: now, updatedAt: now, createdBy: "import", updatedBy: "import" },
+  });
+
+  const skippedRecordIds = new Set(batchOptions?.skipRecordIds ?? []);
+  try {
+    await database.transaction("rw", database.tables, async () => {
+      for (const record of records) {
+        if (skippedRecordIds.has(record.value.id)) continue;
+        const table = getImportTable(database, record.tableName);
+        const existing = await table.get(record.value.id);
+        await table.put(normaliseImportedRecord(record.value, existing, now));
+      }
+      await database.importBatches.put(batch);
+    });
+    return { status: "committed", message: "Import committed to local storage.", batch };
+  } catch (error) {
+    return {
+      status: "failed",
+      message: error instanceof Error ? error.message : "The import transaction failed before it could be committed.",
+    };
+  }
 }
 
 async function commitSailingShellEnrichmentImport(
@@ -127,6 +191,37 @@ export async function commitValidatedImport(
     return commitSailingShellEnrichmentImport(raw, preview, database);
   }
 
+  let convertedReturn;
+  try {
+    convertedReturn = typeof (raw as { schema?: unknown })?.schema === "string"
+      ? await convertEnrichmentReturnToImportPayload(raw, database)
+      : undefined;
+  } catch {
+    return { status: "blocked", message: "The enrichment return no longer matches its governed schema. Preview it again before committing." };
+  }
+  if (convertedReturn) {
+    if (convertedReturn.errors.length > 0 || !convertedReturn.payload) {
+      return { status: "blocked", message: "The enrichment return still has target or validation problems. Preview it again before committing." };
+    }
+    return commitCanonicalPayload(
+      convertedReturn.payload,
+      selectedImportType,
+      preview,
+      protectedFieldsConfirmed,
+      database,
+      {
+        schema: convertedReturn.schema,
+        schemaVersion: convertedReturn.schemaVersion,
+        sourceApp: convertedReturn.sourceApp,
+        receivedAt: convertedReturn.receivedAt,
+        rawContent: raw,
+        notes: `Committed from the governed ${convertedReturn.schema} repair path.`,
+        protectedFieldWarningCount: preview.warnings.filter((warning) => warning.code === "protected_field_warning").length,
+        skipRecordIds: convertedReturn.skipUnchangedRecords ? preview.recordsUnchanged : undefined,
+      },
+    );
+  }
+
   let payload: any;
   try {
     payload = parseImportPayload(json, selectedImportType);
@@ -138,46 +233,7 @@ export async function commitValidatedImport(
     return { status: "blocked", message: "The preview no longer matches the selected import type." };
   }
 
-  const now = new Date().toISOString();
-  const records = getImportRecordCandidates(selectedImportType, payload);
-  const batch = ImportBatchSchema.parse({
-    id: batchId(selectedImportType, now),
-    schema: importDefinitions[selectedImportType].name,
-    schemaVersion: payload.header.schemaVersion,
-    kind: selectedImportType,
-    importType: selectedImportType,
-    status: "committed",
-    receivedAt: payload.header.importedAt,
-    committedAt: now,
-    sourceApp: payload.header.sourceApp,
-    rawContent: payload,
-    validationWarnings: preview.warnings.map((warning) => warning.message),
-    recordsCreated: preview.recordsToCreate.length,
-    recordsUpdated: preview.recordsToUpdate.length,
-    recordsSkipped: preview.recordsUnchanged.length,
-    warningCount: preview.warnings.length,
-    protectedFieldWarningCount: preview.protectedFieldImpacts.length,
-    protectedFieldsConfirmed,
-    validationSummary: preview.summary,
-    targetSummary: [preview.targetType, preview.targetName ?? preview.targetId].filter(Boolean).join(": "),
+  return commitCanonicalPayload(payload, selectedImportType, preview, protectedFieldsConfirmed, database, {
     notes: "Committed from a Tranche 13 validated local preview.",
-    audit: { createdAt: now, updatedAt: now, createdBy: "import", updatedBy: "import" },
   });
-
-  try {
-    await database.transaction("rw", database.tables, async () => {
-      for (const record of records) {
-        const table = getImportTable(database, record.tableName);
-        const existing = await table.get(record.value.id);
-        await table.put(normaliseImportedRecord(record.value, existing, now));
-      }
-      await database.importBatches.put(batch);
-    });
-    return { status: "committed", message: "Import committed to local storage.", batch };
-  } catch (error) {
-    return {
-      status: "failed",
-      message: error instanceof Error ? error.message : "The import transaction failed before it could be committed.",
-    };
-  }
 }

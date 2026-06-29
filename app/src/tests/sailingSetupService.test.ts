@@ -1,7 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { CompleteCruisingDb } from "../db/completeCruisingDb";
 import { seedSampleData } from "../db/seedDatabase";
-import { applyPortLabelsToRows, calculateNights, createSailingShell, generateItineraryRowsFromDates, summariseSetup, type SailingSetupInput } from "../features/sailing-setup/sailingSetupService";
+import {
+  applyPortLabelsToRows,
+  archiveSailing,
+  calculateNights,
+  createSailingShell,
+  deleteSailingSafely,
+  generateItineraryRowsFromDates,
+  getSailingDeleteGuardrail,
+  loadSailingShellInput,
+  summariseSetup,
+  updateSailingShell,
+  type SailingSetupInput,
+} from "../features/sailing-setup/sailingSetupService";
 
 const setupInput: SailingSetupInput = {
   sailingName: "Test Mediterranean Sailing",
@@ -72,5 +84,71 @@ describe("sailing setup service", () => {
     expect(result.reused.ports).toContain("Naples");
     expect(await database.cruiseLines.count()).toBe(1);
     expect(await database.ships.count()).toBe(1);
+  });
+
+  it("loads and updates an existing sailing shell without dropping linked day metadata", async () => {
+    const created = await createSailingShell(setupInput, database);
+    const originalDay = created.itineraryDays[1];
+    await database.itineraryDays.put({
+      ...originalDay,
+      dayGuideId: "linked-day-guide",
+      selectedShorePlanId: "linked-shore-plan",
+    });
+
+    const editable = await loadSailingShellInput(created.sailing.id, database);
+    editable.sailingName = "Updated Mediterranean Sailing";
+    editable.itineraryDays[1].arrivalTime = "08:15";
+    const updated = await updateSailingShell(created.sailing.id, editable, database);
+    const storedDay = await database.itineraryDays.get(originalDay.id);
+
+    expect(updated.sailing.name).toBe("Updated Mediterranean Sailing");
+    expect(storedDay).toMatchObject({
+      arrivalTime: "08:15",
+      dayGuideId: "linked-day-guide",
+      selectedShorePlanId: "linked-shore-plan",
+    });
+  });
+
+  it("archives a sailing without deleting linked itinerary records", async () => {
+    const created = await createSailingShell(setupInput, database);
+    const archived = await archiveSailing(created.sailing.id, database);
+
+    expect(archived.status).toBe("archived");
+    expect(archived.audit.archivedAt).toBeTruthy();
+    expect(await database.itineraryDays.where("sailingId").equals(created.sailing.id).count()).toBe(3);
+  });
+
+  it("blocks delete when a sailing already has linked local records", async () => {
+    const created = await createSailingShell(setupInput, database);
+    const guardrail = await getSailingDeleteGuardrail(created.sailing.id, database);
+
+    expect(guardrail.allowed).toBe(false);
+    await expect(deleteSailingSafely(created.sailing.id, database)).rejects.toThrow(/Archive it instead/i);
+    expect(await database.sailings.get(created.sailing.id)).toBeTruthy();
+  });
+
+  it("allows delete for an empty draft with no linked local records", async () => {
+    const audit = {
+      createdAt: "2026-06-29T10:00:00.000Z",
+      updatedAt: "2026-06-29T10:00:00.000Z",
+      createdBy: "test",
+      updatedBy: "test",
+    };
+    await database.sailings.put({
+      id: "sailing-empty-draft",
+      name: "Empty draft",
+      cruiseLineId: "cruise-line-princess",
+      shipId: "ship-sun-princess",
+      status: "draft",
+      departureDate: "2026-10-01",
+      returnDate: "2026-10-05",
+      audit,
+    });
+
+    const guardrail = await getSailingDeleteGuardrail("sailing-empty-draft", database);
+    expect(guardrail.allowed).toBe(true);
+
+    await deleteSailingSafely("sailing-empty-draft", database);
+    expect(await database.sailings.get("sailing-empty-draft")).toBeUndefined();
   });
 });

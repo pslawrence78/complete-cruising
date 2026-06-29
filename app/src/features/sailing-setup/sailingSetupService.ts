@@ -1,6 +1,7 @@
 import type { CompleteCruisingDb } from "../../db/completeCruisingDb";
 import { db } from "../../db/completeCruisingDb";
 import type { ConfidenceMetadata, Country, CruiseLine, ItineraryDayRecord, Port, Sailing, Ship } from "../../types";
+import { getActiveSailingId, setActiveSailingId } from "../../db/repositories/appSettingsRepository";
 
 export type SetupDayType = "embarkation" | "port" | "sea" | "scenic_cruising" | "overnight_port" | "disembarkation";
 export type SetupTenderStatus = "unknown" | "likely" | "confirmed" | "not_applicable";
@@ -45,6 +46,21 @@ export interface SailingSetupResult {
     cruiseLine: boolean;
     ship: boolean;
     ports: string[];
+  };
+}
+
+export interface SailingDeleteGuardrail {
+  allowed: boolean;
+  reason?: string;
+  relatedRecordCounts: {
+    itineraryDays: number;
+    shorePlans: number;
+    dayGuides: number;
+    weatherSnapshots: number;
+    memories: number;
+    familyNotes: number;
+    enrichmentRuns: number;
+    enrichmentSections: number;
   };
 }
 
@@ -183,33 +199,74 @@ async function ensurePort(portName: string, countryName: string | undefined, dat
   return { port, reused: false };
 }
 
-export async function createSailingShell(input: SailingSetupInput, database: CompleteCruisingDb = db): Promise<SailingSetupResult> {
+async function ensureCruiseLine(input: SailingSetupInput, database: CompleteCruisingDb) {
   const cruiseLineName = normalise(input.cruiseLineName);
-  const shipName = normalise(input.shipName);
-  const sailingId = `sailing-${slugify(input.sailingName)}-${Date.now().toString(36)}`;
-
-  return database.transaction("rw", [database.cruiseLines, database.ships, database.sailings, database.countries, database.ports, database.itineraryDays, database.appSettings], async () => {
-    const existingLine = await findByName<CruiseLine>(database.cruiseLines, cruiseLineName);
-    const cruiseLine: CruiseLine = existingLine ?? {
+  const existingLine = await findByName<CruiseLine>(database.cruiseLines, cruiseLineName);
+  const now = nowIso();
+  const cruiseLine: CruiseLine = existingLine
+    ? {
+      ...existingLine,
+      shortName: optional(input.cruiseLineDisplayName) ?? existingLine.shortName,
+      audit: {
+        ...existingLine.audit,
+        updatedAt: now,
+        updatedBy: "user",
+      },
+    }
+    : {
       id: `cruise-line-${slugify(cruiseLineName)}`,
       name: cruiseLineName,
       shortName: optional(input.cruiseLineDisplayName),
       confidence: userEnteredConfidence(false, "Cruise line shell created from manual sailing setup."),
       audit: audit(),
     };
-    if (!existingLine) await database.cruiseLines.put(cruiseLine);
+  await database.cruiseLines.put(cruiseLine);
+  return { cruiseLine, reused: Boolean(existingLine) };
+}
 
-    const ships = await database.ships.toArray();
-    const existingShip = ships.find((ship) => ship.name.trim().toLowerCase() === shipName.toLowerCase() && ship.cruiseLineId === cruiseLine.id);
-    const ship: Ship = existingShip ?? {
+async function ensureShip(input: SailingSetupInput, cruiseLineId: string, database: CompleteCruisingDb) {
+  const shipName = normalise(input.shipName);
+  const ships = await database.ships.toArray();
+  const existingShip = ships.find((ship) => ship.name.trim().toLowerCase() === shipName.toLowerCase() && ship.cruiseLineId === cruiseLineId);
+  const now = nowIso();
+  const ship: Ship = existingShip
+    ? {
+      ...existingShip,
+      shipOverview: optional(input.shipNotes) ?? existingShip.shipOverview,
+      audit: {
+        ...existingShip.audit,
+        updatedAt: now,
+        updatedBy: "user",
+      },
+    }
+    : {
       id: `ship-${slugify(shipName)}`,
-      cruiseLineId: cruiseLine.id,
+      cruiseLineId,
       name: shipName,
       shipOverview: optional(input.shipNotes),
       confidence: userEnteredConfidence(false, "Ship shell created from manual sailing setup."),
       audit: audit(),
     };
-    if (!existingShip) await database.ships.put(ship);
+  await database.ships.put(ship);
+  return { ship, reused: Boolean(existingShip) };
+}
+
+function updateAudit(existingAudit: Sailing["audit"], archivedAt?: string) {
+  const now = nowIso();
+  return {
+    ...existingAudit,
+    updatedAt: now,
+    updatedBy: "user",
+    archivedAt,
+  };
+}
+
+export async function createSailingShell(input: SailingSetupInput, database: CompleteCruisingDb = db): Promise<SailingSetupResult> {
+  const sailingId = `sailing-${slugify(input.sailingName)}-${Date.now().toString(36)}`;
+
+  return database.transaction("rw", [database.cruiseLines, database.ships, database.sailings, database.countries, database.ports, database.itineraryDays, database.appSettings], async () => {
+    const { cruiseLine, reused: reusedCruiseLine } = await ensureCruiseLine(input, database);
+    const { ship, reused: reusedShip } = await ensureShip(input, cruiseLine.id, database);
 
     const embarkation = optional(input.embarkationPortName)
       ? await ensurePort(input.embarkationPortName!, undefined, database)
@@ -270,10 +327,195 @@ export async function createSailingShell(input: SailingSetupInput, database: Com
       ship,
       itineraryDays,
       reused: {
-        cruiseLine: Boolean(existingLine),
-        ship: Boolean(existingShip),
+        cruiseLine: reusedCruiseLine,
+        ship: reusedShip,
         ports: Array.from(new Set(reusedPorts)),
       },
     };
+  });
+}
+
+export async function loadSailingShellInput(sailingId: string, database: CompleteCruisingDb = db): Promise<SailingSetupInput> {
+  const sailing = await database.sailings.get(sailingId);
+  if (!sailing) throw new Error("That sailing could not be found locally.");
+  const [cruiseLine, ship, itineraryDays, ports, countries] = await Promise.all([
+    database.cruiseLines.get(sailing.cruiseLineId),
+    database.ships.get(sailing.shipId),
+    database.itineraryDays.where("sailingId").equals(sailing.id).sortBy("dayNumber"),
+    database.ports.toArray(),
+    database.countries.toArray(),
+  ]);
+  const portsById = new Map(ports.map((port) => [port.id, port]));
+  const countriesById = new Map(countries.map((country) => [country.id, country]));
+
+  return {
+    sailingName: sailing.name,
+    routeSummary: sailing.routeSummary ?? "",
+    status: sailing.status,
+    notes: sailing.notes ?? "",
+    cruiseLineName: cruiseLine?.name ?? "",
+    cruiseLineDisplayName: cruiseLine?.shortName ?? "",
+    shipName: ship?.name ?? "",
+    shipNotes: ship?.shipOverview ?? "",
+    departureDate: sailing.departureDate,
+    returnDate: sailing.returnDate,
+    voyageCode: sailing.voyageCode ?? "",
+    embarkationPortName: sailing.embarkationPortId ? portsById.get(sailing.embarkationPortId)?.name ?? "" : "",
+    disembarkationPortName: sailing.disembarkationPortId ? portsById.get(sailing.disembarkationPortId)?.name ?? "" : "",
+    itineraryDays: itineraryDays.map((day) => ({
+      dayNumber: day.dayNumber,
+      date: day.date,
+      dayType: day.dayType,
+      portName: day.portId ? portsById.get(day.portId)?.name ?? "" : "",
+      countryName: day.portId ? countriesById.get(portsById.get(day.portId)?.countryId ?? "")?.name ?? "" : "",
+      arrivalTime: day.arrivalTime,
+      departureTime: day.departureTime,
+      allAboardTime: day.allAboardTime,
+      tenderStatus: day.tenderStatus,
+      notes: day.familyNotes,
+      userConfirmed: day.confidence?.confidence === "confirmed",
+    })),
+  };
+}
+
+export async function updateSailingShell(
+  sailingId: string,
+  input: SailingSetupInput,
+  database: CompleteCruisingDb = db,
+): Promise<SailingSetupResult> {
+  const existingSailing = await database.sailings.get(sailingId);
+  if (!existingSailing) throw new Error("That sailing could not be found locally.");
+  const existingDays = await database.itineraryDays.where("sailingId").equals(sailingId).sortBy("dayNumber");
+  if (input.itineraryDays.length < existingDays.length) {
+    throw new Error("Existing itinerary rows stay in place during shell management to avoid accidental loss of local day records. Archive the sailing instead if the shell should be retired.");
+  }
+
+  return database.transaction("rw", [database.cruiseLines, database.ships, database.sailings, database.countries, database.ports, database.itineraryDays], async () => {
+    const { cruiseLine, reused: reusedCruiseLine } = await ensureCruiseLine(input, database);
+    const { ship, reused: reusedShip } = await ensureShip(input, cruiseLine.id, database);
+    const embarkation = optional(input.embarkationPortName)
+      ? await ensurePort(input.embarkationPortName!, undefined, database)
+      : undefined;
+    const disembarkation = optional(input.disembarkationPortName)
+      ? await ensurePort(input.disembarkationPortName!, undefined, database)
+      : undefined;
+
+    const sailing: Sailing = {
+      ...existingSailing,
+      name: normalise(input.sailingName),
+      cruiseLineId: cruiseLine.id,
+      shipId: ship.id,
+      status: input.status,
+      departureDate: input.departureDate,
+      returnDate: input.returnDate,
+      voyageCode: optional(input.voyageCode),
+      routeSummary: optional(input.routeSummary),
+      notes: optional(input.notes),
+      embarkationPortId: embarkation?.port.id,
+      disembarkationPortId: disembarkation?.port.id,
+      audit: updateAudit(existingSailing.audit, input.status === "archived" ? existingSailing.audit.archivedAt ?? nowIso() : undefined),
+    };
+    await database.sailings.put(sailing);
+
+    const reusedPorts: string[] = [];
+    const itineraryDays: ItineraryDayRecord[] = [];
+    for (const [index, row] of [...input.itineraryDays].sort((a, b) => a.dayNumber - b.dayNumber).entries()) {
+      const existingDay = existingDays[index];
+      const hasPort = optional(row.portName) && ["embarkation", "port", "overnight_port", "disembarkation"].includes(row.dayType);
+      const portLookup = hasPort ? await ensurePort(row.portName!, row.countryName, database) : undefined;
+      if (portLookup?.reused) reusedPorts.push(portLookup.port.name);
+      const day: ItineraryDayRecord = {
+        ...existingDay,
+        id: existingDay?.id ?? `${sailingId}-day-${String(index + 1).padStart(2, "0")}`,
+        sailingId,
+        dayNumber: index + 1,
+        date: row.date,
+        dayType: row.dayType,
+        title: portLookup?.port.name ?? (row.dayType === "sea" ? "At sea" : row.dayType.replaceAll("_", " ")),
+        portId: portLookup?.port.id,
+        arrivalTime: optional(row.arrivalTime),
+        departureTime: optional(row.departureTime),
+        allAboardTime: optional(row.allAboardTime),
+        tenderStatus: row.tenderStatus ?? (hasPort ? "unknown" : "not_applicable"),
+        familyNotes: optional(row.notes),
+        confidence: userEnteredConfidence(row.userConfirmed, row.userConfirmed ? "User marked this itinerary row as confirmed." : "Itinerary row edited manually and awaiting verification."),
+        audit: existingDay ? updateAudit(existingDay.audit, existingDay.audit.archivedAt) : audit(),
+      };
+      itineraryDays.push(day);
+    }
+
+    await database.itineraryDays.bulkPut(itineraryDays);
+
+    return {
+      sailing,
+      cruiseLine,
+      ship,
+      itineraryDays,
+      reused: {
+        cruiseLine: reusedCruiseLine,
+        ship: reusedShip,
+        ports: Array.from(new Set(reusedPorts)),
+      },
+    };
+  });
+}
+
+export async function getSailingDeleteGuardrail(sailingId: string, database: CompleteCruisingDb = db): Promise<SailingDeleteGuardrail> {
+  const relatedRecordCounts = {
+    itineraryDays: await database.itineraryDays.where("sailingId").equals(sailingId).count(),
+    shorePlans: await database.shorePlans.where("sailingId").equals(sailingId).count(),
+    dayGuides: await database.dayGuides.where("sailingId").equals(sailingId).count(),
+    weatherSnapshots: await database.weatherSnapshots.where("sailingId").equals(sailingId).count(),
+    memories: await database.memoryEntries.where("sailingId").equals(sailingId).count(),
+    familyNotes: await database.familyNotes.where("sailingId").equals(sailingId).count(),
+    enrichmentRuns: await database.enrichmentRuns.where("targetEntityId").equals(sailingId).count(),
+    enrichmentSections: await database.enrichmentSections.where("entityId").equals(sailingId).count(),
+  };
+  const hasRelatedRecords = Object.values(relatedRecordCounts).some((count) => count > 0);
+  return hasRelatedRecords
+    ? {
+      allowed: false,
+      reason: "Delete remains blocked because this sailing already has linked local records. Archive it instead so guidebook, itinerary and enrichment work is not lost silently.",
+      relatedRecordCounts,
+    }
+    : {
+      allowed: true,
+      relatedRecordCounts,
+    };
+}
+
+export async function archiveSailing(sailingId: string, database: CompleteCruisingDb = db) {
+  const sailing = await database.sailings.get(sailingId);
+  if (!sailing) throw new Error("That sailing could not be found locally.");
+  const archivedAt = nowIso();
+  const archived = {
+    ...sailing,
+    status: "archived" as const,
+    audit: updateAudit(sailing.audit, archivedAt),
+  };
+  await database.sailings.put(archived);
+
+  const activeSailingId = await getActiveSailingId(database);
+  if (activeSailingId === sailingId) {
+    const nextActive = (await database.sailings.orderBy("departureDate").toArray()).find((candidate) => candidate.id !== sailingId && candidate.status !== "archived");
+    if (nextActive) await setActiveSailingId(nextActive.id, database);
+  }
+
+  return archived;
+}
+
+export async function deleteSailingSafely(sailingId: string, database: CompleteCruisingDb = db) {
+  const sailing = await database.sailings.get(sailingId);
+  if (!sailing) throw new Error("That sailing could not be found locally.");
+  const guardrail = await getSailingDeleteGuardrail(sailingId, database);
+  if (!guardrail.allowed) throw new Error(guardrail.reason ?? "Delete is not allowed for this sailing.");
+
+  await database.transaction("rw", [database.sailings, database.appSettings], async () => {
+    await database.sailings.delete(sailingId);
+    const activeSailingId = await getActiveSailingId(database);
+    if (activeSailingId === sailingId) {
+      const nextActive = (await database.sailings.orderBy("departureDate").toArray()).find((candidate) => candidate.id !== sailingId && candidate.status !== "archived");
+      if (nextActive) await setActiveSailingId(nextActive.id, database);
+    }
   });
 }

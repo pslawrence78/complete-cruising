@@ -25,6 +25,7 @@ This delivery tracker summarises the intended tranche sequence. The authoritativ
 19. MVP Cruise Usability and Visual Polish v0.1 - complete
 20. Cartographic Port Atlas and Map Context v0.1 - complete
 21. Cruise Weather Intelligence v0.1 - complete
+21A. Enrichment Workflow Contract Repair v0.1 - complete
 22. Cruise Conditions and Day Readiness v0.1 - recommended next tranche
 23. Content Accuracy Review and Offline Guidebook QA v0.1 - planned
 

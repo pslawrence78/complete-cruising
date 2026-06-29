@@ -82,6 +82,21 @@
   gap: var(--space-5);
 }
 
+.managed-sailing-grid,
+.enrichment-type-grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.managed-sailing-grid {
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  margin-top: var(--space-4);
+}
+
+.enrichment-type-grid {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
 .setup-panel,
 .setup-review article,
 .setup-review aside,
@@ -157,6 +172,10 @@
   gap: var(--space-4);
 }
 
+.enrichment-controls:not(.enrichment-controls--open) {
+  margin-top: var(--space-4);
+}
+
 .setup-section-heading {
   display: flex;
   gap: var(--space-4);
@@ -169,7 +188,9 @@
 .setup-secondary,
 .setup-review a,
 .enrichment-actions button,
-.setup-day-card button {
+.setup-day-card button,
+.managed-sailing-actions button,
+.enrichment-type-card {
   min-height: 2.55rem;
   padding: 0 var(--space-4);
   border: 0;
@@ -181,6 +202,56 @@
 
 .setup-secondary {
   margin-top: var(--space-4);
+}
+
+.enrichment-type-card {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  min-height: 7rem;
+  padding: var(--space-4);
+  border: 1px solid rgba(19, 33, 43, 0.08);
+  border-radius: var(--radius-lg);
+  color: var(--colour-warm-ivory);
+  text-align: left;
+}
+
+.enrichment-type-card span {
+  color: rgba(255, 248, 236, 0.86);
+  font-size: var(--type-sm);
+  line-height: 1.5;
+}
+
+.enrichment-type-card[data-active="false"] {
+  opacity: 0.7;
+}
+
+.managed-sailing-card,
+.pending-sailing-action {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid rgba(19, 33, 43, 0.12);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.managed-sailing-card[data-active="true"] {
+  border-color: rgba(28, 166, 168, 0.42);
+  box-shadow: inset 0 0 0 1px rgba(28, 166, 168, 0.12);
+}
+
+.managed-sailing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.managed-sailing-note {
+  margin: 0;
+  color: var(--text-on-paper-soft);
+  font-size: var(--type-sm);
+  line-height: 1.65;
 }
 
 .setup-paste-panel {
@@ -244,7 +315,9 @@
 }
 
 .setup-day-card button:disabled,
-.setup-primary:disabled {
+.setup-primary:disabled,
+.setup-secondary:disabled,
+.managed-sailing-actions button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
 }

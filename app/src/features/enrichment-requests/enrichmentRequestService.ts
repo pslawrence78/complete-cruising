@@ -5,7 +5,9 @@ import type { ItineraryDayRecord } from "../../types";
 import { buildPrompt } from "./promptTemplates";
 import {
   EnrichmentRequestSchema,
+  buildSuggestedImportFilename,
   returnSchemaByRequestType,
+  requestDefinitionByType,
   type EnrichmentRequestContract,
   type EnrichmentRequestOptions,
   type EnrichmentRequestType,
@@ -29,17 +31,6 @@ function clean(value: unknown): unknown {
     );
   }
   return value;
-}
-
-function titleFor(type: EnrichmentRequestType) {
-  return {
-    sailing_shell_enrichment: "Sailing shell enrichment",
-    itinerary_verification: "Itinerary verification",
-    ship_pack_enrichment: "Ship pack enrichment",
-    port_pack_enrichment: "Port pack enrichment",
-    shore_plan_generation: "Shore plan generation",
-    day_guide_generation: "Day guide generation",
-  }[type];
 }
 
 function taskFor(type: EnrichmentRequestType, packType?: string) {
@@ -94,6 +85,9 @@ async function loadContext(options: EnrichmentRequestOptions, database: Complete
   const active = options.sailingId ? await database.sailings.get(options.sailingId) : await getActiveSailing(database);
   if (!active) throw new Error("No sailing is available for enrichment request generation.");
   const overview = await getSailingOverview(active.id, database);
+  const selectedShip = options.shipId
+    ? await database.ships.get(options.shipId)
+    : overview?.ship;
   const itineraryDays = await database.itineraryDays.where("sailingId").equals(active.id).sortBy("dayNumber");
   const portIds = Array.from(new Set(itineraryDays.map((day) => day.portId).filter(Boolean) as string[]));
   const ports = await Promise.all(portIds.map((id) => database.ports.get(id)));
@@ -104,7 +98,7 @@ async function loadContext(options: EnrichmentRequestOptions, database: Complete
   return {
     sailing: active,
     cruiseLine: overview?.cruiseLine,
-    ship: overview?.ship,
+    ship: selectedShip,
     itineraryDays,
     ports: ports.filter(Boolean),
     selectedDay,
@@ -126,17 +120,10 @@ function targetName(type: EnrichmentRequestType, context: Awaited<ReturnType<typ
 export async function createEnrichmentRequest(options: EnrichmentRequestOptions, database: CompleteCruisingDb = db): Promise<EnrichmentRequestContract> {
   const context = await loadContext(options, database);
   const returnSchemaName = returnSchemaByRequestType[options.requestType];
+  const definition = requestDefinitionByType[options.requestType];
   const task = taskFor(options.requestType, options.shipPackType ?? options.portPackType);
   const createdAt = (options.now ?? new Date()).toISOString();
-  const targetType = options.requestType === "ship_pack_enrichment"
-    ? "ship"
-    : options.requestType === "port_pack_enrichment"
-      ? "port"
-      : options.requestType === "itinerary_verification"
-        ? "itinerary"
-        : options.requestType === "shore_plan_generation" || options.requestType === "day_guide_generation"
-          ? "itinerary_day"
-          : "sailing";
+  const targetType = definition.targetType;
   const targetId = targetType === "ship"
     ? context.ship?.id
     : targetType === "port"
@@ -167,7 +154,8 @@ export async function createEnrichmentRequest(options: EnrichmentRequestOptions,
       familyContext,
     },
     task: {
-      title: titleFor(options.requestType),
+      title: definition.requestLabel,
+      suggestedImportFilename: buildSuggestedImportFilename(options.requestType, options.now),
       ...task,
       returnSchemaName,
       packType: options.shipPackType ?? options.portPackType,
