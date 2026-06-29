@@ -3,9 +3,11 @@ import { ItineraryDayCard } from "./ItineraryDayCard";
 
 interface ItineraryTimelineProps {
   days: readonly ItineraryDay[];
+  onRefreshWeather?: (dayId: string) => void | Promise<void>;
+  refreshingDayId?: string;
 }
 
-export function ItineraryTimeline({ days }: ItineraryTimelineProps) {
+export function ItineraryTimeline({ days, onRefreshWeather, refreshingDayId }: ItineraryTimelineProps) {
   return (
     <section className="itinerary-timeline" aria-labelledby="itinerary-timeline-title">
       <div className="itinerary-section-heading">
@@ -33,7 +35,11 @@ export function ItineraryTimeline({ days }: ItineraryTimelineProps) {
               key={day.id}
             >
               <span className="itinerary-timeline__node" aria-hidden="true" />
-              <ItineraryDayCard day={day} />
+              <ItineraryDayCard
+                day={day}
+                onRefreshWeather={onRefreshWeather}
+                refreshing={refreshingDayId === day.id}
+              />
             </li>
           ))}
         </ol>

@@ -13,6 +13,8 @@ export interface RouteStop {
   id: string;
   name: string;
   kind: "port" | "sea";
+  weatherBadge?: string;
+  weatherTone?: DashboardStatusTone;
 }
 
 export interface DashboardMetric {
@@ -63,6 +65,16 @@ export interface DashboardData {
     ship: string;
     status: "upcoming";
   };
+  weatherOutlook: {
+    canRefresh: boolean;
+    lastUpdated: string;
+    privacyNote: string;
+    refreshLabel: string;
+    refreshTone: DashboardStatusTone;
+    source: string;
+    stateLabel: string;
+    summary: string;
+  };
   statusCards: readonly DashboardStatusCard[];
 }
 
@@ -83,21 +95,21 @@ export const sampleDashboardData = {
     status: "upcoming",
   },
   route: [
-    { id: "civitavecchia", name: "Civitavecchia / Rome", kind: "port" },
-    { id: "naples", name: "Naples", kind: "port" },
+    { id: "civitavecchia", name: "Civitavecchia / Rome", kind: "port", weatherBadge: "Climate only", weatherTone: "review" },
+    { id: "naples", name: "Naples", kind: "port", weatherBadge: "29°C · rain 10%", weatherTone: "confirmed" },
     { id: "sea-1", name: "Sea Day", kind: "sea" },
-    { id: "souda-bay", name: "Souda Bay / Chania", kind: "port" },
+    { id: "souda-bay", name: "Souda Bay / Chania", kind: "port", weatherBadge: "27°C · rain 20%", weatherTone: "review" },
     { id: "sea-2", name: "Sea Day", kind: "sea" },
-    { id: "kusadasi", name: "Kusadasi / Ephesus", kind: "port" },
-    { id: "mykonos", name: "Mykonos", kind: "port" },
-    { id: "piraeus", name: "Athens / Piraeus", kind: "port" },
-    { id: "santorini", name: "Santorini", kind: "port" },
+    { id: "kusadasi", name: "Kusadasi / Ephesus", kind: "port", weatherBadge: "30°C · rain 5%", weatherTone: "confirmed" },
+    { id: "mykonos", name: "Mykonos", kind: "port", weatherBadge: "26°C · wind 18 km/h", weatherTone: "review" },
+    { id: "piraeus", name: "Athens / Piraeus", kind: "port", weatherBadge: "Forecast pending", weatherTone: "review" },
+    { id: "santorini", name: "Santorini", kind: "port", weatherBadge: "Locked · 28°C", weatherTone: "refresh" },
     { id: "sea-3", name: "Sea Day", kind: "sea" },
-    { id: "bar", name: "Bar, Montenegro", kind: "port" },
-    { id: "corfu", name: "Corfu", kind: "port" },
-    { id: "messina", name: "Messina", kind: "port" },
+    { id: "bar", name: "Bar, Montenegro", kind: "port", weatherBadge: "Climate only", weatherTone: "review" },
+    { id: "corfu", name: "Corfu", kind: "port", weatherBadge: "27°C · rain 15%", weatherTone: "confirmed" },
+    { id: "messina", name: "Messina", kind: "port", weatherBadge: "Forecast stale", weatherTone: "refresh" },
     { id: "sea-4", name: "Sea Day", kind: "sea" },
-    { id: "barcelona", name: "Barcelona", kind: "port" },
+    { id: "barcelona", name: "Barcelona", kind: "port", weatherBadge: "Captured", weatherTone: "refresh" },
   ],
   metrics: [
     {
@@ -143,6 +155,16 @@ export const sampleDashboardData = {
       accent: "gold",
     },
   ],
+  weatherOutlook: {
+    canRefresh: true,
+    lastUpdated: "Updated 20 Jun 2026, 09:00",
+    privacyNote: "Weather refresh sends port coordinates and dates to Open-Meteo. It does not send family identity, booking details, cabin information or traveller details.",
+    refreshLabel: "Refresh cruise weather",
+    refreshTone: "confirmed",
+    source: "Open-Meteo forecast",
+    stateLabel: "Forecast recent",
+    summary: "Weather is available for the next practical port windows and can be refreshed locally when connectivity returns.",
+  },
   statusCards: [
     {
       id: "next-port",

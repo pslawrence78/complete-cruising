@@ -4,4 +4,5 @@ export * from "./portRepository";
 export * from "./sailingRepository";
 export * from "./shipRepository";
 export * from "./shorePlanRepository";
+export * from "./weatherRepository";
 export * from "./screenRepository";

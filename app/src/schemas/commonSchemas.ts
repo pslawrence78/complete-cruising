@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const ConfidenceSchema = z.enum(["confirmed", "high", "medium", "low", "inferred", "unknown"]);
 export const ReviewStatusSchema = z.enum(["not_reviewed", "needs_user_review", "reviewed", "verified", "needs_refresh", "stale", "rejected"]);
-export const SourceTypeSchema = z.enum(["booking_confirmed", "cruise_line_confirmed", "official_port_source", "official_tourism_source", "official_attraction_source", "official_transport_source", "reputable_travel_source", "family_note", "user_entered", "researched", "inferred"]);
+export const SourceTypeSchema = z.enum(["booking_confirmed", "cruise_line_confirmed", "official_port_source", "official_tourism_source", "official_attraction_source", "official_transport_source", "reputable_travel_source", "weather_service", "family_note", "user_entered", "researched", "inferred"]);
 export const SailingStatusSchema = z.enum(["draft", "planned", "upcoming", "active", "completed", "archived"]);
 export const DayTypeSchema = z.enum(["embarkation", "port", "sea", "disembarkation", "scenic_cruising", "overnight_port"]);
 export const TenderStatusSchema = z.enum(["unknown", "likely", "confirmed", "not_applicable"]);
@@ -15,6 +15,8 @@ export const WeatherDependencySchema = z.enum(["low", "medium", "high", "unknown
 export const ShorePlanTypeSchema = z.enum(["booked_excursion", "diy", "private_tour", "low_effort", "backup", "onboard_only", "ambitious"]);
 export const ShorePlanStatusSchema = z.enum(["idea", "shortlisted", "selected", "booked", "completed", "cancelled", "rejected"]);
 export const WeatherSnapshotTypeSchema = z.enum(["climate", "forecast", "same_day", "observed", "manual"]);
+export const WeatherStateSchema = z.enum(["climate_expectation", "forecast_pending", "forecast_available", "forecast_recent", "forecast_stale", "day_locked", "historical_lookup_available", "missing_coordinates"]);
+export const WeatherRefreshStateSchema = z.enum(["ready", "refreshing", "updated", "skipped", "failed"]);
 
 const IsoDateTimeSchema = z.string().datetime({ offset: true });
 const IsoDateSchema = z.string().date();

@@ -50,7 +50,7 @@ describe("data-driven application screens", () => {
     expect(screen.getByText(/Your cruise day companion is preparing for embarkation/)).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 2, name: /Pending/ }).length).toBeGreaterThan(0);
     expect(screen.getByText("Not set")).toBeInTheDocument();
-    expect(screen.getByText("Forecast pending")).toBeInTheDocument();
+    expect(screen.getByText("Weather and comfort")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Worth opening next Explore the voyage route/ })).toBeInTheDocument();
   });
 

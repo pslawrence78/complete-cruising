@@ -4,6 +4,13 @@
   min-width: 0;
 }
 
+.itinerary-page__weather-message {
+  margin: calc(var(--space-2) * -1) 0 0;
+  color: var(--text-on-ocean-soft);
+  font-size: var(--type-sm);
+  line-height: 1.5;
+}
+
 .itinerary-summary {
   position: relative;
   display: grid;
@@ -472,6 +479,49 @@
   font-size: var(--type-sm);
 }
 
+.itinerary-day-card__weather {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  border: 1px solid rgba(19, 33, 43, 0.1);
+  border-radius: var(--radius-md);
+  background: rgba(12, 48, 72, 0.045);
+}
+
+.itinerary-day-card[data-day-type="sea"] .itinerary-day-card__weather {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.itinerary-day-card__weather-line {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.itinerary-day-card__weather-line span {
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.itinerary-day-card__weather p,
+.itinerary-day-card__weather small {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.itinerary-day-card__weather small {
+  color: var(--text-on-paper-soft);
+  font-size: 0.64rem;
+  letter-spacing: 0.04em;
+}
+
 .itinerary-day-card__times {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -550,6 +600,25 @@
   line-height: 1.55;
 }
 
+.itinerary-day-card__weather-guidance {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border-left: 2px solid var(--colour-sea-glass-aqua);
+  background: rgba(142, 228, 225, 0.06);
+}
+
+.itinerary-day-card[data-day-type="port"] .itinerary-day-card__weather-guidance {
+  border-left-color: var(--colour-champagne-gold);
+  background: rgba(216, 181, 109, 0.08);
+}
+
+.itinerary-day-card__weather-guidance p {
+  margin: 0;
+  line-height: 1.5;
+}
+
 .itinerary-day-card__enrichment {
   position: relative;
   z-index: 1;
@@ -581,6 +650,21 @@
   flex-wrap: wrap;
   gap: var(--space-2);
   margin-top: auto;
+}
+
+.itinerary-day-card__refresh {
+  min-height: 2.85rem;
+  padding: 0.68rem 0.95rem;
+  border: 1px solid rgba(216, 181, 109, 0.28);
+  border-radius: var(--radius-pill);
+  color: var(--colour-ocean-navy);
+  background: linear-gradient(135deg, #f4dfa9, var(--colour-champagne-gold));
+  font-weight: 850;
+}
+
+.itinerary-day-card__refresh:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
 }
 
 @media (max-width: 72rem) {
@@ -759,6 +843,12 @@
   .itinerary-day-card__times dd {
     margin: 0;
   }
+
+  .itinerary-day-card__weather-line,
+  .itinerary-day-card__metadata {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 25rem) {
@@ -784,5 +874,9 @@
     width: fit-content;
     margin: calc(var(--space-5) * -1) 0 var(--space-4);
     border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  }
+
+  .itinerary-day-card__refresh {
+    width: 100%;
   }
 }

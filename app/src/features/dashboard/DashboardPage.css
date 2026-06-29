@@ -426,6 +426,162 @@
   font-weight: 600;
 }
 
+.route-stop__weather {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 7.6rem;
+  padding: 0.28rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-pill);
+  color: var(--text-on-ocean-soft);
+  background: rgba(255, 255, 255, 0.05);
+  font-family: var(--font-data);
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.route-stop__weather[data-tone="confirmed"] {
+  color: var(--colour-sea-glass-aqua);
+  border-color: rgba(142, 228, 225, 0.28);
+  background: rgba(142, 228, 225, 0.08);
+}
+
+.route-stop__weather[data-tone="refresh"] {
+  color: var(--colour-champagne-gold);
+  border-color: rgba(216, 181, 109, 0.26);
+  background: rgba(216, 181, 109, 0.1);
+}
+
+.route-stop__weather[data-tone="review"] {
+  color: var(--text-on-ocean-soft);
+}
+
+.cruise-weather-outlook {
+  position: relative;
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+  padding: clamp(var(--space-6), 4vw, var(--space-10));
+  overflow: hidden;
+}
+
+.cruise-weather-outlook__motif {
+  position: absolute;
+  top: -5%;
+  right: -4%;
+  width: min(34rem, 52vw);
+  opacity: 0.28;
+}
+
+.cruise-weather-outlook__header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: var(--space-5);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.cruise-weather-outlook__header h2 {
+  max-width: 15ch;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+}
+
+.cruise-weather-outlook__header p {
+  max-width: 40rem;
+  margin: var(--space-2) 0 0;
+  color: var(--text-on-ocean-soft);
+  line-height: 1.6;
+}
+
+.cruise-weather-outlook__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.cruise-weather-outlook__grid div,
+.cruise-weather-outlook__privacy {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cruise-weather-outlook__grid div {
+  display: grid;
+  gap: var(--space-2);
+  min-height: 7rem;
+  padding: var(--space-4);
+}
+
+.cruise-weather-outlook__grid span {
+  color: var(--text-on-ocean-muted);
+  font-size: 0.58rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cruise-weather-outlook__grid strong {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.cruise-weather-outlook__privacy {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: var(--space-4);
+  color: var(--text-on-ocean-soft);
+  line-height: 1.6;
+}
+
+.cruise-weather-outlook__actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cruise-weather-outlook__button {
+  min-height: 3rem;
+  padding: 0.72rem 1rem;
+  border: 1px solid rgba(216, 181, 109, 0.42);
+  border-radius: var(--radius-pill);
+  color: var(--colour-ocean-navy);
+  background: linear-gradient(135deg, #f4dfa9, var(--colour-champagne-gold));
+  font-weight: 850;
+  letter-spacing: 0.02em;
+}
+
+.cruise-weather-outlook__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.dashboard-page__weather-message {
+  margin: calc(var(--space-2) * -1) 0 0;
+  color: var(--text-on-ocean-muted);
+  font-size: var(--type-sm);
+  line-height: 1.5;
+}
+
 .dashboard-metrics,
 .voyage-status {
   min-width: 0;
@@ -848,6 +1004,18 @@
     gap: var(--space-2);
   }
 
+  .cruise-weather-outlook__header {
+    flex-direction: column;
+  }
+
+  .cruise-weather-outlook__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cruise-weather-outlook__actions {
+    align-items: flex-start;
+  }
+
   .route-ribbon__track {
     min-width: 73.5rem;
   }
@@ -878,6 +1046,15 @@
 
   .route-ribbon {
     padding: var(--space-3);
+  }
+
+  .cruise-weather-outlook {
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+  }
+
+  .cruise-weather-outlook__button {
+    width: 100%;
   }
 
   .dashboard-status-card {

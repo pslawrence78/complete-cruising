@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { LocalDataState } from "../../components/states/LocalDataState";
 import { mapToday } from "../../data/viewModelMappers";
+import { refreshCruiseWeatherForSailing } from "../weather/weatherRefreshService";
 import { useTodayGuide } from "../../hooks/useLocalData";
 import { CruiseMapCard } from "../maps/CruiseMapCard";
 import { mapProviderConfig } from "../maps/mapConfig";
@@ -16,11 +18,24 @@ import "./TodayPage.css";
 
 export function TodayPage() {
   const query = useTodayGuide();
+  const [weatherMessage, setWeatherMessage] = useState<string | undefined>();
+  const [refreshing, setRefreshing] = useState(false);
   if (query.loading) return <LocalDataState kind="loading" />;
   if (query.error) return <LocalDataState kind="error" />;
   if (!query.data) return <LocalDataState kind="empty" />;
   const today = mapToday(query.data);
   if (!today) return <LocalDataState kind="empty" detail="The active sailing has no selected Today itinerary day." />;
+  const offline = typeof navigator !== "undefined" && !navigator.onLine;
+  const handleRefreshWeather = async () => {
+    setRefreshing(true);
+    setWeatherMessage(undefined);
+    const result = await refreshCruiseWeatherForSailing(query.data!.sailing.id, undefined, {
+      itineraryDayId: query.data!.day?.id,
+      allowHistoricalLookup: today.weather.state === "day_locked" || today.weather.state === "historical_lookup_available",
+    });
+    setWeatherMessage(result.message);
+    setRefreshing(false);
+  };
   const todayAtlasPoint = "day" in query.data && query.data.day && query.data.port ? [atlasPointFromPort(query.data.port, query.data.day)] : [];
   const todayFallback = "port" in query.data ? buildPortFallbackMetadata(query.data.port, query.data.country) : undefined;
   return (
@@ -33,7 +48,14 @@ export function TodayPage() {
       />
 
       <div className="today-page__primary">
-        <WeatherTile weather={today.weather} />
+        <div className="today-page__weather-stack">
+          <WeatherTile
+            onRefresh={offline ? undefined : handleRefreshWeather}
+            refreshDisabled={refreshing}
+            weather={today.weather}
+          />
+          {weatherMessage ? <p className="today-page__weather-message">{weatherMessage}</p> : null}
+        </div>
         <TodayPlanSummary plans={today.plans} />
       </div>
 

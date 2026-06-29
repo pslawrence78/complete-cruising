@@ -48,8 +48,13 @@ export async function getActiveShipGuideBundle(database: CompleteCruisingDb = db
 export async function getActivePortGuideBundle(database: CompleteCruisingDb = db) {
   const today = await getTodayGuideBundle(database);
   if (!today?.day || !today.port) return today ? { sailing: today.sailing } : undefined;
-  const guide = await getPortGuideBundle(today.port.id, database);
-  return { sailing: today.sailing, day: today.day, guide };
+  const [guide, weather] = await Promise.all([
+    getPortGuideBundle(today.port.id, database),
+    today.day.weatherSnapshotId
+      ? database.weatherSnapshots.get(today.day.weatherSnapshotId)
+      : database.weatherSnapshots.where("itineraryDayId").equals(today.day.id).sortBy("capturedAt").then((records) => records.at(-1)),
+  ]);
+  return { sailing: today.sailing, day: today.day, guide, weather };
 }
 
 export async function getActiveSailingMemoriesBundle(database: CompleteCruisingDb = db) {

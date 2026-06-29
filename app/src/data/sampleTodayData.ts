@@ -1,3 +1,5 @@
+import type { WeatherCardModel } from "../features/weather/weatherTypes";
+
 export type TodayStatusTone = "confirmed" | "review" | "refresh";
 export type TodayConfidenceLevel =
   | "confirmed"
@@ -71,14 +73,7 @@ export interface TodayData {
     photoPrompt: string;
     prompt: string;
   };
-  weather: {
-    condition: string;
-    confidence: TodayConfidenceLevel;
-    highTemperature: string;
-    planImpact: string;
-    rainChance: string;
-    refreshLabel: string;
-  };
+  weather: WeatherCardModel;
 }
 
 export const sampleTodayData = {
@@ -87,8 +82,7 @@ export const sampleTodayData = {
     dateLabel: "August 2026 - date TBC",
     port: "Naples",
     country: "Italy",
-    portSummary:
-      "Gateway to Vesuvius, Roman history and proper Neapolitan pizza.",
+    portSummary: "Gateway to Vesuvius, Roman history and proper Neapolitan pizza.",
     arrivalTime: "07:00",
     allAboardTime: "17:30",
     departureTime: "18:30",
@@ -106,18 +100,31 @@ export const sampleTodayData = {
     note: "Aim to be back in the port area with a calm 45-minute buffer before all aboard.",
   },
   weather: {
-    condition: "Warm and dry",
-    highTemperature: "29°C",
-    rainChance: "10%",
+    confidenceLabel: "High confidence",
+    confidenceLevel: "high",
+    state: "forecast_recent",
+    stateLabel: "Forecast recent",
+    badgeLabel: "29 C | rain 10%",
+    badgeTone: "confirmed",
+    summary: "Warm and bright",
+    temperatureLabel: "29 C / 22 C",
+    rainLabel: "10% rain",
+    windLabel: "18 km/h, gusts 28 km/h",
+    uvLabel: "UV 7",
+    comfortSummary: "Warm port day, shade matters.",
+    clothingGuidance: "Hats, water and shade breaks are worth packing.",
     planImpact: "Shade, water and comfortable shoes are important.",
-    refreshLabel: "Illustrative forecast - refresh closer to travel",
-    confidence: "inferred",
+    sourceLabel: "Open-Meteo forecast",
+    updatedLabel: "Updated 20 Jun 2026, 09:00",
+    refreshLabel: "Refresh cruise weather",
+    refreshState: "updated",
+    canRefresh: true,
   },
   plans: {
     likely:
       "Historic centre, harbour walk and a proper Neapolitan pizza stop, paced around shade and a comfortable return.",
     backup:
-      "Shorter seafront walk and café stop if heat, tiredness or timing makes the city plan feel too ambitious.",
+      "Shorter seafront walk and cafe stop if heat, tiredness or timing makes the city plan feel too ambitious.",
     status: { label: "Needs family review", tone: "review" },
   },
   checklist: [
@@ -137,7 +144,7 @@ export const sampleTodayData = {
   ],
   local: {
     language: "Italian",
-    currency: "Euro (€)",
+    currency: "Euro",
     phrase: "Buongiorno",
     phraseMeaning: "Good morning",
   },

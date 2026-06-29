@@ -23,8 +23,8 @@ describe("local database foundation", () => {
     await database.delete();
   });
 
-  it("instantiates version 1 with the required tables", () => {
-    expect(database.verno).toBe(1);
+  it("instantiates version 2 with the required tables", () => {
+    expect(database.verno).toBe(2);
     expect(database.tables.map(({ name }) => name)).toEqual(expect.arrayContaining([
       "cruiseLines", "ships", "sailings", "countries", "ports", "itineraryDays", "attractions",
       "shorePlans", "dayGuides", "weatherSnapshots", "enrichmentSections", "familyNotes",

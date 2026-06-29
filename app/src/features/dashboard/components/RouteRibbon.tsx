@@ -34,6 +34,11 @@ export function RouteRibbon({
             <li className="route-stop" data-kind={stop.kind} key={stop.id}>
               <span className="route-stop__day">{index + 1}</span>
               <span className="route-stop__node" aria-hidden="true" />
+              {stop.weatherBadge ? (
+                <span className="route-stop__weather" data-tone={stop.weatherTone ?? "review"}>
+                  {stop.weatherBadge}
+                </span>
+              ) : null}
               <span className="route-stop__name">{stop.name}</span>
             </li>
           ))}

@@ -1,3 +1,4 @@
+import type { WeatherCardModel } from "../features/weather/weatherTypes";
 import type { ConfidenceLevel } from "../components/status/ConfidenceChip";
 import type { StatusTone } from "../components/status/StatusChip";
 
@@ -59,6 +60,10 @@ export interface PortGuideData {
     refreshStatus: string;
     reviewStatus: string;
   };
+  weather?: WeatherCardModel & {
+    coordinatesLabel: string;
+    seasonalitySummary: string;
+  };
   photoPrompt: PortTrustMetadata & {
     caption: string;
     prompt: string;
@@ -71,14 +76,14 @@ export const samplePortData = {
     name: "Naples",
     country: "Italy",
     region: "Campania",
-    flag: "🇮🇹",
-    guideLabel: "Illustrative port guidebook · v0.1",
+    flag: "IT",
+    guideLabel: "Illustrative port guidebook v0.1",
     overview:
       "A vivid Mediterranean gateway where volcanic landscapes, Roman history and everyday Neapolitan life sit remarkably close together.",
   },
   facts: [
     { label: "Language", value: "Italian" },
-    { label: "Currency", value: "Euro (€)" },
+    { label: "Currency", value: "Euro" },
     { label: "Port character", value: "City gateway" },
     { label: "Family pace", value: "Moderate" },
   ],
@@ -88,6 +93,28 @@ export const samplePortData = {
     refreshStatus: "Refresh before travel",
     lastReviewed: "Illustrative review · June 2026",
     recordScope: "Reusable port guidebook · not an itinerary day",
+  },
+  weather: {
+    confidenceLabel: "Inferred confidence",
+    confidenceLevel: "inferred",
+    state: "climate_expectation",
+    stateLabel: "Climate expectation",
+    badgeLabel: "Climate only",
+    badgeTone: "review",
+    summary: "Seasonal expectation only",
+    temperatureLabel: "Pending / Pending",
+    rainLabel: "Rain pending",
+    windLabel: "Wind pending",
+    comfortSummary: "Seasonal notes help set the tone, but a live forecast will be better later.",
+    clothingGuidance: "Pack flexible layers for the weather window.",
+    planImpact: "Seasonal notes only for now.",
+    sourceLabel: "Local seasonality notes",
+    updatedLabel: "Not refreshed yet",
+    refreshLabel: "Refresh cruise weather",
+    refreshState: "ready",
+    canRefresh: false,
+    coordinatesLabel: "Approximate port area only",
+    seasonalitySummary: "Typical Mediterranean warmth, with stronger sun and a sensible shade plan in the warmer months.",
   },
   sections: [
     {
@@ -171,7 +198,7 @@ export const samplePortData = {
   familyLens: {
     title: "A family day with room to breathe",
     bestBalance:
-      "Choose one main story—Roman history or central Naples—then add shade, food and an intentionally generous return margin.",
+      "Choose one main story - Roman history or central Naples - then add shade, food and an intentionally generous return margin.",
     sebDiscovery:
       "Can Seb spot three ways the volcano has shaped the city: its skyline, its history and the stone beneath the streets?",
     status: { label: "Family lens reviewed", tone: "confirmed" },
@@ -179,7 +206,7 @@ export const samplePortData = {
   },
   photoPrompt: {
     prompt:
-      "Frame Seb against the harbour with Vesuvius in the distance—only if visibility and a safe stopping place make the composition possible.",
+      "Frame Seb against the harbour with Vesuvius in the distance - only if visibility and a safe stopping place make the composition possible.",
     caption: "Bay, city, volcano: three layers in one family photograph.",
     status: { label: "Creative prompt", tone: "review" },
     confidence: { level: "inferred" },
@@ -189,7 +216,7 @@ export const samplePortData = {
       "Keep a clear turnaround point; no sample journey time should set the return plan.",
       "Expect heat, uneven surfaces, crowds or closures to change the family pace.",
       "Verify attraction entry requirements and transport arrangements close to travel.",
-      "Use the sailing-specific Today view—not this reusable guide—for confirmed ship times.",
+      "Use the sailing-specific Today view, not this reusable guide, for confirmed ship times.",
     ],
     status: { label: "Refresh all practical detail", tone: "refresh" },
     confidence: { level: "low" },

@@ -1,7 +1,7 @@
+import { useMemo, useState } from "react";
 import { LocalDataState } from "../../components/states/LocalDataState";
 import { mapPortGuide } from "../../data/viewModelMappers";
 import { usePortGuide, useSailingDashboard } from "../../hooks/useLocalData";
-import { useMemo } from "react";
 import { PortAtlasMap } from "../maps/PortAtlasMap";
 import { getAtlasSummary } from "../maps/mapUtils";
 import { AttractionHighlightCard } from "./components/AttractionHighlightCard";
@@ -10,24 +10,61 @@ import { HintsWatchoutsCard } from "./components/HintsWatchoutsCard";
 import { PhotoPromptCard } from "./components/PhotoPromptCard";
 import { PortGuideSection } from "./components/PortGuideSection";
 import { PortPostcard } from "./components/PortPostcard";
-import { buildAtlasCaption, buildPortFallbackMetadata, buildVoyageAtlasPoints } from "./portAtlasViewModel";
+import { buildAtlasCaption, buildPortFallbackMetadata, buildVoyageAtlasPoints } from "../ports/portAtlasViewModel";
+import { WeatherSeasonalityPanel } from "../weather/components/WeatherSeasonalityPanel";
+import { buildWeatherCardModelFromSnapshot } from "../weather/weatherStateService";
+import { refreshCruiseWeatherForSailing } from "../weather/weatherRefreshService";
 import "./PortGuidePage.css";
 
 export function PortGuidePage() {
   const query = usePortGuide();
   const sailingQuery = useSailingDashboard();
+  const [refreshingWeather, setRefreshingWeather] = useState(false);
+  const [weatherMessage, setWeatherMessage] = useState<string | undefined>();
   const atlasPoints = useMemo(
     () => sailingQuery.data ? buildVoyageAtlasPoints(sailingQuery.data.itinerary) : [],
     [sailingQuery.data],
   );
+
   if (query.loading || sailingQuery.loading) return <LocalDataState kind="loading" />;
   if (query.error || sailingQuery.error) return <LocalDataState kind="error" />;
   if (!query.data) return <LocalDataState kind="empty" />;
+
   const port = mapPortGuide(query.data);
   if (!port) return <LocalDataState kind="empty" detail="The selected day does not have a local port guide yet." />;
+
+  const guidePort = "guide" in query.data ? query.data.guide?.port : undefined;
+  const weatherCard = "day" in query.data && query.data.day
+    ? buildWeatherCardModelFromSnapshot({
+      day: query.data.day,
+      port: guidePort,
+      snapshot: query.data.weather,
+    })
+    : undefined;
   const selectedPointId = "day" in query.data && query.data.day ? query.data.day.id : undefined;
   const fallbackMetadata = "guide" in query.data ? buildPortFallbackMetadata(query.data.guide?.port, query.data.guide?.country) : undefined;
   const atlasSummary = getAtlasSummary(atlasPoints);
+
+  const handleRefreshWeather = async () => {
+    if (!query.data || !("sailing" in query.data)) return;
+    setRefreshingWeather(true);
+    setWeatherMessage(undefined);
+    const result = await refreshCruiseWeatherForSailing(query.data.sailing.id, undefined, {
+      itineraryDayId: query.data.day?.id,
+      allowHistoricalLookup: weatherCard?.state === "day_locked" || weatherCard?.state === "historical_lookup_available",
+    });
+    setWeatherMessage(result.message);
+    setRefreshingWeather(false);
+  };
+
+  const weatherPanel = guidePort && weatherCard ? {
+    ...weatherCard,
+    coordinatesLabel: guidePort.geo?.latitude !== undefined && guidePort.geo?.longitude !== undefined
+      ? `${guidePort.geo.latitude.toFixed(2)}, ${guidePort.geo.longitude.toFixed(2)}`
+      : "Approximate port area",
+    seasonalitySummary: guidePort.weatherSeasonalitySummary ?? "Seasonal weather notes are held locally until a live forecast makes them more useful.",
+  } : undefined;
+
   return (
     <div className="port-page">
       <PortPostcard
@@ -35,6 +72,17 @@ export function PortGuidePage() {
         identity={port.identity}
         metadata={port.metadata}
       />
+
+      {weatherPanel ? (
+        <div className="port-page__weather">
+          <WeatherSeasonalityPanel
+            onRefresh={weatherPanel.canRefresh ? handleRefreshWeather : undefined}
+            refreshing={refreshingWeather}
+            weather={weatherPanel}
+          />
+          {weatherMessage ? <p className="port-page__weather-message">{weatherMessage}</p> : null}
+        </div>
+      ) : null}
 
       <div className="port-page__atlas">
         <PortAtlasMap

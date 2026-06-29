@@ -4,6 +4,19 @@
   min-width: 0;
 }
 
+.port-page__weather {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.port-page__weather-message {
+  margin: 0;
+  color: var(--text-on-ocean-soft);
+  font-size: var(--type-sm);
+  line-height: 1.5;
+}
+
 .port-postcard {
   position: relative;
   display: grid;
@@ -201,6 +214,118 @@
 .port-practical { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .port-page__atlas {
   min-width: 0;
+}
+
+.weather-seasonality-panel {
+  position: relative;
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+  padding: clamp(var(--space-6), 4vw, var(--space-10));
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(216, 181, 109, 0.18), transparent 13rem),
+    var(--surface-glass);
+}
+
+.weather-seasonality-panel__header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: var(--space-5);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.weather-seasonality-panel__header h2 {
+  max-width: 15ch;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+}
+
+.weather-seasonality-panel__header p {
+  max-width: 42rem;
+  margin: var(--space-2) 0 0;
+  color: var(--text-on-ocean-soft);
+  line-height: 1.6;
+}
+
+.weather-seasonality-panel__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.weather-seasonality-panel__grid div,
+.weather-seasonality-panel__summary {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.weather-seasonality-panel__grid div {
+  display: grid;
+  gap: var(--space-2);
+  min-height: 7rem;
+  padding: var(--space-4);
+}
+
+.weather-seasonality-panel__grid span {
+  color: var(--text-on-ocean-muted);
+  font-size: 0.58rem;
+  font-weight: 850;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.weather-seasonality-panel__grid strong {
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  line-height: 1.1;
+}
+
+.weather-seasonality-panel__summary {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-4);
+}
+
+.weather-seasonality-panel__summary p {
+  margin: 0;
+  color: var(--text-on-ocean-soft);
+  line-height: 1.55;
+}
+
+.weather-seasonality-panel__metadata {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.weather-seasonality-panel__button {
+  min-height: 3rem;
+  padding: 0.72rem 1rem;
+  border: 1px solid rgba(216, 181, 109, 0.36);
+  border-radius: var(--radius-pill);
+  color: var(--colour-ocean-navy);
+  background: linear-gradient(135deg, #f4dfa9, var(--colour-champagne-gold));
+  font-weight: 850;
+}
+
+.weather-seasonality-panel__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
 }
 
 .port-guide-section,
@@ -507,6 +632,12 @@
   .port-postcard h1 { font-size: clamp(4rem, 17vw, 6rem); }
   .port-postcard__map { top: 3%; right: -35%; width: 115%; opacity: .56; }
   .port-postcard__stamp { width: 5.5rem; height: 5.5rem; }
+  .weather-seasonality-panel__header {
+    flex-direction: column;
+  }
+  .weather-seasonality-panel__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .port-practical,
   .port-section-heading,
   .port-page__editorial,
@@ -532,10 +663,19 @@
   .port-postcard__stamp { top: var(--space-5); right: var(--space-5); }
   .port-fact-chips,
   .port-highlights__grid,
-  .port-confidence dl { grid-template-columns: 1fr; }
+  .port-confidence dl,
+  .weather-seasonality-panel__grid { grid-template-columns: 1fr; }
   .port-fact-chip { min-height: auto; }
   .port-postcard__scope { position: static; grid-column: 1; }
   .attraction-card { min-height: auto; }
+  .weather-seasonality-panel,
+  .weather-seasonality-panel__button {
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+  }
+  .weather-seasonality-panel__button {
+    width: 100%;
+  }
 }
 
 @media (max-width: 25rem) {
