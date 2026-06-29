@@ -6,7 +6,7 @@ import { getPortGuideBundle } from "./portRepository";
 export async function getDashboardBundle(database: CompleteCruisingDb = db) {
   const sailing = await getActiveSailing(database);
   if (!sailing) return undefined;
-  const [ship, cruiseLine, itinerary, documents, enrichment, memories, weather] = await Promise.all([
+  const [ship, cruiseLine, itinerary, documents, enrichment, memories, weather, shorePlans, dayGuides] = await Promise.all([
     database.ships.get(sailing.shipId),
     database.cruiseLines.get(sailing.cruiseLineId),
     getItineraryWithPorts(sailing.id, database),
@@ -14,8 +14,10 @@ export async function getDashboardBundle(database: CompleteCruisingDb = db) {
     database.enrichmentSections.toArray(),
     database.memoryEntries.where("sailingId").equals(sailing.id).toArray(),
     database.weatherSnapshots.where("sailingId").equals(sailing.id).toArray(),
+    database.shorePlans.where("sailingId").equals(sailing.id).toArray(),
+    database.dayGuides.where("sailingId").equals(sailing.id).toArray(),
   ]);
-  return { sailing, ship, cruiseLine, itinerary, documents, enrichment, memories, weather };
+  return { sailing, ship, cruiseLine, itinerary, documents, enrichment, memories, weather, shorePlans, dayGuides };
 }
 
 export async function getTodayGuideBundle(database: CompleteCruisingDb = db) {

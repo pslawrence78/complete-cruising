@@ -479,6 +479,13 @@
   font-size: var(--type-sm);
 }
 
+.itinerary-day-card__conditions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
 .itinerary-day-card__weather {
   position: relative;
   z-index: 1;

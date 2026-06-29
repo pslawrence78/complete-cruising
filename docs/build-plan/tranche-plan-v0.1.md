@@ -26,8 +26,8 @@ This delivery tracker summarises the intended tranche sequence. The authoritativ
 20. Cartographic Port Atlas and Map Context v0.1 - complete
 21. Cruise Weather Intelligence v0.1 - complete
 21A. Enrichment Workflow Contract Repair v0.1 - complete
-22. Cruise Conditions and Day Readiness v0.1 - recommended next tranche
-23. Content Accuracy Review and Offline Guidebook QA v0.1 - planned
+22. Cruise Conditions and Day Readiness v0.1 - complete
+23. Weather Import and Forecast Window Preparation v0.1 - recommended next tranche
 
 This sequence may be refined as the product matures. Any change should preserve small, independently reviewable tranches and be reflected in the project knowledge index.
 

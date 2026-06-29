@@ -7,6 +7,8 @@ import { CruiseWeatherOutlookCard } from "./components/CruiseWeatherOutlookCard"
 import { SailingHero } from "./components/SailingHero";
 import { VoyageStatusGrid } from "./components/VoyageStatusGrid";
 import { refreshCruiseWeatherForSailing } from "../weather/weatherRefreshService";
+import { ConditionsSummaryCard } from "../conditions/ConditionsSummaryCard";
+import "../conditions/conditions.css";
 import "./DashboardPage.css";
 
 export function DashboardPage() {
@@ -38,6 +40,7 @@ export function DashboardPage() {
         refreshing={refreshing}
         weather={dashboard.weatherOutlook}
       />
+      <ConditionsSummaryCard summary={dashboard.conditionsSummary} />
       {weatherMessage ? <p className="dashboard-page__weather-message">{weatherMessage}</p> : null}
 
       <section className="dashboard-metrics" aria-labelledby="dashboard-metrics-title">

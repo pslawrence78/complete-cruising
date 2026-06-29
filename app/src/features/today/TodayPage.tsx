@@ -8,12 +8,14 @@ import { mapProviderConfig } from "../maps/mapConfig";
 import { PortAtlasFallback } from "../maps/PortAtlasFallback";
 import { PortAtlasMap } from "../maps/PortAtlasMap";
 import { atlasPointFromPort, buildPortFallbackMetadata } from "../ports/portAtlasViewModel";
+import { DayReadinessPanel } from "../conditions/DayReadinessPanel";
 import { ConfidenceNotes } from "./components/ConfidenceNotes";
 import { SebDiscoveryPreview } from "./components/SebDiscoveryPreview";
 import { TakeAshoreChecklist } from "./components/TakeAshoreChecklist";
 import { TodayAshorePanel } from "./components/TodayAshorePanel";
 import { TodayPlanSummary } from "./components/TodayPlanSummary";
 import { WeatherTile } from "./components/WeatherTile";
+import "../conditions/conditions.css";
 import "./TodayPage.css";
 
 export function TodayPage() {
@@ -49,6 +51,7 @@ export function TodayPage() {
 
       <div className="today-page__primary">
         <div className="today-page__weather-stack">
+          <DayReadinessPanel readiness={today.readiness} />
           <WeatherTile
             onRefresh={offline ? undefined : handleRefreshWeather}
             refreshDisabled={refreshing}

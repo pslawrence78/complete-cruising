@@ -9,6 +9,16 @@ export type DashboardConfidenceLevel =
   | "inferred"
   | "unknown";
 
+export interface DashboardConditionsSummary {
+  activeDayLabel?: string;
+  climateOnlyDays: number;
+  forecastPendingDays: number;
+  nextReview?: string;
+  readyDays: number;
+  totalDays: number;
+  usableDays: number;
+}
+
 export interface RouteStop {
   id: string;
   name: string;
@@ -48,6 +58,7 @@ export interface DashboardStatusCard {
 }
 
 export interface DashboardData {
+  conditionsSummary: DashboardConditionsSummary;
   metrics: readonly DashboardMetric[];
   route: readonly RouteStop[];
   sailing: {
@@ -79,6 +90,15 @@ export interface DashboardData {
 }
 
 export const sampleDashboardData = {
+  conditionsSummary: {
+    readyDays: 8,
+    usableDays: 12,
+    totalDays: 15,
+    forecastPendingDays: 5,
+    climateOnlyDays: 2,
+    nextReview: "Naples - forecast pending and plan review needed.",
+    activeDayLabel: "Usable with cautions",
+  },
   sailing: {
     name: "Sun Princess Mediterranean 2026",
     cruiseLine: "Princess Cruises",

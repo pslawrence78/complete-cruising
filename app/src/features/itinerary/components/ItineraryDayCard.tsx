@@ -2,6 +2,8 @@ import type { ItineraryDay } from "../../../data/sampleItineraryData";
 import { CardSurface } from "../../../components/surfaces/CardSurface";
 import { ConfidenceChip } from "../../../components/status/ConfidenceChip";
 import { StatusChip } from "../../../components/status/StatusChip";
+import { ConditionBadge } from "../../conditions/ConditionBadge";
+import { toneFromSeverity } from "../../conditions/conditionViewModels";
 
 interface ItineraryDayCardProps {
   day: ItineraryDay;
@@ -19,6 +21,7 @@ const dayTypeLabels: Record<ItineraryDay["dayType"], string> = {
 export function ItineraryDayCard({ day, onRefreshWeather, refreshing }: ItineraryDayCardProps) {
   const hasTimes = Boolean(day.arrivalTime || day.departureTime || day.allAboardTime);
   const weather = day.weather;
+  const readiness = day.readiness;
 
   return (
     <CardSurface
@@ -41,6 +44,19 @@ export function ItineraryDayCard({ day, onRefreshWeather, refreshing }: Itinerar
       <h3>{day.title}</h3>
       {day.country ? (
         <p className="itinerary-day-card__country">{day.country}</p>
+      ) : null}
+
+      {readiness ? (
+        <div className="itinerary-day-card__conditions">
+          <ConditionBadge readiness={readiness} />
+          {readiness.badges.map((badge) => (
+            <StatusChip
+              key={badge}
+              label={badge}
+              tone={toneFromSeverity(readiness.severity)}
+            />
+          ))}
+        </div>
       ) : null}
 
       {weather ? (

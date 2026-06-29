@@ -1,4 +1,5 @@
 import type { WeatherCardModel } from "../features/weather/weatherTypes";
+import type { DayReadinessAssessment } from "../features/conditions/conditionTypes";
 
 export type TodayStatusTone = "confirmed" | "review" | "refresh";
 export type TodayConfidenceLevel =
@@ -63,6 +64,7 @@ export interface TodayData {
       tone: TodayStatusTone;
     };
   };
+  readiness: DayReadinessAssessment;
   returnPlan: {
     latestSafeReturn: string;
     note: string;
@@ -98,6 +100,27 @@ export const sampleTodayData = {
     latestSafeReturn: "16:45",
     riskLevel: "medium",
     note: "Aim to be back in the port area with a calm 45-minute buffer before all aboard.",
+  },
+  readiness: {
+    status: "usable_with_cautions",
+    statusLabel: "Usable with cautions",
+    severity: "notice",
+    readinessScore: 7,
+    summary: "The day is usable, but one or two checks still matter.",
+    cruiseConditionLabel: "Forecast pending",
+    cruiseConditionStatus: "forecast_pending",
+    timing: { key: "timing", label: "Timing", score: 2, status: "ready", summary: "All-aboard present, safe return guidance available.", flags: [{ id: "all-aboard", label: "All-aboard confirmed", severity: "positive" }] },
+    weather: { key: "weather", label: "Weather", score: 1, status: "forecast_pending", summary: "Forecast pending - use seasonal guidance for now.", flags: [{ id: "forecast-pending", label: "Forecast pending", severity: "notice" }] },
+    plan: { key: "plan", label: "Plan", score: 2, status: "ready", summary: "Selected plan available, backup present.", flags: [{ id: "selected-plan", label: "Selected plan ready", severity: "positive" }] },
+    family: { key: "family", label: "Family", score: 1, status: "review_needed", summary: "Family comfort guidance is partial.", flags: [{ id: "comfort-missing", label: "Comfort notes missing", severity: "notice" }] },
+    trust: { key: "trust", label: "Trust", score: 1, status: "stale", summary: "Weather or guide data needs refresh before travel.", flags: [{ id: "needs-refresh", label: "Needs refresh", severity: "caution" }] },
+    nextActions: ["Forecast pending", "Comfort notes missing", "Needs refresh"],
+    badges: ["Forecast pending", "Selected plan ready", "Needs refresh"],
+    metadata: {
+      confidenceLevel: "medium",
+      reviewStatus: "needs_user_review",
+      refreshRecommended: true,
+    },
   },
   weather: {
     confidenceLabel: "High confidence",

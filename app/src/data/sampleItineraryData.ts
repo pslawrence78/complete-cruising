@@ -1,4 +1,5 @@
 import type { WeatherCardModel } from "../features/weather/weatherTypes";
+import type { DayReadinessAssessment } from "../features/conditions/conditionTypes";
 
 export type ItineraryDayType =
   | "embarkation"
@@ -35,6 +36,7 @@ export interface ItineraryDay {
   isHighlighted?: boolean;
   planSummary: string;
   portName?: string;
+  readiness?: DayReadinessAssessment;
   refreshStatus: {
     label: string;
     tone: ItineraryStatusTone;
