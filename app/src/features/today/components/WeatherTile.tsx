@@ -18,7 +18,7 @@ export function WeatherTile({ buttonState, onRefresh, weather }: WeatherTileProp
         <div>
           <p className="paper-kicker">Weather and comfort</p>
           <h2>{weather.portName}</h2>
-          <p>{weather.contextMessage}</p>
+          {weather.showContextCaption ? <p>{weather.contextMessage}</p> : null}
         </div>
         <span className="weather-tile__sun" aria-hidden="true" />
       </div>

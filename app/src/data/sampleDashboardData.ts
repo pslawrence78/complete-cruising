@@ -79,6 +79,9 @@ export interface DashboardData {
   weatherOutlook: {
     attributionLabel: string;
     canRefresh: boolean;
+    conflictCount?: number;
+    conflictHref?: string;
+    conflictSummary?: string;
     contextMessage: string;
     expectedForecastFromLabel?: string;
     lastUpdated: string;

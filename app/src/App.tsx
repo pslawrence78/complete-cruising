@@ -12,6 +12,7 @@ import { ImportExportPage } from "./features/import-export/ImportExportPage";
 import { SailingSetupPage } from "./features/sailing-setup/SailingSetupPage";
 import { EnrichmentRequestsPage } from "./features/enrichment-requests/EnrichmentRequestsPage";
 import { DataManagementPage } from "./features/data-management/DataManagementPage";
+import { WeatherSnapshotReviewPage } from "./features/weather/WeatherSnapshotReviewPage";
 import { routeConfig } from "./routes/routeConfig";
 import { LocalDataState } from "./components/states/LocalDataState";
 import { useDatabaseBootstrap } from "./hooks/useLocalData";
@@ -54,7 +55,9 @@ function App() {
   };
 
   const activePage =
-    activeRouteId === "sailing-setup" ? (
+    activeRouteId === "weather-review" ? (
+      <WeatherSnapshotReviewPage />
+    ) : activeRouteId === "sailing-setup" ? (
       <SailingSetupPage />
     ) : activeRouteId === "enrichment-requests" ? (
       <EnrichmentRequestsPage />

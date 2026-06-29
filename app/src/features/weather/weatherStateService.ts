@@ -66,7 +66,9 @@ export function buildWeatherCardModelFromSnapshot(input: {
   });
   const state = deriveLegacyWeatherState({ readinessState, refreshMode, snapshot: input.snapshot });
   const snapshot = input.snapshot;
-  const portName = input.port?.name ?? input.day.title ?? "Port not recorded";
+  const hasPortContext = Boolean(input.port?.name);
+  const isSeaLikeDay = input.day.dayType === "sea" || input.day.dayType === "scenic_cruising";
+  const portName = input.port?.name ?? input.day.title ?? (isSeaLikeDay ? "Sea day" : "Port not recorded");
   const visitDateLabel = formatWeatherDateLabel(input.day.date);
   const weatherDate = snapshot?.forecastDate ?? snapshot?.date;
   const weatherDateLabel = weatherDate ? formatWeatherDateLabel(weatherDate) : "Not refreshed yet";
@@ -75,13 +77,15 @@ export function buildWeatherCardModelFromSnapshot(input: {
     : snapshot?.forecastExpectedFrom;
   const forecastExpectedFromLabel = forecastExpectedFrom ? formatWeatherDateLabel(forecastExpectedFrom) : undefined;
   const weatherContext = snapshot?.weatherContext
-    ?? (refreshMode === "same_day_check"
-      ? "same_day_check"
-      : refreshMode === "visit_date_forecast"
-        ? "visit_date_forecast"
-        : refreshMode === "weather_now_in_port"
-          ? "weather_now_in_port"
-          : "observed");
+    ?? (isSeaLikeDay || !hasPortContext
+      ? undefined
+      : refreshMode === "same_day_check"
+        ? "same_day_check"
+        : refreshMode === "visit_date_forecast"
+          ? "visit_date_forecast"
+          : refreshMode === "weather_now_in_port"
+            ? "weather_now_in_port"
+            : "observed");
   const buttonState: WeatherButtonState =
     readinessState === "missing_coordinates" ? "missing_coordinates"
       : refreshMode === "past_day" ? "unavailable"
@@ -94,6 +98,9 @@ export function buildWeatherCardModelFromSnapshot(input: {
     visitDateLabel,
     weatherDate,
     weatherDateLabel,
+    contextLabelOverride: isSeaLikeDay ? "Sea-day weather" : undefined,
+    dayType: input.day.dayType,
+    hasPortContext,
     weatherContext,
     forecastExpectedFrom,
     forecastExpectedFromLabel,

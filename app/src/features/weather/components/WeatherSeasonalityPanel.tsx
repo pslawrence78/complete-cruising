@@ -23,7 +23,7 @@ export function WeatherSeasonalityPanel({ buttonState, weather, onRefresh }: Wea
         <div>
           <p className="section-kicker">Weather and seasonality</p>
           <h2 id="weather-seasonality-title">{weather.portName}</h2>
-          <p>{weather.contextMessage}</p>
+          {weather.showContextCaption ? <p>{weather.contextMessage}</p> : null}
         </div>
         <StatusChip label={weather.readinessLabel} tone={weather.badgeTone} />
       </div>

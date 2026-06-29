@@ -2,11 +2,13 @@ import { db, type CompleteCruisingDb } from "../completeCruisingDb";
 import { getActiveSailing } from "./sailingRepository";
 import { getItineraryWithPorts, getTodayItineraryDay } from "./itineraryRepository";
 import { getPortGuideBundle } from "./portRepository";
+import { getWeatherSnapshotReviewEventsForSailing } from "./weatherSnapshotReviewRepository";
+import { getPreferredWeatherSnapshotForItineraryDay } from "./weatherRepository";
 
 export async function getDashboardBundle(database: CompleteCruisingDb = db) {
   const sailing = await getActiveSailing(database);
   if (!sailing) return undefined;
-  const [ship, cruiseLine, itinerary, documents, enrichment, memories, weather, shorePlans, dayGuides] = await Promise.all([
+  const [ship, cruiseLine, itinerary, documents, enrichment, memories, weather, shorePlans, dayGuides, weatherReviewEvents] = await Promise.all([
     database.ships.get(sailing.shipId),
     database.cruiseLines.get(sailing.cruiseLineId),
     getItineraryWithPorts(sailing.id, database),
@@ -16,8 +18,9 @@ export async function getDashboardBundle(database: CompleteCruisingDb = db) {
     database.weatherSnapshots.where("sailingId").equals(sailing.id).toArray(),
     database.shorePlans.where("sailingId").equals(sailing.id).toArray(),
     database.dayGuides.where("sailingId").equals(sailing.id).toArray(),
+    getWeatherSnapshotReviewEventsForSailing(sailing.id, database),
   ]);
-  return { sailing, ship, cruiseLine, itinerary, documents, enrichment, memories, weather, shorePlans, dayGuides };
+  return { sailing, ship, cruiseLine, itinerary, documents, enrichment, memories, weather, shorePlans, dayGuides, weatherReviewEvents };
 }
 
 export async function getTodayGuideBundle(database: CompleteCruisingDb = db) {
@@ -28,9 +31,7 @@ export async function getTodayGuideBundle(database: CompleteCruisingDb = db) {
   const [port, guide, weather, plans] = await Promise.all([
     day.portId ? database.ports.get(day.portId) : undefined,
     day.dayGuideId ? database.dayGuides.get(day.dayGuideId) : database.dayGuides.where("itineraryDayId").equals(day.id).first(),
-    day.weatherSnapshotId
-      ? database.weatherSnapshots.get(day.weatherSnapshotId)
-      : database.weatherSnapshots.where("itineraryDayId").equals(day.id).sortBy("capturedAt").then((records) => records.at(-1)),
+    getPreferredWeatherSnapshotForItineraryDay(day.id, database),
     database.shorePlans.where("itineraryDayId").equals(day.id).toArray(),
   ]);
   const country = port ? await database.countries.get(port.countryId) : undefined;
@@ -54,11 +55,15 @@ export async function getActivePortGuideBundle(database: CompleteCruisingDb = db
   if (!today?.day || !today.port) return today ? { sailing: today.sailing } : undefined;
   const [guide, weather] = await Promise.all([
     getPortGuideBundle(today.port.id, database),
-    today.day.weatherSnapshotId
-      ? database.weatherSnapshots.get(today.day.weatherSnapshotId)
-      : database.weatherSnapshots.where("itineraryDayId").equals(today.day.id).sortBy("capturedAt").then((records) => records.at(-1)),
+    getPreferredWeatherSnapshotForItineraryDay(today.day.id, database),
   ]);
   return { sailing: today.sailing, day: today.day, guide, weather };
+}
+
+export async function getWeatherSnapshotReviewBundle(database: CompleteCruisingDb = db) {
+  const dashboard = await getDashboardBundle(database);
+  if (!dashboard) return undefined;
+  return dashboard;
 }
 
 export async function getActiveSailingMemoriesBundle(database: CompleteCruisingDb = db) {

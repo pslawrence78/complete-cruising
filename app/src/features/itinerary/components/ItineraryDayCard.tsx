@@ -67,7 +67,7 @@ export function ItineraryDayCard({ buttonState = "idle", day, onRefreshWeather }
             <span>{weather.weatherTypeLabel ?? weather.stateLabel}</span>
             <StatusChip label={weather.badgeLabel ?? weather.summary ?? weather.stateLabel ?? "Weather pending"} tone={weather.badgeTone ?? "review"} />
           </div>
-          <p>{weather.contextMessage ?? weather.summary}</p>
+          {weather.showContextCaption ? <p>{weather.contextMessage ?? weather.summary}</p> : null}
           <small>Visit date {weather.visitDateLabel} · Weather data {weather.weatherDateLabel}</small>
           <small>{weather.sourceLabel} · {weather.attributionLabel}</small>
           {weather.forecastExpectedFromLabel ? <small>Visit forecast expected from {weather.forecastExpectedFromLabel}</small> : null}

@@ -23,11 +23,11 @@ describe("local database foundation", () => {
     await database.delete();
   });
 
-  it("instantiates version 2 with the required tables", () => {
-    expect(database.verno).toBe(2);
+  it("instantiates version 3 with the required tables", () => {
+    expect(database.verno).toBe(3);
     expect(database.tables.map(({ name }) => name)).toEqual(expect.arrayContaining([
       "cruiseLines", "ships", "sailings", "countries", "ports", "itineraryDays", "attractions",
-      "shorePlans", "dayGuides", "weatherSnapshots", "enrichmentSections", "familyNotes",
+      "shorePlans", "dayGuides", "weatherSnapshots", "weatherSnapshotReviewEvents", "enrichmentSections", "familyNotes",
       "memoryEntries", "importBatches", "appSettings",
     ]));
   });

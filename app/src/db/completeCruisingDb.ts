@@ -18,6 +18,7 @@ import type {
   Ship,
   ShorePlanRecord,
   Traveller,
+  WeatherSnapshotReviewEvent,
   WeatherSnapshot,
 } from "../types";
 import type { z } from "zod";
@@ -37,6 +38,7 @@ export class CompleteCruisingDb extends Dexie {
   shorePlans!: EntityTable<ShorePlanRecord, "id">;
   dayGuides!: EntityTable<DayGuide, "id">;
   weatherSnapshots!: EntityTable<WeatherSnapshot, "id">;
+  weatherSnapshotReviewEvents!: EntityTable<WeatherSnapshotReviewEvent, "id">;
   enrichmentSections!: EntityTable<EnrichmentSection, "id">;
   familyNotes!: EntityTable<FamilyNote, "id">;
   memoryEntries!: EntityTable<MemoryEntry, "id">;
@@ -85,6 +87,30 @@ export class CompleteCruisingDb extends Dexie {
       shorePlans: "id, itineraryDayId, sailingId, status, [itineraryDayId+status]",
       dayGuides: "id, itineraryDayId, sailingId",
       weatherSnapshots: "id, sailingId, itineraryDayId, portId, date, snapshotType, weatherState, refreshState, capturedAt, [itineraryDayId+capturedAt], [sailingId+date], [sailingId+itineraryDayId+capturedAt], [refreshState+capturedAt]",
+      enrichmentSections: "id, entityType, entityId, sectionType, [entityType+entityId]",
+      familyNotes: "id, sailingId, itineraryDayId",
+      memoryEntries: "id, sailingId, itineraryDayId, type",
+      importBatches: "id, kind, status, receivedAt",
+      appSettings: "id, &key",
+      cabins: "id, sailingId",
+      travellers: "id, *sailingIds",
+      enrichmentRuns: "id, targetEntityType, targetEntityId, status",
+      documentChecklists: "id, sailingId, status",
+      adventureAlmanacExports: "id, sailingId, status",
+    });
+
+    this.version(3).stores({
+      cruiseLines: "id, name",
+      ships: "id, cruiseLineId, name",
+      sailings: "id, status, departureDate, shipId, cruiseLineId",
+      countries: "id, name, isoCode",
+      ports: "id, countryId, name",
+      itineraryDays: "id, sailingId, date, dayNumber, portId, [sailingId+dayNumber], [sailingId+date]",
+      attractions: "id, portId, type",
+      shorePlans: "id, itineraryDayId, sailingId, status, [itineraryDayId+status]",
+      dayGuides: "id, itineraryDayId, sailingId",
+      weatherSnapshots: "id, sailingId, itineraryDayId, portId, date, snapshotType, weatherState, refreshState, capturedAt, [itineraryDayId+capturedAt], [sailingId+date], [sailingId+itineraryDayId+capturedAt], [refreshState+capturedAt]",
+      weatherSnapshotReviewEvents: "id, sailingId, itineraryDayId, forecastDate, createdAt, action, [itineraryDayId+createdAt], [sailingId+forecastDate]",
       enrichmentSections: "id, entityType, entityId, sectionType, [entityType+entityId]",
       familyNotes: "id, sailingId, itineraryDayId",
       memoryEntries: "id, sailingId, itineraryDayId, type",

@@ -12,6 +12,15 @@ export async function getLatestWeatherSnapshotForItineraryDay(itineraryDayId: st
   return snapshots.at(-1);
 }
 
+export async function getPreferredWeatherSnapshotForItineraryDay(itineraryDayId: string, database: CompleteCruisingDb = db) {
+  const day = await database.itineraryDays.get(itineraryDayId);
+  if (day?.weatherSnapshotId) {
+    const preferred = await database.weatherSnapshots.get(day.weatherSnapshotId);
+    if (preferred) return preferred;
+  }
+  return getLatestWeatherSnapshotForItineraryDay(itineraryDayId, database);
+}
+
 export async function getWeatherSnapshotForSailingDay(sailingId: string, itineraryDayId: string, database: CompleteCruisingDb = db) {
   const snapshots = await database.weatherSnapshots.where("[sailingId+itineraryDayId+capturedAt]").between([sailingId, itineraryDayId, ""], [sailingId, itineraryDayId, "\uffff"]).toArray();
   return snapshots.at(-1);
@@ -32,6 +41,26 @@ export async function getLatestWeatherSnapshotsByDay(sailingId: string, database
   return byDay;
 }
 
+export async function getPreferredWeatherSnapshotsByDay(sailingId: string, database: CompleteCruisingDb = db) {
+  const [days, snapshots] = await Promise.all([
+    database.itineraryDays.where("sailingId").equals(sailingId).toArray(),
+    getWeatherSnapshotsForSailing(sailingId, database),
+  ]);
+  const snapshotsById = new Map(snapshots.map((snapshot) => [snapshot.id, snapshot]));
+  const latestByDay = new Map<string, WeatherSnapshot>();
+  for (const snapshot of snapshots) {
+    const current = latestByDay.get(snapshot.itineraryDayId);
+    if (!current || current.capturedAt < snapshot.capturedAt) latestByDay.set(snapshot.itineraryDayId, snapshot);
+  }
+
+  const preferred = new Map<string, WeatherSnapshot>();
+  for (const day of days) {
+    const snapshot = (day.weatherSnapshotId ? snapshotsById.get(day.weatherSnapshotId) : undefined) ?? latestByDay.get(day.id);
+    if (snapshot) preferred.set(day.id, snapshot);
+  }
+  return preferred;
+}
+
 export async function getRefreshStateSnapshots(sailingId: string, database: CompleteCruisingDb = db) {
   return database.weatherSnapshots.where("sailingId").equals(sailingId).toArray();
 }
@@ -40,4 +69,3 @@ export async function upsertWeatherSnapshot(snapshot: WeatherSnapshot, database:
   await database.weatherSnapshots.put(snapshot);
   return snapshot;
 }
-

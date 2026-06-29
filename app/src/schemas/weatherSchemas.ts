@@ -61,3 +61,23 @@ export const WeatherSnapshotSchema = z.object({
   sampleOnly: z.boolean().optional(),
   dataCaveat: z.string().min(1).optional(),
 }).strict();
+
+export const WeatherSnapshotReviewEventSchema = z.object({
+  id: IdSchema,
+  sailingId: IdSchema,
+  itineraryDayId: IdSchema,
+  forecastDate: z.string().date(),
+  action: z.enum([
+    "preferred_snapshot_selected",
+    "conflict_acknowledged",
+    "snapshot_rejected",
+    "preferred_snapshot_restored",
+  ]),
+  fromSnapshotId: IdSchema.optional(),
+  toSnapshotId: IdSchema.optional(),
+  candidateSnapshotIds: z.array(IdSchema),
+  reason: z.string().trim().min(1).optional(),
+  notes: z.string().trim().min(1).optional(),
+  createdAt: z.string().datetime({ offset: true }),
+  createdBy: z.enum(["user", "system"]),
+}).strict();

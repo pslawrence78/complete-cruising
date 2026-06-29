@@ -7,6 +7,7 @@ import {
   getActiveShipGuideBundle,
   getDashboardBundle,
   getTodayGuideBundle,
+  getWeatherSnapshotReviewBundle,
 } from "../db/repositories";
 
 export interface LocalQueryState<T> {
@@ -47,3 +48,4 @@ export const useTodayGuide = () => useLocalQuery(getTodayGuideBundle, []);
 export const useShipGuide = () => useLocalQuery(getActiveShipGuideBundle, []);
 export const usePortGuide = () => useLocalQuery(getActivePortGuideBundle, []);
 export const useMemories = () => useLocalQuery(getActiveSailingMemoriesBundle, []);
+export const useWeatherSnapshotReview = () => useLocalQuery(getWeatherSnapshotReviewBundle, []);

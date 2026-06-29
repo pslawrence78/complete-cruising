@@ -1,0 +1,122 @@
+.weather-review-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.weather-review-page__hero,
+.weather-review-page__empty,
+.weather-review-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.weather-review-page__hero h1,
+.weather-review-card h2,
+.weather-review-card h3 {
+  margin: 0;
+}
+
+.weather-review-page__hero-chips,
+.weather-review-snapshot__chips,
+.weather-review-card__meta,
+.weather-review-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.weather-review-page__message {
+  margin: 0;
+  color: var(--color-ink);
+}
+
+.weather-review-page__list,
+.weather-review-card__snapshots {
+  display: grid;
+  gap: 1rem;
+}
+
+.weather-review-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+}
+
+.weather-review-card__meta {
+  color: var(--color-muted-ink);
+  font-size: 0.95rem;
+}
+
+.weather-review-snapshot {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-gold-400) 18%, transparent);
+  border-radius: 1.25rem;
+  background: color-mix(in srgb, var(--color-surface-glass) 85%, transparent);
+}
+
+.weather-review-snapshot[data-preferred="true"] {
+  border-color: color-mix(in srgb, var(--color-teal-300) 40%, transparent);
+}
+
+.weather-review-snapshot header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.weather-review-snapshot p,
+.weather-review-card__differences p,
+.weather-review-card__audit p {
+  margin: 0;
+}
+
+.weather-review-snapshot dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.weather-review-snapshot dl div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.weather-review-snapshot dt {
+  color: var(--color-muted-ink);
+  font-size: 0.82rem;
+}
+
+.weather-review-snapshot dd {
+  margin: 0;
+}
+
+.weather-review-snapshot__action,
+.weather-review-card__acknowledge {
+  width: fit-content;
+  padding: 0.8rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--color-gold-400) 22%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-deep-ocean) 72%, transparent);
+  color: var(--color-ivory-050);
+  font: inherit;
+  cursor: pointer;
+}
+
+.weather-review-card__differences ul,
+.weather-review-card__audit ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+@media (max-width: 767px) {
+  .weather-review-card__header,
+  .weather-review-snapshot header {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+}

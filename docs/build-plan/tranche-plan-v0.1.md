@@ -28,7 +28,8 @@ This delivery tracker summarises the intended tranche sequence. The authoritativ
 21A. Enrichment Workflow Contract Repair v0.1 - complete
 22. Cruise Conditions and Day Readiness v0.1 - complete
 23. Open-Meteo Manual Weather Refresh v0.1 - complete
-24. Weather Snapshot Review and Conflict Resolution v0.1 - recommended next tranche
+24. Weather Snapshot Review and Conflict Resolution v0.1 - complete
+25. Weather Snapshot Review Workflow Polish v0.1 - recommended next tranche
 
 This sequence may be refined as the product matures. Any change should preserve small, independently reviewable tranches and be reflected in the project knowledge index.
 

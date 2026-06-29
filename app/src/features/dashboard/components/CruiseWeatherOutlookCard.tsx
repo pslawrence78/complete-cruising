@@ -51,6 +51,11 @@ export function CruiseWeatherOutlookCard({ onRefresh, weather }: CruiseWeatherOu
       </div>
 
       <p className="cruise-weather-outlook__privacy">{weather.privacyNote}</p>
+      {weather.conflictSummary && weather.conflictHref ? (
+        <p className="cruise-weather-outlook__privacy">
+          <a href={weather.conflictHref}>{weather.conflictSummary}</a>
+        </p>
+      ) : null}
 
       <div className="cruise-weather-outlook__actions">
         <StatusChip label={weather.stateLabel} tone={weather.refreshTone} />

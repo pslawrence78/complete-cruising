@@ -73,6 +73,14 @@ export const routeConfig: readonly RouteDefinition[] = [
     order: 12,
   },
   {
+    id: "weather-review",
+    path: "/weather-review",
+    title: "Weather Review",
+    status: "implemented",
+    navigationGroup: "more",
+    order: 19,
+  },
+  {
     id: "sailing-setup",
     path: "/sailing-setup",
     title: "Sailing Setup",

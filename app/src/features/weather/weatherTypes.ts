@@ -82,6 +82,7 @@ export interface WeatherCardModel {
   weatherDate?: string;
   weatherDateLabel: string;
   weatherTypeLabel: string;
+  showContextCaption?: boolean;
   weatherContext?: WeatherContext;
   forecastExpectedFrom?: string;
   forecastExpectedFromLabel?: string;

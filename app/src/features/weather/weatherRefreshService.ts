@@ -32,13 +32,6 @@ function isTrustedSnapshot(snapshot?: WeatherSnapshotRecord) {
     || snapshot.sourceType === "family_note";
 }
 
-function canReplaceOpenMeteoSnapshot(snapshot?: WeatherSnapshotRecord) {
-  if (!snapshot || isTrustedSnapshot(snapshot)) return false;
-  return snapshot.sourceName === "Open-Meteo"
-    && snapshot.sourceType === "weather_service"
-    && snapshot.snapshotType !== "observed";
-}
-
 function deriveSnapshotType(context: WeatherContext) {
   switch (context) {
     case "same_day_check":
@@ -319,16 +312,19 @@ export async function refreshWeatherForItineraryDay(
     sourceUrl: fetched.sourceUrl,
     sourceName: fetched.sourceName,
     sourceAttribution: fetched.sourceAttribution,
-    existing: canReplaceOpenMeteoSnapshot(latestSnapshot) ? latestSnapshot : undefined,
   });
 
   await upsertWeatherSnapshot(snapshot, database);
-  await database.itineraryDays.update(day.id, { weatherSnapshotId: snapshot.id });
+  if (!day.weatherSnapshotId) {
+    await database.itineraryDays.update(day.id, { weatherSnapshotId: snapshot.id });
+  }
 
   return buildSingleOutcome({
     status: "saved",
     buttonState: "refreshed",
-    message: "Weather refreshed and stored locally.",
+    message: day.weatherSnapshotId
+      ? "Weather refreshed and stored locally. Review the competing snapshots before changing the preferred view."
+      : "Weather refreshed and stored locally.",
     snapshot,
   });
 }

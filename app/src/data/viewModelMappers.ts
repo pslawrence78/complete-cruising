@@ -8,6 +8,7 @@ import type { ConfidenceMetadata, DayGuide, EnrichmentSection, MemoryEntry, Shor
 import { buildWeatherCardModelFromSnapshot } from "../features/weather/weatherStateService";
 import type { WeatherSnapshot } from "../types";
 import { assessDayReadiness, summariseCruiseConditions } from "../features/conditions/dayReadinessService";
+import { buildWeatherSnapshotConflicts } from "../features/weather/weatherSnapshotConflictService";
 import type {
   getActivePortGuideBundle,
   getActiveSailingMemoriesBundle,
@@ -24,13 +25,24 @@ const longDateLabel = (value: string) => new Intl.DateTimeFormat("en-GB", { week
 const reviewedLabel = (value?: string | null) => value ? `Illustrative review · ${new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(new Date(value))}` : "Not yet reviewed";
 const factsObject = (facts: EnrichmentSection["structuredFacts"]) => facts && !Array.isArray(facts) ? facts : undefined;
 
-function latestWeatherByDay(weather: readonly WeatherSnapshot[] | undefined) {
+function preferredWeatherByDay(
+  itinerary: readonly { day: { id: string; weatherSnapshotId?: string } }[],
+  weather: readonly WeatherSnapshot[] | undefined,
+) {
+  const snapshots = weather ?? [];
+  const snapshotsById = new Map(snapshots.map((snapshot) => [snapshot.id, snapshot]));
   const latest = new Map<string, WeatherSnapshot>();
-  for (const snapshot of weather ?? []) {
+  for (const snapshot of snapshots) {
     const current = latest.get(snapshot.itineraryDayId);
     if (!current || current.capturedAt < snapshot.capturedAt) latest.set(snapshot.itineraryDayId, snapshot);
   }
-  return latest;
+
+  const preferred = new Map<string, WeatherSnapshot>();
+  for (const { day } of itinerary) {
+    const snapshot = (day.weatherSnapshotId ? snapshotsById.get(day.weatherSnapshotId) : undefined) ?? latest.get(day.id);
+    if (snapshot) preferred.set(day.id, snapshot);
+  }
+  return preferred;
 }
 
 function plansByDay(plans: readonly ShorePlanRecord[] | undefined) {
@@ -65,9 +77,15 @@ export function mapDashboard(bundle: Resolved<typeof getDashboardBundle>): Dashb
   const { sailing, ship, cruiseLine, itinerary } = bundle;
   const portDays = itinerary.filter(({ day }) => day.dayType === "port");
   const seaDays = itinerary.filter(({ day }) => day.dayType === "sea");
-  const weatherByDay = latestWeatherByDay(bundle.weather);
+  const weatherByDay = preferredWeatherByDay(itinerary, bundle.weather);
   const shorePlansByDay = plansByDay(bundle.shorePlans);
   const dayGuidesByDay = guidesByDay(bundle.dayGuides);
+  const weatherConflicts = buildWeatherSnapshotConflicts({
+    itineraryDays: itinerary.map(({ day, port }) => ({ day, port })),
+    snapshots: bundle.weather ?? [],
+    reviewEvents: bundle.weatherReviewEvents ?? [],
+  });
+  const unresolvedConflictCount = weatherConflicts.filter((conflict) => conflict.recommendedReviewState === "review_recommended" || conflict.recommendedReviewState === "stale_preferred").length;
   const readinessByDay = itinerary.map(({ day, port }) => ({
     day,
     title: port?.name ?? day.title ?? titleCase(day.dayType),
@@ -128,6 +146,9 @@ export function mapDashboard(bundle: Resolved<typeof getDashboardBundle>): Dashb
     route,
     weatherOutlook: {
       canRefresh: Boolean(portDays.length),
+      conflictCount: unresolvedConflictCount || undefined,
+      conflictHref: unresolvedConflictCount ? "#/weather-review" : undefined,
+      conflictSummary: unresolvedConflictCount ? `${unresolvedConflictCount} weather snapshot review ${unresolvedConflictCount === 1 ? "item is" : "items are"} waiting.` : undefined,
       lastUpdated: featuredWeather?.updatedLabel ?? "Not refreshed yet",
       privacyNote: "Weather refresh sends port coordinates and dates to Open-Meteo. It does not send family identity, booking details, cabin information or traveller details.",
       refreshLabel: featuredWeather?.refreshLabel ?? "Refresh cruise weather",
@@ -159,7 +180,7 @@ export function mapDashboard(bundle: Resolved<typeof getDashboardBundle>): Dashb
 
 export function mapItinerary(bundle: Resolved<typeof getDashboardBundle>): ItineraryData {
   const todayIso = new Date().toISOString().slice(0, 10);
-  const weatherByDay = latestWeatherByDay(bundle.weather);
+  const weatherByDay = preferredWeatherByDay(bundle.itinerary, bundle.weather);
   const shorePlansByDay = plansByDay(bundle.shorePlans);
   const dayGuidesByDay = guidesByDay(bundle.dayGuides);
   const days: ItineraryDay[] = bundle.itinerary.map(({ day, port }, index) => {

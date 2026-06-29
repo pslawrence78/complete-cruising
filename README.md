@@ -6,9 +6,9 @@ The product follows the **Ocean Luxe** direction established by the standalone p
 
 ## Project status
 
-**Local-first application stage - Tranche 23: Open-Meteo Manual Weather Refresh v0.1 complete.**
+**Local-first application stage - Tranche 24: Weather Snapshot Review and Conflict Resolution v0.1 complete.**
 
-The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype, tested Ocean Luxe React experience, Zod-backed canonical data and a versioned Dexie/IndexedDB persistence foundation. The app defaults to the real local Sun Princess 2026 Eastern Mediterranean Cruise shell, with Day 1 to Day 15 generated for 2026-08-15 to 2026-08-29 and operational times left empty pending review. Tranche 20 adds a MapLibre-powered Port Atlas using a centralised OpenFreeMap no-key style configuration, visible attribution, approximate port-area coordinates, missing-coordinate fallback states and no geocoding, routing, weather overlays, geolocation or tile caching. Tranche 21 adds local-first cruise weather intelligence with Open-Meteo forecast and archive refreshes, route badges, Today and port weather cards, itinerary weather chips and local weather snapshot persistence. Tranche 21A repairs the six-type enrichment workflow contract so governed request prompts, import types, preview validation and commit routing now stay in parity for sailing shell, itinerary, ship pack, port pack, day guide and shore plan flows, while Sailing Setup can also manage, archive and safely delete local sailings. Tranche 22 adds a derived Cruise Conditions and Day Readiness layer across Dashboard, Today and Itinerary, preserving trust metadata while surfacing forecast caveats, return-buffer gaps and practical review needs without adding new persistence. Tranche 23 refines weather into a manual-only, trust-aware Open-Meteo flow that distinguishes visit-date forecasts from current port context, preserves trusted snapshots and keeps attribution visible across weather surfaces. Live integrations remain deliberately deferred apart from the approved weather source.
+The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype, tested Ocean Luxe React experience, Zod-backed canonical data and a versioned Dexie/IndexedDB persistence foundation. The app defaults to the real local Sun Princess 2026 Eastern Mediterranean Cruise shell, with Day 1 to Day 15 generated for 2026-08-15 to 2026-08-29 and operational times left empty pending review. Tranche 20 adds a MapLibre-powered Port Atlas using a centralised OpenFreeMap no-key style configuration, visible attribution, approximate port-area coordinates, missing-coordinate fallback states and no geocoding, routing, weather overlays, geolocation or tile caching. Tranche 21 adds local-first cruise weather intelligence with Open-Meteo forecast and archive refreshes, route badges, Today and port weather cards, itinerary weather chips and local weather snapshot persistence. Tranche 21A repairs the six-type enrichment workflow contract so governed request prompts, import types, preview validation and commit routing now stay in parity for sailing shell, itinerary, ship pack, port pack, day guide and shore plan flows, while Sailing Setup can also manage, archive and safely delete local sailings. Tranche 22 adds a derived Cruise Conditions and Day Readiness layer across Dashboard, Today and Itinerary, preserving trust metadata while surfacing forecast caveats, return-buffer gaps and practical review needs without adding new persistence. Tranche 23 refines weather into a manual-only, trust-aware Open-Meteo flow that distinguishes visit-date forecasts from current port context, preserves trusted snapshots and keeps attribution visible across weather surfaces. Tranche 24 fixes sea-day wording, stores competing snapshots, adds a local Weather Review route and records audit events when the preferred snapshot is changed or a conflict is acknowledged. Live integrations remain deliberately deferred apart from the approved weather source.
 
 ## Start here
 
@@ -21,7 +21,7 @@ The repository contains the project foundations, governance, illustrative sample
 
 ```text
 complete-cruising/
-|-- app/               Ocean Luxe React app through Tranche 23
+|-- app/               Ocean Luxe React app through Tranche 24
 |-- docs/              Product foundations, decisions and delivery plans
 |-- enrichment/        Prompt, staged-import and reviewed-output workspaces
 |-- prototypes/        Preserved visual reference artefacts
@@ -45,4 +45,4 @@ Work proceeds in small, independently reviewable tranches. The MVP direction is 
 
 Sample data must remain illustrative and must never include sensitive family information, booking references, cabin details, passport data, insurance data, addresses or other private details.
 
-The app can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The recommended next tranche is **Tranche 24: Weather Snapshot Review and Conflict Resolution v0.1**.
+The app can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The recommended next tranche is **Tranche 25: Weather Snapshot Review Workflow Polish v0.1**.

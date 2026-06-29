@@ -86,12 +86,17 @@ export function getWeatherButtonLabel(state: WeatherButtonState) {
 }
 
 export function buildWeatherContextMessage(input: {
+  dayType?: "embarkation" | "port" | "sea" | "disembarkation" | "scenic_cruising" | "overnight_port";
+  hasPortContext?: boolean;
   portName: string;
   visitDateLabel: string;
   weatherDateLabel: string;
   weatherContext?: WeatherContext;
   forecastExpectedFromLabel?: string;
 }) {
+  if (input.dayType === "sea" || input.dayType === "scenic_cruising" || input.hasPortContext === false) {
+    return "Sea-day weather not set.";
+  }
   switch (input.weatherContext) {
     case "visit_date_forecast":
       return `Applies to your ${input.portName} call on ${input.visitDateLabel}.`;

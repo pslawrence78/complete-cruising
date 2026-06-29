@@ -5,4 +5,5 @@ export * from "./sailingRepository";
 export * from "./shipRepository";
 export * from "./shorePlanRepository";
 export * from "./weatherRepository";
+export * from "./weatherSnapshotReviewRepository";
 export * from "./screenRepository";

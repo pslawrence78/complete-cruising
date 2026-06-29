@@ -133,6 +133,9 @@ export function createWeatherCardModel(input: {
   visitDateLabel: string;
   weatherDate?: string;
   weatherDateLabel: string;
+  contextLabelOverride?: string;
+  dayType?: "embarkation" | "port" | "sea" | "disembarkation" | "scenic_cruising" | "overnight_port";
+  hasPortContext?: boolean;
   weatherContext?: WeatherContext;
   forecastExpectedFrom?: string;
   forecastExpectedFromLabel?: string;
@@ -172,7 +175,8 @@ export function createWeatherCardModel(input: {
               ? "unknown"
               : "inferred";
   const readinessLabel = getWeatherReadinessLabel(input.readinessState);
-  const weatherTypeLabel = getWeatherContextLabel(input.weatherContext);
+  const weatherTypeLabel = input.contextLabelOverride ?? getWeatherContextLabel(input.weatherContext);
+  const showContextCaption = input.dayType !== "sea" && input.dayType !== "scenic_cruising" && input.hasPortContext !== false;
   const badgeTone = deriveWeatherBadgeTone(input.state);
 
   return {
@@ -192,6 +196,8 @@ export function createWeatherCardModel(input: {
     badgeTone,
     summary: input.conditionSummary,
     contextMessage: buildWeatherContextMessage({
+      dayType: input.dayType,
+      hasPortContext: input.hasPortContext,
       portName: input.portName,
       visitDateLabel: input.visitDateLabel,
       weatherDateLabel: input.weatherDateLabel,
@@ -204,6 +210,7 @@ export function createWeatherCardModel(input: {
     weatherDate: input.weatherDate,
     weatherDateLabel: input.weatherDateLabel,
     weatherTypeLabel,
+    showContextCaption,
     weatherContext: input.weatherContext,
     forecastExpectedFrom: input.forecastExpectedFrom,
     forecastExpectedFromLabel: input.forecastExpectedFromLabel,
