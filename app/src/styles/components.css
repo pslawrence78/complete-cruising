@@ -152,12 +152,16 @@
   position: relative;
 }
 
-.navigation-more summary {
-  list-style: none;
+.navigation-more__trigger::after {
+  display: inline-block;
+  margin-left: 0.48rem;
+  font-size: 0.66rem;
+  content: "▾";
+  transition: transform var(--transition-fast);
 }
 
-.navigation-more summary::-webkit-details-marker {
-  display: none;
+.navigation-more__trigger[aria-expanded="true"]::after {
+  transform: rotate(180deg);
 }
 
 .navigation-more__menu {
@@ -166,12 +170,25 @@
   top: calc(100% + 0.5rem);
   z-index: calc(var(--layer-header) + 1);
   display: grid;
+  gap: 0.12rem;
   min-width: 14rem;
   padding: 0.55rem;
   border: 1px solid rgba(142, 228, 225, 0.2);
   border-radius: var(--radius-lg);
   background: rgba(6, 31, 44, 0.96);
   box-shadow: var(--shadow-card);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-0.35rem);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.navigation-more__menu[data-open="true"] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .navigation-more__item,
@@ -266,7 +283,6 @@
   left: var(--space-3);
   z-index: var(--layer-mobile-nav);
   display: none;
-  overflow: hidden;
   padding: 0.4rem;
   border-radius: var(--radius-lg);
 }
@@ -313,12 +329,15 @@
   position: relative;
 }
 
-.mobile-navigation__more summary {
-  list-style: none;
-}
-
-.mobile-navigation__more summary::-webkit-details-marker {
-  display: none;
+.mobile-navigation__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--layer-mobile-nav) - 1);
+  background:
+    linear-gradient(180deg, rgba(3, 17, 29, 0.12), rgba(3, 17, 29, 0.42)),
+    radial-gradient(circle at 50% 100%, rgba(142, 228, 225, 0.1), transparent 42%);
+  -webkit-backdrop-filter: blur(0.2rem);
+  backdrop-filter: blur(0.2rem);
 }
 
 .mobile-navigation__more-menu {
@@ -326,14 +345,31 @@
   right: var(--space-3);
   bottom: 5.3rem;
   left: var(--space-3);
+  z-index: calc(var(--layer-mobile-nav) + 1);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.25rem;
+  max-width: min(32rem, calc(100vw - (var(--space-3) * 2)));
   padding: 0.55rem;
+  margin-inline: auto;
   border: 1px solid rgba(142, 228, 225, 0.2);
   border-radius: var(--radius-lg);
-  background: rgba(6, 31, 44, 0.97);
+  background:
+    linear-gradient(165deg, rgba(8, 43, 67, 0.98), rgba(4, 23, 35, 0.98)),
+    rgba(6, 31, 44, 0.97);
   box-shadow: var(--shadow-card);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(0.5rem);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.mobile-navigation__more-menu[data-open="true"] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .route-motif {

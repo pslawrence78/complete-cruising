@@ -131,10 +131,101 @@ describe("data-driven application screens", () => {
     const labels = within(navigation).getAllByRole("button").map((button) => button.textContent);
     expect(labels.slice(0, 5)).toEqual(["Dashboard", "Today", "Itinerary", "Ports", "Ship"]);
     fireEvent.click(within(navigation).getByText("More"));
-    expect(within(navigation).getByRole("button", { name: "Sailing Setup" })).toBeInTheDocument();
-    expect(within(navigation).getByRole("button", { name: "Guidebook Tools" })).toBeInTheDocument();
-    expect(within(navigation).getByRole("button", { name: "Import / Export" })).toBeInTheDocument();
-    expect(within(navigation).getByRole("button", { name: "Data Safety" })).toBeInTheDocument();
+    expect(within(navigation).getByRole("menuitem", { name: "Sailing Setup" })).toBeInTheDocument();
+    expect(within(navigation).getByRole("menuitem", { name: "Guidebook Tools" })).toBeInTheDocument();
+    expect(within(navigation).getByRole("menuitem", { name: "Import / Export" })).toBeInTheDocument();
+    expect(within(navigation).getByRole("menuitem", { name: "Data Safety" })).toBeInTheDocument();
+  });
+
+  it("closes the desktop More menu after selecting a route", async () => {
+    await renderRoute();
+    const navigation = screen.getByRole("navigation", { name: "Primary navigation" });
+    const moreButton = within(navigation).getByRole("button", { name: "More" });
+
+    fireEvent.click(moreButton);
+    expect(moreButton).toHaveAttribute("aria-expanded", "true");
+
+    fireEvent.click(within(navigation).getByRole("menuitem", { name: "Plans" }));
+
+    expect(await screen.findByRole("heading", { name: "Guide pending." })).toBeInTheDocument();
+    expect(moreButton).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("closes the desktop More menu when Escape is pressed", async () => {
+    await renderRoute();
+    const navigation = screen.getByRole("navigation", { name: "Primary navigation" });
+    const moreButton = within(navigation).getByRole("button", { name: "More" });
+
+    fireEvent.click(moreButton);
+    expect(moreButton).toHaveAttribute("aria-expanded", "true");
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(moreButton).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("closes the desktop More menu on outside click", async () => {
+    await renderRoute();
+    const navigation = screen.getByRole("navigation", { name: "Primary navigation" });
+    const moreButton = within(navigation).getByRole("button", { name: "More" });
+
+    fireEvent.click(moreButton);
+    expect(moreButton).toHaveAttribute("aria-expanded", "true");
+
+    fireEvent.mouseDown(document.body);
+
+    expect(moreButton).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("closes the desktop More menu when the hash route changes", async () => {
+    await renderRoute();
+    const navigation = screen.getByRole("navigation", { name: "Primary navigation" });
+    const moreButton = within(navigation).getByRole("button", { name: "More" });
+
+    fireEvent.click(moreButton);
+    expect(moreButton).toHaveAttribute("aria-expanded", "true");
+
+    window.history.replaceState(null, "", "#/weather-review");
+    fireEvent(window, new HashChangeEvent("hashchange"));
+
+    expect(window.location.hash).toBe("#/weather-review");
+    expect(moreButton).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("opens the mobile More menu and keeps its items reachable", async () => {
+    await renderRoute();
+    const mobileNavigation = screen.getByRole("navigation", { name: "Mobile navigation" });
+    const moreButton = within(mobileNavigation).getByRole("button", { name: "More" });
+
+    fireEvent.click(moreButton);
+
+    const moreMenu = screen
+      .getAllByRole("menu")
+      .find((menu) => menu.className.includes("mobile-navigation__more-menu"));
+
+    expect(moreMenu).toBeDefined();
+    expect(moreButton).toHaveAttribute("aria-expanded", "true");
+    expect(moreMenu).toHaveAttribute("data-open", "true");
+    expect(within(moreMenu!).getByRole("menuitem", { name: "Ship" })).toBeInTheDocument();
+    expect(within(moreMenu!).getByRole("menuitem", { name: "Weather Review" })).toBeInTheDocument();
+  });
+
+  it("closes the mobile More menu after selecting a route", async () => {
+    await renderRoute();
+    const mobileNavigation = screen.getByRole("navigation", { name: "Mobile navigation" });
+    const moreButton = within(mobileNavigation).getByRole("button", { name: "More" });
+
+    fireEvent.click(moreButton);
+    const moreMenu = screen
+      .getAllByRole("menu")
+      .find((menu) => menu.className.includes("mobile-navigation__more-menu"));
+
+    expect(moreMenu).toBeDefined();
+    fireEvent.click(within(moreMenu!).getByRole("menuitem", { name: "Ship" }));
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Sun Princess" })).toBeInTheDocument();
+    expect(moreButton).toHaveAttribute("aria-expanded", "false");
+    expect(moreMenu).toHaveAttribute("data-open", "false");
   });
 
   it("shows app-shell offline readiness and local update status", async () => {

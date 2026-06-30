@@ -1,5 +1,6 @@
 import type { RouteDefinition } from "../../routes/routeConfig";
 import { BrandMark } from "../visual/BrandMark";
+import { useMoreMenu } from "./useMoreMenu";
 
 interface TopNavigationProps {
   activeRouteId: string;
@@ -12,6 +13,15 @@ export function TopNavigation({
   onNavigate,
   routes,
 }: TopNavigationProps) {
+  const {
+    buttonId,
+    menuId,
+    menuRef,
+    triggerRef,
+    isOpen,
+    closeMenu,
+    toggleMenu,
+  } = useMoreMenu({ activeRouteId });
   const primaryRoutes = routes
     .filter((route) => route.navigationGroup === "primary")
     .sort((a, b) => a.order - b.order);
@@ -65,26 +75,53 @@ export function TopNavigation({
             );
           })}
           <li>
-            <details className="navigation-more" open={moreIsActive}>
-              <summary className="navigation-item" aria-current={moreIsActive ? "page" : undefined}>More</summary>
-              <div className="navigation-more__menu">
+            <div className="navigation-more">
+              <button
+                id={buttonId}
+                ref={triggerRef}
+                className="navigation-item navigation-more__trigger"
+                type="button"
+                aria-current={moreIsActive ? "page" : undefined}
+                aria-expanded={isOpen}
+                aria-haspopup="menu"
+                aria-controls={menuId}
+                onClick={toggleMenu}
+              >
+                More
+              </button>
+              <div
+                id={menuId}
+                ref={menuRef}
+                className="navigation-more__menu"
+                role="menu"
+                aria-labelledby={buttonId}
+                data-open={isOpen}
+              >
                 {moreRoutes.map((route) => {
                   const isAvailable = route.status === "implemented";
-                  return <button
-                    key={route.id}
-                    className="navigation-more__item"
-                    type="button"
-                    aria-current={route.id === activeRouteId ? "page" : undefined}
-                    aria-disabled={!isAvailable}
-                    onClick={() => {
-                      if (isAvailable) onNavigate(route.id);
-                    }}
-                  >
-                    {route.title}
-                  </button>;
+                  return (
+                    <button
+                      key={route.id}
+                      className="navigation-more__item"
+                      type="button"
+                      role="menuitem"
+                      aria-current={route.id === activeRouteId ? "page" : undefined}
+                      aria-disabled={!isAvailable}
+                      onClick={() => {
+                        if (!isAvailable) {
+                          return;
+                        }
+
+                        closeMenu();
+                        onNavigate(route.id);
+                      }}
+                    >
+                      {route.title}
+                    </button>
+                  );
                 })}
               </div>
-            </details>
+            </div>
           </li>
         </ul>
       </nav>
