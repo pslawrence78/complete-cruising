@@ -182,6 +182,7 @@ complete-cruising/
 |       `-- tests/setup.ts            Testing Library setup and cleanup
 |-- docs/
 |   |-- README.md                     This living inventory and knowledge index
+|   |-- 01-sun-princess-2026-guidebook-brief.md
 |   |-- 01-product-specification-v0.1.md
 |   |-- 02-enrichment-framework-v0.1.md
 |   |-- 03-data-model-v0.1.md
@@ -250,6 +251,7 @@ complete-cruising/
 | [../.gitignore](../.gitignore) | Repository configuration | Excludes dependency folders, build output, local environment files, editor settings, logs and coverage output without hiding project artefacts. |
 | [../.github/workflows/deploy.yml](../.github/workflows/deploy.yml) | Deployment workflow | Builds, validates, uploads and deploys `app/dist` to GitHub Pages through GitHub Actions. |
 | [README.md](README.md) | Project knowledge | Living repository inventory, knowledge router, current-state summary and gap register. |
+| [01-sun-princess-2026-guidebook-brief.md](01-sun-princess-2026-guidebook-brief.md) | Product brief | Defines the reset single-sailing Sun Princess 2026 edition, its users, scope, information architecture, confidence model, weather approach, technical direction and tranche sequence. |
 | [01-product-specification-v0.1.md](01-product-specification-v0.1.md) | Product foundation | Defines the vision, audience, journeys, scope, information architecture, product-level data concepts, enrichment philosophy, visual ambition and success criteria. |
 | [02-enrichment-framework-v0.1.md](02-enrichment-framework-v0.1.md) | Trust and content foundation | Defines targeted enrichment packs, source hierarchy, confidence, review and refresh metadata, review workflow, family lenses, import standards and anti-patterns. |
 | [03-data-model-v0.1.md](03-data-model-v0.1.md) | Data foundation | Defines conceptual entities, relationships, enumerations, protected-field conflict rules, quality rules and the boundary between reusable guidebook data and sailing-specific records. |
