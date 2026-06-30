@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { LocalDataState } from "../../components/states/LocalDataState";
 import { mapPortGuide } from "../../data/viewModelMappers";
 import { usePortGuide, useSailingDashboard } from "../../hooks/useLocalData";
@@ -13,15 +13,11 @@ import { PortPostcard } from "./components/PortPostcard";
 import { buildAtlasCaption, buildPortFallbackMetadata, buildVoyageAtlasPoints } from "../ports/portAtlasViewModel";
 import { WeatherSeasonalityPanel } from "../weather/components/WeatherSeasonalityPanel";
 import { buildWeatherCardModelFromSnapshot } from "../weather/weatherStateService";
-import { refreshCruiseWeatherForSailing } from "../weather/weatherRefreshService";
-import type { WeatherButtonState } from "../weather/weatherTypes";
 import "./PortGuidePage.css";
 
 export function PortGuidePage() {
   const query = usePortGuide();
   const sailingQuery = useSailingDashboard();
-  const [weatherButtonState, setWeatherButtonState] = useState<WeatherButtonState>("idle");
-  const [weatherMessage, setWeatherMessage] = useState<string | undefined>();
   const atlasPoints = useMemo(
     () => sailingQuery.data ? buildVoyageAtlasPoints(sailingQuery.data.itinerary) : [],
     [sailingQuery.data],
@@ -46,22 +42,6 @@ export function PortGuidePage() {
   const fallbackMetadata = "guide" in query.data ? buildPortFallbackMetadata(query.data.guide?.port, query.data.guide?.country) : undefined;
   const atlasSummary = getAtlasSummary(atlasPoints);
 
-  const handleRefreshWeather = async () => {
-    if (!query.data || !("sailing" in query.data)) return;
-    setWeatherMessage(undefined);
-    if (typeof navigator !== "undefined" && !navigator.onLine) {
-      setWeatherButtonState("offline");
-      setWeatherMessage("Weather refresh needs a connection. Your existing local weather context has been preserved.");
-      return;
-    }
-    setWeatherButtonState("refreshing");
-    const result = await refreshCruiseWeatherForSailing(query.data.sailing.id, undefined, {
-      itineraryDayId: query.data.day?.id,
-    });
-    setWeatherMessage(result.message);
-    setWeatherButtonState(result.buttonState);
-  };
-
   const weatherPanel = guidePort && weatherCard ? {
     ...weatherCard,
     coordinatesLabel: guidePort.geo?.latitude !== undefined && guidePort.geo?.longitude !== undefined
@@ -81,11 +61,9 @@ export function PortGuidePage() {
       {weatherPanel ? (
         <div className="port-page__weather">
           <WeatherSeasonalityPanel
-            buttonState={weatherButtonState}
-            onRefresh={weatherPanel.canRefresh ? handleRefreshWeather : undefined}
+            buttonState="idle"
             weather={weatherPanel}
           />
-          {weatherMessage ? <p className="port-page__weather-message">{weatherMessage}</p> : null}
         </div>
       ) : null}
 
@@ -142,6 +120,20 @@ export function PortGuidePage() {
         <PhotoPromptCard photo={port.photoPrompt} />
         <HintsWatchoutsCard hints={port.hints} />
       </div>
+
+      {port.sections.length > 3 ? (
+        <section className="port-practical" aria-labelledby="port-extra-guide-title">
+          <div className="port-section-heading">
+            <div>
+              <p className="section-kicker">More from the guidebook</p>
+              <h2 id="port-extra-guide-title">Imported sections that now surface here.</h2>
+            </div>
+          </div>
+          {port.sections.slice(3).map((section) => (
+            <PortGuideSection key={section.id} section={section} />
+          ))}
+        </section>
+      ) : null}
 
       <section className="port-confidence" aria-labelledby="port-confidence-title">
         <div>

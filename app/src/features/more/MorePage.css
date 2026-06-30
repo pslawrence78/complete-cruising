@@ -1,0 +1,116 @@
+.more-page {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.more-hero,
+.more-backstage,
+.more-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(185, 198, 214, 0.18);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(7, 15, 30, 0.2);
+}
+
+.more-hero,
+.more-backstage {
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  background:
+    radial-gradient(circle at top right, rgba(210, 171, 106, 0.18), transparent 28%),
+    linear-gradient(145deg, rgba(9, 26, 49, 0.94), rgba(18, 46, 70, 0.82));
+}
+
+.more-hero h1,
+.more-backstage h2,
+.more-card h3 {
+  margin: 0;
+}
+
+.more-hero p,
+.more-backstage p,
+.more-card p {
+  margin: 0;
+}
+
+.more-hero aside {
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+  padding: 1rem 1.1rem;
+  border-radius: 20px;
+  background: rgba(247, 241, 229, 0.09);
+  color: rgba(244, 238, 227, 0.92);
+}
+
+.more-hero aside span,
+.more-backstage__link,
+.more-card span {
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.more-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.more-section-heading {
+  display: grid;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.more-grid__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.more-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.35rem;
+  text-decoration: none;
+  color: inherit;
+  background:
+    linear-gradient(180deg, rgba(255, 249, 240, 0.95), rgba(248, 241, 229, 0.86));
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.more-card:hover,
+.more-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 28px 54px rgba(10, 20, 34, 0.18);
+}
+
+.more-card span {
+  color: var(--color-sea-glass-aqua);
+}
+
+.more-backstage {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.more-backstage__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0 1.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(227, 201, 154, 0.36);
+  color: var(--color-warm-ivory);
+  text-decoration: none;
+  background: rgba(227, 201, 154, 0.08);
+}
+
+@media (max-width: 767px) {
+  .more-backstage {
+    grid-template-columns: 1fr;
+  }
+}

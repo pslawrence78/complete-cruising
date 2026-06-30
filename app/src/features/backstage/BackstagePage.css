@@ -1,0 +1,56 @@
+.backstage-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.backstage-hero,
+.backstage-card {
+  border: 1px solid rgba(185, 198, 214, 0.18);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(7, 15, 30, 0.18);
+}
+
+.backstage-hero {
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  background:
+    radial-gradient(circle at top left, rgba(95, 161, 177, 0.16), transparent 26%),
+    linear-gradient(145deg, rgba(8, 23, 43, 0.94), rgba(16, 38, 60, 0.86));
+}
+
+.backstage-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.backstage-heading {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.backstage-grid__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.backstage-card {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.3rem;
+  text-decoration: none;
+  color: inherit;
+  background:
+    linear-gradient(180deg, rgba(255, 249, 240, 0.96), rgba(243, 237, 227, 0.9));
+}
+
+.backstage-card h3,
+.backstage-card p {
+  margin: 0;
+}
+
+.backstage-card span {
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-sea-glass-aqua);
+}

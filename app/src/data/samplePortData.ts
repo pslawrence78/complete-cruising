@@ -16,7 +16,7 @@ export interface PortTrustMetadata {
 export interface PortGuideSectionData extends PortTrustMetadata {
   body: string;
   eyebrow: string;
-  id: "logistics" | "getting-around" | "food-culture";
+  id: string;
   note: string;
   title: string;
 }

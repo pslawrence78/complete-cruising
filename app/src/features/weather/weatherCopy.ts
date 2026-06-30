@@ -21,7 +21,7 @@ export function formatWeatherDateLabel(value?: string) {
 
 export function formatWeatherTimestamp(value?: string) {
   if (!value) return "Not refreshed yet";
-  return `Last refreshed ${timestampFormatter.format(new Date(value))}`;
+  return `Last checked ${timestampFormatter.format(new Date(value))}`;
 }
 
 export function getWeatherContextLabel(context?: WeatherContext) {
@@ -44,17 +44,17 @@ export function getWeatherContextLabel(context?: WeatherContext) {
 export function getWeatherReadinessLabel(state: WeatherReadinessState) {
   switch (state) {
     case "visit_forecast_ready":
-      return "Visit forecast ready";
+      return "Forecast available";
     case "same_day_checked":
-      return "Same-day checked";
+      return "Same-day check";
     case "weather_now_context_only":
-      return "Destination context only";
+      return "Forecast not available yet";
     case "forecast_pending":
-      return "Forecast pending";
+      return "Forecast not available yet";
     case "missing_coordinates":
       return "Coordinates needed";
     case "stale":
-      return "Needs refresh";
+      return "Last checked earlier";
     case "offline_unavailable":
       return "Offline";
     case "not_applicable":

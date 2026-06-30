@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { AppShell } from "./components/layout/AppShell";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
+import { BackstagePage } from "./features/backstage/BackstagePage";
 import { FamilyGuidePage } from "./features/family/FamilyGuidePage";
+import { GuideLoaderPage } from "./features/guide-loader/GuideLoaderPage";
 import { ItineraryPage } from "./features/itinerary/ItineraryPage";
 import { MemoriesPage } from "./features/memories/MemoriesPage";
+import { MorePage } from "./features/more/MorePage";
 import { PlansPage } from "./features/plans/PlansPage";
 import { PortGuidePage } from "./features/ports/PortGuidePage";
 import { ShipPage } from "./features/ship/ShipPage";
@@ -55,7 +58,9 @@ function App() {
   };
 
   const activePage =
-    activeRouteId === "weather-review" ? (
+    activeRouteId === "backstage" ? (
+      <BackstagePage />
+    ) : activeRouteId === "weather-review" ? (
       <WeatherSnapshotReviewPage />
     ) : activeRouteId === "sailing-setup" ? (
       <SailingSetupPage />
@@ -65,6 +70,10 @@ function App() {
       <ImportExportPage />
     ) : activeRouteId === "data-management" ? (
       <DataManagementPage />
+    ) : activeRouteId === "guide-loader" ? (
+      <GuideLoaderPage />
+    ) : activeRouteId === "more" ? (
+      <MorePage />
     ) : activeRouteId === "plans" ? (
       <PlansPage />
     ) : activeRouteId === "family" ? (

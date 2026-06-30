@@ -9,14 +9,7 @@ export interface ShipGuideSection {
     label?: string;
     level: ConfidenceLevel;
   };
-  id:
-    | "identity"
-    | "orientation"
-    | "dining"
-    | "family"
-    | "recreation"
-    | "entertainment"
-    | "watchouts";
+  id: string;
   index: string;
   nextStep: string;
   status: {

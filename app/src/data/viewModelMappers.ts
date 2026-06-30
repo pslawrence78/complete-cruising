@@ -73,6 +73,10 @@ function trustFromConfidence(confidence?: ConfidenceMetadata): TrustMetadata {
   };
 }
 
+function matchesSectionType(sectionType: string, candidates: string[]) {
+  return candidates.includes(sectionType);
+}
+
 export function mapDashboard(bundle: Resolved<typeof getDashboardBundle>): DashboardData {
   const { sailing, ship, cruiseLine, itinerary } = bundle;
   const portDays = itinerary.filter(({ day }) => day.dayType === "port");
@@ -184,6 +188,7 @@ export function mapItinerary(bundle: Resolved<typeof getDashboardBundle>): Itine
   const shorePlansByDay = plansByDay(bundle.shorePlans);
   const dayGuidesByDay = guidesByDay(bundle.dayGuides);
   const days: ItineraryDay[] = bundle.itinerary.map(({ day, port }, index) => {
+    const dayPlans = shorePlansByDay.get(day.id) ?? [];
     const metadataStatus = statusFromConfidence(day.confidence);
     const accent = day.dayType === "sea" ? "aqua" : day.dayType === "embarkation" || day.dayType === "disembarkation" ? "gold" : index % 2 ? "coral" : "mist";
     const isOperationalTimesPending = day.dayType === "port" && !day.arrivalTime && !day.departureTime && !day.allAboardTime;
@@ -200,7 +205,17 @@ export function mapItinerary(bundle: Resolved<typeof getDashboardBundle>): Itine
       id: day.id, dayNumber: day.dayNumber, dateLabel: dateLabel(day.date), dayType: day.dayType as ItineraryDay["dayType"],
       title: port?.name ?? day.title ?? titleCase(day.dayType), portName: port?.name, country: undefined,
       arrivalTime: day.arrivalTime, departureTime: day.departureTime, allAboardTime: day.allAboardTime,
-      planSummary: day.selectedShorePlanId ? "Selected shore plan held locally" : day.dayType === "port" ? "No shore plan selected yet" : day.dayType === "embarkation" ? "Embarkation, ship orientation and first bearings" : day.dayType === "disembarkation" ? "Disembarkation and onward travel notes" : "A day for the ship and horizon",
+      planSummary: day.selectedShorePlanId
+        ? "Selected shore plan held locally"
+        : dayPlans.length
+          ? `${dayPlans.length} local shore plan option${dayPlans.length === 1 ? "" : "s"} ready`
+          : day.dayType === "port"
+            ? "No shore plan selected yet"
+            : day.dayType === "embarkation"
+              ? "Embarkation, ship orientation and first bearings"
+              : day.dayType === "disembarkation"
+                ? "Disembarkation and onward travel notes"
+                : "A day for the ship and horizon",
       enrichmentStatus: isOperationalTimesPending ? `${guideStatus} - Times need review` : guideStatus, isHighlighted: day.date >= todayIso && !bundle.itinerary.some(({ day: candidate }) => candidate.date >= todayIso && candidate.dayNumber < day.dayNumber), accent,
       confidence: { level: day.confidence?.confidence ?? "unknown" }, reviewStatus: metadataStatus,
       refreshStatus: { label: weather.readinessLabel, tone: weather.badgeTone },
@@ -216,7 +231,7 @@ export function mapToday(bundle: Resolved<typeof getTodayGuideBundle>): TodayDat
   if (!("day" in bundle) || !bundle.day) return undefined;
   const { day, port, country, guide, weather, plans } = bundle;
   const isPreCruise = new Date(`${bundle.sailing.departureDate}T00:00:00`).getTime() > Date.now();
-  const selected = plans.find((plan) => plan.id === day.selectedShorePlanId || plan.status === "selected" || plan.status === "booked");
+  const selected = plans.find((plan) => plan.id === day.selectedShorePlanId || plan.status === "selected" || plan.status === "booked") ?? plans[0];
   const backup = plans.find((plan) => plan.id === day.backupShorePlanId) ?? plans.find((plan) => plan.id !== selected?.id);
   const planStatus = statusFromConfidence(selected?.confidence);
   const weatherCard = buildWeatherCardModelFromSnapshot({ day, port, snapshot: weather });
@@ -248,7 +263,7 @@ export function mapToday(bundle: Resolved<typeof getTodayGuideBundle>): TodayDat
   };
 }
 
-const shipSectionPresentation: Record<string, { id: ShipGuideSection["id"]; accent: ShipGuideSection["accent"]; nextStep: string }> = {
+const shipSectionPresentation: Record<string, { id: string; accent: ShipGuideSection["accent"]; nextStep: string }> = {
   identity: { id: "identity", accent: "gold", nextStep: "Verify the final venue mix for this sailing season." },
   orientation: { id: "orientation", accent: "aqua", nextStep: "Add a verified deck-by-deck quick route." },
   dining: { id: "dining", accent: "coral", nextStep: "Confirm inclusions, booking rules and family-friendly timings." },
@@ -265,7 +280,7 @@ export function mapShipGuide(bundle: Resolved<typeof getActiveShipGuideBundle>):
     const presentation = shipSectionPresentation[section.sectionType] ?? { id: "identity" as const, accent: "mist" as const, nextStep: "Complete and review this guidebook section." };
     const status = statusFromConfidence(section.confidence);
     const facts = factsObject(section.structuredFacts);
-    return { id: presentation.id, index: String(index + 1).padStart(2, "0"), title: section.title, watchword: String(facts?.watchword ?? "Guide in progress"), summary: section.summary ?? "This local section has not yet been enriched.", nextStep: String(facts?.nextStep ?? presentation.nextStep), status, confidence: { level: section.confidence.confidence }, accent: presentation.accent };
+    return { id: `${presentation.id}-${index + 1}`, index: String(index + 1).padStart(2, "0"), title: section.title, watchword: String(facts?.watchword ?? "Guide in progress"), summary: section.summary ?? "This local section has not yet been enriched.", nextStep: String(facts?.nextStep ?? presentation.nextStep), status, confidence: { level: section.confidence.confidence }, accent: presentation.accent };
   });
   const confidence = ship.confidence;
   const identityFacts = factsObject(sections.find((s) => s.sectionType === "identity")?.structuredFacts);
@@ -288,16 +303,39 @@ export function mapPortGuide(bundle: Resolved<typeof getActivePortGuideBundle>):
   if (!("guide" in bundle) || !bundle.guide) return undefined;
   const { port, country, attractions, enrichmentSections } = bundle.guide;
   const confidence = port.confidence;
-  const section = (type: string) => enrichmentSections.find((item) => item.sectionType === type);
+  const section = (...types: string[]) => enrichmentSections.find((item) => matchesSectionType(item.sectionType, types));
   const mappedAttractions: PortAttraction[] = attractions.map((attraction) => ({ id: attraction.id, name: attraction.name, category: titleCase(attraction.type ?? "possible story"), description: attraction.shortDescription ?? "Guide pending. Add a short family-relevant reason to consider this place.", familyNote: attraction.accessibilityNotes ?? `Family suitability: ${titleCase(attraction.familySuitability ?? "unknown")}.`, sebAngle: attraction.sebInterestSummary, status: { label: attraction.bookingRequired === "unknown" ? "Requirements unknown" : titleCase(attraction.bookingRequired ?? "needs review"), tone: attraction.bookingRequired === "unknown" ? "refresh" : "review" }, confidence: { level: attraction.confidence?.confidence ?? "unknown" } }));
+  const usedSectionIds = new Set<string>();
+  const remember = (item?: EnrichmentSection) => {
+    if (item) usedSectionIds.add(item.id);
+    return item;
+  };
+  const logistics = remember(section("logistics", "cruise_logistics"));
+  const gettingAround = remember(section("getting-around", "getting_around"));
+  const foodCulture = remember(section("food-culture", "food_culture"));
+  const familySection = remember(section("family-discovery", "family_lens", "seb_discovery"));
+  const photographySection = remember(section("photography"));
+  const extraSections = enrichmentSections
+    .filter((item) => !usedSectionIds.has(item.id))
+    .map((item) => mapPortSection(item, {
+      id: item.sectionType,
+      eyebrow: "Guidebook detail",
+      title: item.title,
+      body: item.summary,
+    }));
   return {
     identity: { name: port.name, country: country?.name ?? "Country not recorded", region: port.region ?? "Region not recorded", flag: country?.flagEmoji ?? "🌍", guideLabel: "Illustrative port guidebook · local edition", overview: port.overview ?? "Port overview not yet enriched." },
     facts: [{ label: "Language", value: country?.primaryLanguage ?? "Not recorded" }, { label: "Currency", value: country?.currencyName ? `${country.currencyName}${country.currencyCode ? ` (${country.currencyCode})` : ""}` : "Not recorded" }, { label: "Port character", value: titleCase(port.portType ?? "unknown") }, { label: "Family pace", value: titleCase(port.returnRiskDefault ?? "unknown") }],
     metadata: { confidence: confidence?.confidence ?? "unknown", reviewStatus: titleCase(confidence?.reviewStatus ?? "not_reviewed"), refreshStatus: confidence?.refreshRecommended ? "Refresh before travel" : "No refresh requested", lastReviewed: reviewedLabel(confidence?.lastReviewedAt), recordScope: "Reusable port guidebook · not an itinerary day" },
-    sections: [mapPortSection(section("logistics"), { id: "logistics", eyebrow: "Practical arrival", title: "Cruise logistics", body: port.cruiseLogisticsSummary }), mapPortSection(section("getting-around"), { id: "getting-around", eyebrow: "Finding a rhythm", title: "Getting around", body: port.gettingAroundSummary }), mapPortSection(section("food-culture"), { id: "food-culture", eyebrow: "A city with appetite", title: "Food and culture", body: port.foodCultureSummary })],
+    sections: [
+      mapPortSection(logistics, { id: "logistics", eyebrow: "Practical arrival", title: "Cruise logistics", body: port.cruiseLogisticsSummary }),
+      mapPortSection(gettingAround, { id: "getting-around", eyebrow: "Finding a rhythm", title: "Getting around", body: port.gettingAroundSummary }),
+      mapPortSection(foodCulture, { id: "food-culture", eyebrow: "A city with appetite", title: "Food and culture", body: port.foodCultureSummary }),
+      ...extraSections,
+    ],
     attractions: mappedAttractions,
-    familyLens: { title: "A family day with room to breathe", bestBalance: port.familySuitabilitySummary ?? "Choose one strong story and preserve a generous return margin.", sebDiscovery: String(factsObject(section("family-discovery")?.structuredFacts)?.thingToSpot ?? "Look for one landscape clue that explains the port."), status: statusFromConfidence(section("family-discovery")?.confidence ?? confidence), confidence: { level: section("family-discovery")?.confidence.confidence ?? confidence?.confidence ?? "unknown", label: "Family lens" } },
-    photoPrompt: { prompt: port.photographySummary ?? "Choose a safe frame that captures the character of the port day.", caption: String(factsObject(section("photography")?.structuredFacts)?.caption ?? "A local story in one frame."), status: statusFromConfidence(section("photography")?.confidence ?? confidence), confidence: { level: section("photography")?.confidence.confidence ?? confidence?.confidence ?? "unknown" } },
+    familyLens: { title: "A family day with room to breathe", bestBalance: port.familySuitabilitySummary ?? "Choose one strong story and preserve a generous return margin.", sebDiscovery: String(factsObject(familySection?.structuredFacts)?.thingToSpot ?? "Look for one landscape clue that explains the port."), status: statusFromConfidence(familySection?.confidence ?? confidence), confidence: { level: familySection?.confidence.confidence ?? confidence?.confidence ?? "unknown", label: "Family lens" } },
+    photoPrompt: { prompt: port.photographySummary ?? "Choose a safe frame that captures the character of the port day.", caption: String(factsObject(photographySection?.structuredFacts)?.caption ?? "A local story in one frame."), status: statusFromConfidence(photographySection?.confidence ?? confidence), confidence: { level: photographySection?.confidence.confidence ?? confidence?.confidence ?? "unknown" } },
     hints: { items: (port.hintsTipsSummary ?? "Keep a clear turnaround point. Verify transport and opening details. Use Today for sailing-specific times.").split("|").map((item) => item.trim()), status: statusFromConfidence(confidence), confidence: { level: confidence?.confidence ?? "unknown" } },
     caveat: port.dataCaveat ?? "Local guidebook details should be reviewed before travel.",
   };

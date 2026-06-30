@@ -3,7 +3,7 @@ export interface RouteDefinition {
   path: string;
   title: string;
   status: "implemented" | "placeholder";
-  navigationGroup: "primary" | "mobile-primary" | "more";
+  navigationGroup: "primary" | "more" | "backstage";
   order: number;
 }
 
@@ -53,8 +53,24 @@ export const routeConfig: readonly RouteDefinition[] = [
     path: "/plans",
     title: "Plans",
     status: "implemented",
+    navigationGroup: "primary",
+    order: 6,
+  },
+  {
+    id: "more",
+    path: "/more",
+    title: "More",
+    status: "implemented",
     navigationGroup: "more",
     order: 10,
+  },
+  {
+    id: "guide-loader",
+    path: "/guide-loader",
+    title: "Guide Loader",
+    status: "implemented",
+    navigationGroup: "more",
+    order: 11,
   },
   {
     id: "family",
@@ -62,7 +78,7 @@ export const routeConfig: readonly RouteDefinition[] = [
     title: "Family Guide",
     status: "implemented",
     navigationGroup: "more",
-    order: 11,
+    order: 12,
   },
   {
     id: "memories",
@@ -70,47 +86,55 @@ export const routeConfig: readonly RouteDefinition[] = [
     title: "Memories",
     status: "implemented",
     navigationGroup: "more",
-    order: 12,
+    order: 13,
+  },
+  {
+    id: "backstage",
+    path: "/backstage",
+    title: "Backstage",
+    status: "implemented",
+    navigationGroup: "more",
+    order: 14,
   },
   {
     id: "weather-review",
     path: "/weather-review",
     title: "Weather Review",
     status: "implemented",
-    navigationGroup: "more",
-    order: 19,
+    navigationGroup: "backstage",
+    order: 20,
   },
   {
     id: "sailing-setup",
     path: "/sailing-setup",
     title: "Sailing Setup",
     status: "implemented",
-    navigationGroup: "more",
-    order: 20,
+    navigationGroup: "backstage",
+    order: 21,
   },
   {
     id: "enrichment-requests",
     path: "/enrichment-requests",
-    title: "Guidebook Tools",
+    title: "Prompt Studio",
     status: "implemented",
-    navigationGroup: "more",
-    order: 21,
+    navigationGroup: "backstage",
+    order: 22,
   },
   {
     id: "import-export",
     path: "/import-export",
     title: "Import / Export",
     status: "implemented",
-    navigationGroup: "more",
-    order: 22,
+    navigationGroup: "backstage",
+    order: 23,
   },
   {
     id: "data-management",
     path: "/data-management",
     title: "Data Safety",
     status: "implemented",
-    navigationGroup: "more",
-    order: 23,
+    navigationGroup: "backstage",
+    order: 24,
   },
   {
     id: "documents",

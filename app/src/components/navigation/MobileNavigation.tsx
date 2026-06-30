@@ -22,13 +22,22 @@ export function MobileNavigation({
     toggleMenu,
   } = useMoreMenu({ activeRouteId });
   const primaryRoutes = routes
-    .filter((route) => route.navigationGroup === "primary" && route.id !== "ship")
+    .filter((route) =>
+      ["dashboard", "today", "itinerary", "ports"].includes(route.id),
+    )
     .sort((a, b) => a.order - b.order);
   const moreRoutes = routes
-    .filter((route) => route.navigationGroup === "more" || route.id === "ship")
+    .filter((route) =>
+      route.id === "ship"
+      || route.id === "plans"
+      || route.navigationGroup === "more",
+    )
     .sort((a, b) => a.order - b.order);
   const activeRoute = routes.find((route) => route.id === activeRouteId);
-  const moreIsActive = activeRoute?.navigationGroup === "more" || activeRouteId === "ship";
+  const moreIsActive =
+    activeRoute?.navigationGroup !== "primary"
+    || activeRouteId === "ship"
+    || activeRouteId === "plans";
 
   return (
     <>

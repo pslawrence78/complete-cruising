@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { LocalDataState } from "../../components/states/LocalDataState";
 import { mapToday } from "../../data/viewModelMappers";
-import { refreshCruiseWeatherForSailing } from "../weather/weatherRefreshService";
 import { useTodayGuide } from "../../hooks/useLocalData";
 import { CruiseMapCard } from "../maps/CruiseMapCard";
 import { mapProviderConfig } from "../maps/mapConfig";
@@ -15,34 +13,16 @@ import { TakeAshoreChecklist } from "./components/TakeAshoreChecklist";
 import { TodayAshorePanel } from "./components/TodayAshorePanel";
 import { TodayPlanSummary } from "./components/TodayPlanSummary";
 import { WeatherTile } from "./components/WeatherTile";
-import type { WeatherButtonState } from "../weather/weatherTypes";
 import "../conditions/conditions.css";
 import "./TodayPage.css";
 
 export function TodayPage() {
   const query = useTodayGuide();
-  const [weatherMessage, setWeatherMessage] = useState<string | undefined>();
-  const [weatherButtonState, setWeatherButtonState] = useState<WeatherButtonState>("idle");
   if (query.loading) return <LocalDataState kind="loading" />;
   if (query.error) return <LocalDataState kind="error" />;
   if (!query.data) return <LocalDataState kind="empty" />;
   const today = mapToday(query.data);
   if (!today) return <LocalDataState kind="empty" detail="The active sailing has no selected Today itinerary day." />;
-  const offline = typeof navigator !== "undefined" && !navigator.onLine;
-  const handleRefreshWeather = async () => {
-    setWeatherMessage(undefined);
-    if (offline) {
-      setWeatherButtonState("offline");
-      setWeatherMessage("Weather refresh needs a connection. Your existing local weather context has been preserved.");
-      return;
-    }
-    setWeatherButtonState("refreshing");
-    const result = await refreshCruiseWeatherForSailing(query.data!.sailing.id, undefined, {
-      itineraryDayId: query.data!.day?.id,
-    });
-    setWeatherMessage(result.message);
-    setWeatherButtonState(result.buttonState);
-  };
   const todayAtlasPoint = "day" in query.data && query.data.day && query.data.port ? [atlasPointFromPort(query.data.port, query.data.day)] : [];
   const todayFallback = "port" in query.data ? buildPortFallbackMetadata(query.data.port, query.data.country) : undefined;
   return (
@@ -58,11 +38,9 @@ export function TodayPage() {
         <div className="today-page__weather-stack">
           <DayReadinessPanel readiness={today.readiness} />
           <WeatherTile
-            buttonState={weatherButtonState}
-            onRefresh={today.weather.canRefresh ? handleRefreshWeather : undefined}
+            buttonState="idle"
             weather={today.weather}
           />
-          {weatherMessage ? <p className="today-page__weather-message">{weatherMessage}</p> : null}
         </div>
         <TodayPlanSummary plans={today.plans} />
       </div>

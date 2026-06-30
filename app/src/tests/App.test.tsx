@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "../App";
 import { db } from "../db/completeCruisingDb";
 import { ACTIVE_SAILING_SETTING, seedSampleData } from "../db/seedDatabase";
+import { commitGuidePack, createGuidePackPreview } from "../features/guide-loader/guidePackService";
 import { getSampleImport } from "../features/import-export/sampleImports";
 
 async function renderRoute(hash = "#/") {
@@ -129,12 +130,10 @@ describe("data-driven application screens", () => {
     await renderRoute();
     const navigation = screen.getByRole("navigation", { name: "Primary navigation" });
     const labels = within(navigation).getAllByRole("button").map((button) => button.textContent);
-    expect(labels.slice(0, 5)).toEqual(["Dashboard", "Today", "Itinerary", "Ports", "Ship"]);
+    expect(labels.slice(0, 6)).toEqual(["Dashboard", "Today", "Itinerary", "Ports", "Ship", "Plans"]);
     fireEvent.click(within(navigation).getByText("More"));
-    expect(within(navigation).getByRole("menuitem", { name: "Sailing Setup" })).toBeInTheDocument();
-    expect(within(navigation).getByRole("menuitem", { name: "Guidebook Tools" })).toBeInTheDocument();
-    expect(within(navigation).getByRole("menuitem", { name: "Import / Export" })).toBeInTheDocument();
-    expect(within(navigation).getByRole("menuitem", { name: "Data Safety" })).toBeInTheDocument();
+    expect(within(navigation).getByRole("menuitem", { name: "Guide Loader" })).toBeInTheDocument();
+    expect(within(navigation).getByRole("menuitem", { name: "Backstage" })).toBeInTheDocument();
   });
 
   it("closes the desktop More menu after selecting a route", async () => {
@@ -207,7 +206,7 @@ describe("data-driven application screens", () => {
     expect(moreButton).toHaveAttribute("aria-expanded", "true");
     expect(moreMenu).toHaveAttribute("data-open", "true");
     expect(within(moreMenu!).getByRole("menuitem", { name: "Ship" })).toBeInTheDocument();
-    expect(within(moreMenu!).getByRole("menuitem", { name: "Weather Review" })).toBeInTheDocument();
+    expect(within(moreMenu!).getByRole("menuitem", { name: "Backstage" })).toBeInTheDocument();
   });
 
   it("closes the mobile More menu after selecting a route", async () => {
@@ -267,5 +266,112 @@ describe("data-driven application screens", () => {
 
     expect(await screen.findByText("I understand this import will overwrite protected cruise data.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Protected confirmation required" })).toBeDisabled();
+  });
+
+  it("renders the simpler Guide Loader with technical details collapsed by default", async () => {
+    await renderRoute("#/guide-loader");
+    expect(await screen.findByRole("heading", { level: 1, name: /Bring guide content in without opening the whole workshop/i })).toBeInTheDocument();
+    expect(screen.getByLabelText("Guide pack JSON")).toBeInTheDocument();
+    expect(screen.getByText("Guide Loader")).toBeInTheDocument();
+    expect(screen.getByText("Show technical details").closest("details")).not.toHaveAttribute("open");
+  });
+
+  it("groups advanced routes under Backstage / Data tools", async () => {
+    await renderRoute("#/backstage");
+    expect(await screen.findByRole("heading", { level: 1, name: /Technical controls, quietly off the main stage/i })).toBeInTheDocument();
+    expect(screen.getByText("Weather Review")).toBeInTheDocument();
+    expect(screen.getByText("Import / Export")).toBeInTheDocument();
+    expect(screen.getByText("Prompt Studio")).toBeInTheDocument();
+    expect(screen.getByText("Data Safety")).toBeInTheDocument();
+  });
+
+  it("keeps weather refresh buttons off the calmer main routes", async () => {
+    await renderRoute("#/today");
+    expect(screen.queryByRole("button", { name: "Refresh weather" })).not.toBeInTheDocument();
+
+    window.history.replaceState(null, "", "#/itinerary");
+    fireEvent(window, new HashChangeEvent("hashchange"));
+    await screen.findByRole("heading", { name: "Voyage map context" });
+    expect(screen.queryByRole("button", { name: "Refresh weather" })).not.toBeInTheDocument();
+
+    window.history.replaceState(null, "", "#/ports");
+    fireEvent(window, new HashChangeEvent("hashchange"));
+    await screen.findByRole("heading", { name: "Cartographic Port Atlas" });
+    expect(screen.queryByRole("button", { name: "Refresh weather" })).not.toBeInTheDocument();
+  });
+
+  it("shows imported port guide content on the normal Ports route", async () => {
+    const guidePack = {
+      schema: "complete-cruising-guide-pack-v1",
+      schemaVersion: 1,
+      createdAt: "2026-06-30T10:00:00.000Z",
+      source: "ChatGPT",
+      target: {
+        type: "port",
+        id: "port-civitavecchia",
+        name: "Civitavecchia",
+        portName: "Civitavecchia",
+      },
+      guide: {
+        title: "Civitavecchia harbour rhythm",
+        shortSummary: "A calmer port-day opener for the Rome gateway.",
+        sections: [
+          {
+            sectionType: "highlights",
+            title: "Best first hour ashore",
+            shortSummary: "Start with the harbour edge and keep Rome ambitions realistic.",
+          },
+        ],
+      },
+      metadata: {
+        confidence: "medium",
+        reviewStatus: "needs_user_review",
+        refreshRecommended: true,
+        sourceTypesUsed: ["generated"],
+      },
+    };
+
+    const preview = await createGuidePackPreview(JSON.stringify(guidePack), { kind: "port", id: "port-civitavecchia" });
+    await commitGuidePack(preview);
+
+    await renderRoute("#/ports");
+    expect(await screen.findByRole("heading", { name: "Best first hour ashore" })).toBeInTheDocument();
+  });
+
+  it("shows imported ship guide content on the normal Ship route", async () => {
+    const guidePack = {
+      schema: "complete-cruising-guide-pack-v1",
+      schemaVersion: 1,
+      createdAt: "2026-06-30T10:00:00.000Z",
+      source: "ChatGPT",
+      target: {
+        type: "ship",
+        id: "ship-sun-princess",
+        name: "Sun Princess",
+      },
+      guide: {
+        title: "Sun Princess quiet corners",
+        shortSummary: "A quick family guide to finding calmer spaces on board.",
+        sections: [
+          {
+            sectionType: "practical_tips",
+            title: "Calmer corners",
+            shortSummary: "Learn one indoor fallback and one outer-deck retreat early.",
+          },
+        ],
+      },
+      metadata: {
+        confidence: "medium",
+        reviewStatus: "needs_user_review",
+        refreshRecommended: true,
+        sourceTypesUsed: ["generated"],
+      },
+    };
+
+    const preview = await createGuidePackPreview(JSON.stringify(guidePack), { kind: "ship", id: "ship-sun-princess" });
+    await commitGuidePack(preview);
+
+    await renderRoute("#/ship");
+    expect(await screen.findByRole("heading", { name: "Calmer corners" })).toBeInTheDocument();
   });
 });

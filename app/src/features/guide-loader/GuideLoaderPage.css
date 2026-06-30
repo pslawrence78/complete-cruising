@@ -1,0 +1,138 @@
+.guide-loader-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.guide-loader-hero,
+.guide-loader-card,
+.guide-loader-preview-card,
+.guide-loader-prompt-card,
+.guide-loader-warning,
+.guide-loader-details {
+  border: 1px solid rgba(185, 198, 214, 0.18);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(7, 15, 30, 0.18);
+}
+
+.guide-loader-hero,
+.guide-loader-card,
+.guide-loader-warning,
+.guide-loader-details,
+.guide-loader-preview-card,
+.guide-loader-prompt-card {
+  background:
+    linear-gradient(180deg, rgba(255, 249, 240, 0.96), rgba(244, 237, 226, 0.9));
+}
+
+.guide-loader-hero {
+  display: grid;
+  gap: 1.25rem;
+  padding: clamp(1.5rem, 3vw, 2.4rem);
+  background:
+    radial-gradient(circle at top right, rgba(76, 153, 168, 0.15), transparent 26%),
+    linear-gradient(145deg, rgba(8, 28, 49, 0.95), rgba(16, 41, 63, 0.86));
+}
+
+.guide-loader-hero aside {
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+  padding: 1rem 1.1rem;
+  border-radius: 20px;
+  background: rgba(247, 241, 229, 0.08);
+}
+
+.guide-loader-controls,
+.guide-loader-input,
+.guide-loader-preview-grid,
+.guide-loader-prompt-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.guide-loader-controls,
+.guide-loader-input {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.guide-loader-card {
+  padding: 1.25rem;
+}
+
+.guide-loader-card--input textarea {
+  min-height: 19rem;
+}
+
+.guide-loader-heading {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.guide-loader-type-grid,
+.guide-loader-preview-grid,
+.guide-loader-prompt-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.guide-loader-type,
+.guide-loader-action {
+  min-height: 3rem;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 48, 74, 0.14);
+  background: rgba(255, 255, 255, 0.58);
+  color: inherit;
+}
+
+.guide-loader-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.guide-loader-select,
+.guide-loader-card textarea {
+  width: 100%;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 48, 74, 0.14);
+  padding: 0.9rem 1rem;
+  background: rgba(255, 255, 255, 0.68);
+  color: inherit;
+}
+
+.guide-loader-preview-card,
+.guide-loader-prompt-card,
+.guide-loader-warning,
+.guide-loader-details {
+  padding: 1.1rem 1.2rem;
+}
+
+.guide-loader-preview-card h3,
+.guide-loader-prompt-card h3,
+.guide-loader-warning h3,
+.guide-loader-details summary {
+  margin: 0 0 0.5rem;
+}
+
+.guide-loader-details summary {
+  cursor: pointer;
+}
+
+.guide-loader-empty,
+.guide-loader-commit,
+.guide-loader-prompt-message {
+  margin: 0;
+}
+
+@media (max-width: 767px) {
+  .guide-loader-controls,
+  .guide-loader-input {
+    grid-template-columns: 1fr;
+  }
+
+  .guide-loader-heading {
+    flex-direction: column;
+  }
+}

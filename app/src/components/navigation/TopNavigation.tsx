@@ -29,7 +29,7 @@ export function TopNavigation({
     .filter((route) => route.navigationGroup === "more")
     .sort((a, b) => a.order - b.order);
   const activeRoute = routes.find((route) => route.id === activeRouteId);
-  const moreIsActive = activeRoute?.navigationGroup === "more";
+  const moreIsActive = activeRoute?.navigationGroup !== "primary";
 
   return (
     <header className="top-navigation card-surface card-surface--glass">
