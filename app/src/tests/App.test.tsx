@@ -131,9 +131,10 @@ describe("data-driven application screens", () => {
     const navigation = screen.getByRole("navigation", { name: "Primary navigation" });
     const labels = within(navigation).getAllByRole("button").map((button) => button.textContent);
     expect(labels.slice(0, 6)).toEqual(["Dashboard", "Today", "Itinerary", "Ports", "Ship", "Plans"]);
-    fireEvent.click(within(navigation).getByText("More"));
-    expect(within(navigation).getByRole("menuitem", { name: "Guide Loader" })).toBeInTheDocument();
-    expect(within(navigation).getByRole("menuitem", { name: "Backstage" })).toBeInTheDocument();
+    fireEvent.click(within(navigation).getByRole("button", { name: "More" }));
+    const moreMenu = within(navigation).getByRole("menu");
+    expect(within(moreMenu).getByRole("menuitem", { name: "Guide Loader" })).toBeInTheDocument();
+    expect(within(moreMenu).getByRole("menuitem", { name: "Backstage" })).toBeInTheDocument();
   });
 
   it("closes the desktop More menu after selecting a route", async () => {
@@ -144,9 +145,10 @@ describe("data-driven application screens", () => {
     fireEvent.click(moreButton);
     expect(moreButton).toHaveAttribute("aria-expanded", "true");
 
-    fireEvent.click(within(navigation).getByRole("menuitem", { name: "Plans" }));
+    const moreMenu = within(navigation).getByRole("menu");
+    fireEvent.click(within(moreMenu).getByRole("menuitem", { name: "Guide Loader" }));
 
-    expect(await screen.findByRole("heading", { name: "Guide pending." })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: /Bring guide content in without opening the whole workshop/i })).toBeInTheDocument();
     expect(moreButton).toHaveAttribute("aria-expanded", "false");
   });
 
@@ -270,10 +272,11 @@ describe("data-driven application screens", () => {
 
   it("renders the simpler Guide Loader with technical details collapsed by default", async () => {
     await renderRoute("#/guide-loader");
-    expect(await screen.findByRole("heading", { level: 1, name: /Bring guide content in without opening the whole workshop/i })).toBeInTheDocument();
-    expect(screen.getByLabelText("Guide pack JSON")).toBeInTheDocument();
-    expect(screen.getByText("Guide Loader")).toBeInTheDocument();
-    expect(screen.getByText("Show technical details").closest("details")).not.toHaveAttribute("open");
+    const main = screen.getByRole("main");
+    expect(await within(main).findByRole("heading", { level: 1, name: /Bring guide content in without opening the whole workshop/i })).toBeInTheDocument();
+    expect(within(main).getByLabelText("Guide pack JSON")).toBeInTheDocument();
+    expect(within(main).getByText("Guide Loader")).toBeInTheDocument();
+    expect(within(main).getByText("Show technical details").closest("details")).not.toHaveAttribute("open");
   });
 
   it("groups advanced routes under Backstage / Data tools", async () => {

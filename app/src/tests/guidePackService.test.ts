@@ -3,8 +3,6 @@ import { CompleteCruisingDb } from "../db/completeCruisingDb";
 import { seedSampleData } from "../db/seedDatabase";
 import { commitGuidePack, createGuidePackPreview } from "../features/guide-loader/guidePackService";
 
-const dayOneId = "sailing-eastern-mediterranean-cruise-mqxo1afu-day-01";
-
 function shipGuidePack() {
   return {
     schema: "complete-cruising-guide-pack-v1",
@@ -147,6 +145,9 @@ describe("guide pack service", () => {
   });
 
   it("creates a day guide that can feed Today and Itinerary", async () => {
+    const dayOne = await database.itineraryDays.orderBy("dayNumber").first();
+    expect(dayOne).toBeDefined();
+
     const payload = {
       schema: "complete-cruising-guide-pack-v1",
       schemaVersion: 1,
@@ -154,9 +155,9 @@ describe("guide pack service", () => {
       source: "ChatGPT",
       target: {
         type: "itinerary_day",
-        id: dayOneId,
-        name: "Day 1",
-        dayNumber: 1,
+        id: dayOne!.id,
+        name: `Day ${dayOne!.dayNumber}`,
+        dayNumber: dayOne!.dayNumber,
       },
       guide: {
         title: "Embarkation bearings",
@@ -179,11 +180,18 @@ describe("guide pack service", () => {
 
     const preview = await createGuidePackPreview(
       JSON.stringify(payload),
-      { kind: "day_guide", id: dayOneId },
+      { kind: "day_guide", id: dayOne!.id },
       database,
     );
-    await commitGuidePack(preview, database);
+    expect(preview.status).toBe("valid");
+    expect(preview.affectedAreas).toEqual(expect.arrayContaining(["Today", "Itinerary"]));
 
-    expect(await database.dayGuides.where("itineraryDayId").equals(dayOneId).count()).toBe(1);
+    const outcome = await commitGuidePack(preview, database);
+    expect(outcome.status).toBe("committed");
+
+    const guide = await database.dayGuides.where("itineraryDayId").equals(dayOne!.id).first();
+    expect(guide).toBeDefined();
+    expect(guide?.title).toBe("Embarkation bearings");
+    expect(await database.dayGuides.where("itineraryDayId").equals(dayOne!.id).count()).toBe(1);
   });
 });
