@@ -2,7 +2,7 @@
 
 This is the entry point for project knowledge in the Complete Cruising repository. It inventories the current project files, explains which document to consult for each kind of decision, and records gaps between the documented target and the repository as it exists.
 
-Last inventoried: 30 June 2026.
+Last inventoried: 1 July 2026.
 
 ## Repository at a glance
 
@@ -225,7 +225,8 @@ complete-cruising/
 |   |-- build-plan/
 |   |   `-- tranche-plan-v0.1.md
 |   `-- decisions/
-|       `-- 0001-project-start.md
+|       |-- 0001-project-start.md
+|       `-- 0001-project-reset-to-single-sailing-guidebook.md
 |-- enrichment/
 |   |-- imports/README.md
 |   |-- prompts/README.md
