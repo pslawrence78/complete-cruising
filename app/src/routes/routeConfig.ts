@@ -1,155 +1,21 @@
 export interface RouteDefinition {
-  id: string;
+  id: "dashboard" | "today" | "itinerary" | "ports" | "ship" | "plans" | "memories" | "about";
   path: string;
   title: string;
-  status: "implemented" | "placeholder";
-  navigationGroup: "primary" | "more" | "backstage";
-  order: number;
 }
 
-export const routeConfig: readonly RouteDefinition[] = [
-  {
-    id: "dashboard",
-    path: "/",
-    title: "Dashboard",
-    status: "implemented",
-    navigationGroup: "primary",
-    order: 1,
-  },
-  {
-    id: "today",
-    path: "/today",
-    title: "Today",
-    status: "implemented",
-    navigationGroup: "primary",
-    order: 2,
-  },
-  {
-    id: "itinerary",
-    path: "/itinerary",
-    title: "Itinerary",
-    status: "implemented",
-    navigationGroup: "primary",
-    order: 3,
-  },
-  {
-    id: "ports",
-    path: "/ports",
-    title: "Ports",
-    status: "implemented",
-    navigationGroup: "primary",
-    order: 4,
-  },
-  {
-    id: "ship",
-    path: "/ship",
-    title: "Ship",
-    status: "implemented",
-    navigationGroup: "primary",
-    order: 5,
-  },
-  {
-    id: "plans",
-    path: "/plans",
-    title: "Plans",
-    status: "implemented",
-    navigationGroup: "primary",
-    order: 6,
-  },
-  {
-    id: "more",
-    path: "/more",
-    title: "More",
-    status: "implemented",
-    navigationGroup: "more",
-    order: 10,
-  },
-  {
-    id: "guide-loader",
-    path: "/guide-loader",
-    title: "Guide Loader",
-    status: "implemented",
-    navigationGroup: "more",
-    order: 11,
-  },
-  {
-    id: "family",
-    path: "/family",
-    title: "Family Guide",
-    status: "implemented",
-    navigationGroup: "more",
-    order: 12,
-  },
-  {
-    id: "memories",
-    path: "/memories",
-    title: "Memories",
-    status: "implemented",
-    navigationGroup: "more",
-    order: 13,
-  },
-  {
-    id: "backstage",
-    path: "/backstage",
-    title: "Backstage",
-    status: "implemented",
-    navigationGroup: "more",
-    order: 14,
-  },
-  {
-    id: "weather-review",
-    path: "/weather-review",
-    title: "Weather Review",
-    status: "implemented",
-    navigationGroup: "backstage",
-    order: 20,
-  },
-  {
-    id: "sailing-setup",
-    path: "/sailing-setup",
-    title: "Sailing Setup",
-    status: "implemented",
-    navigationGroup: "backstage",
-    order: 21,
-  },
-  {
-    id: "enrichment-requests",
-    path: "/enrichment-requests",
-    title: "Prompt Studio",
-    status: "implemented",
-    navigationGroup: "backstage",
-    order: 22,
-  },
-  {
-    id: "import-export",
-    path: "/import-export",
-    title: "Import / Export",
-    status: "implemented",
-    navigationGroup: "backstage",
-    order: 23,
-  },
-  {
-    id: "data-management",
-    path: "/data-management",
-    title: "Data Safety",
-    status: "implemented",
-    navigationGroup: "backstage",
-    order: 24,
-  },
-  {
-    id: "documents",
-    path: "/documents",
-    title: "Documents",
-    status: "placeholder",
-    navigationGroup: "more",
-    order: 13,
-  },
-  {
-    id: "settings",
-    path: "/settings",
-    title: "Settings",
-    status: "placeholder",
-    navigationGroup: "more",
-    order: 24,
-  },
+export const routes: RouteDefinition[] = [
+  { id: "dashboard", path: "/", title: "Dashboard" },
+  { id: "today", path: "/today", title: "Today" },
+  { id: "itinerary", path: "/itinerary", title: "Itinerary" },
+  { id: "ports", path: "/ports", title: "Ports" },
+  { id: "ship", path: "/ship", title: "Ship" },
+  { id: "plans", path: "/plans", title: "Plans" },
+  { id: "memories", path: "/memories", title: "Memories" },
+  { id: "about", path: "/about", title: "About" },
 ];
+
+export function getRouteFromHash(hash: string) {
+  const path = hash.replace(/^#/, "") || "/";
+  return routes.find((route) => route.path === path) ?? routes[0];
+}

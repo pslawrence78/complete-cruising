@@ -1,23 +1,12 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import React from "react";
+import ReactDOM from "react-dom/client";
 import App from "./App";
-import { registerServiceWorker } from "./pwa/registerServiceWorker";
 import "./styles/tokens.css";
 import "./styles/base.css";
-import "./styles/app-shell.css";
-import "./styles/components.css";
-import "./styles/responsive.css";
+import "./styles/app.css";
 
-const rootElement = document.getElementById("root");
-
-if (!rootElement) {
-  throw new Error("Unable to find the application root element.");
-}
-
-createRoot(rootElement).render(
-  <StrictMode>
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
     <App />
-  </StrictMode>,
+  </React.StrictMode>,
 );
-
-registerServiceWorker();

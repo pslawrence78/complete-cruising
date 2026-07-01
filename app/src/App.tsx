@@ -1,107 +1,45 @@
 import { useEffect, useState } from "react";
-import { AppShell } from "./components/layout/AppShell";
-import { DashboardPage } from "./features/dashboard/DashboardPage";
-import { BackstagePage } from "./features/backstage/BackstagePage";
-import { FamilyGuidePage } from "./features/family/FamilyGuidePage";
-import { GuideLoaderPage } from "./features/guide-loader/GuideLoaderPage";
-import { ItineraryPage } from "./features/itinerary/ItineraryPage";
-import { MemoriesPage } from "./features/memories/MemoriesPage";
-import { MorePage } from "./features/more/MorePage";
-import { PlansPage } from "./features/plans/PlansPage";
-import { PortGuidePage } from "./features/ports/PortGuidePage";
-import { ShipPage } from "./features/ship/ShipPage";
-import { TodayPage } from "./features/today/TodayPage";
-import { ImportExportPage } from "./features/import-export/ImportExportPage";
-import { SailingSetupPage } from "./features/sailing-setup/SailingSetupPage";
-import { EnrichmentRequestsPage } from "./features/enrichment-requests/EnrichmentRequestsPage";
-import { DataManagementPage } from "./features/data-management/DataManagementPage";
-import { WeatherSnapshotReviewPage } from "./features/weather/WeatherSnapshotReviewPage";
-import { routeConfig } from "./routes/routeConfig";
-import { LocalDataState } from "./components/states/LocalDataState";
-import { useDatabaseBootstrap } from "./hooks/useLocalData";
+import { AppShell } from "./components/AppShell";
+import { getRouteFromHash } from "./routes/routeConfig";
+import { AboutPage } from "./pages/AboutPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { ItineraryPage } from "./pages/ItineraryPage";
+import { MemoriesPage } from "./pages/MemoriesPage";
+import { PlansPage } from "./pages/PlansPage";
+import { PortsPage } from "./pages/PortsPage";
+import { ShipPage } from "./pages/ShipPage";
+import { TodayPage } from "./pages/TodayPage";
 
-function getActiveRouteId() {
-  const hashPath = window.location.hash.replace(/^#/, "") || "/";
-  const route = routeConfig.find(
-    (candidate) =>
-      candidate.status === "implemented" && candidate.path === hashPath,
-  );
-
-  return route?.id ?? "dashboard";
+function resolveRoute() {
+  return getRouteFromHash(window.location.hash);
 }
 
 function App() {
-  const database = useDatabaseBootstrap();
-  const [activeRouteId, setActiveRouteId] = useState(getActiveRouteId);
+  const [activeRoute, setActiveRoute] = useState(resolveRoute);
 
   useEffect(() => {
-    const handleHashChange = () => {
-      setActiveRouteId(getActiveRouteId());
-    };
-
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
+    const onHashChange = () => setActiveRoute(resolveRoute());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
-  const handleNavigate = (routeId: string) => {
-    const route = routeConfig.find(
-      (candidate) =>
-        candidate.id === routeId && candidate.status === "implemented",
-    );
-
-    if (!route) {
-      return;
-    }
-
-    setActiveRouteId(route.id);
-    window.location.hash = route.path;
+  const navigate = (path: string) => {
+    window.location.hash = path;
   };
 
-  const activePage =
-    activeRouteId === "backstage" ? (
-      <BackstagePage />
-    ) : activeRouteId === "weather-review" ? (
-      <WeatherSnapshotReviewPage />
-    ) : activeRouteId === "sailing-setup" ? (
-      <SailingSetupPage />
-    ) : activeRouteId === "enrichment-requests" ? (
-      <EnrichmentRequestsPage />
-    ) : activeRouteId === "import-export" ? (
-      <ImportExportPage />
-    ) : activeRouteId === "data-management" ? (
-      <DataManagementPage />
-    ) : activeRouteId === "guide-loader" ? (
-      <GuideLoaderPage />
-    ) : activeRouteId === "more" ? (
-      <MorePage />
-    ) : activeRouteId === "plans" ? (
-      <PlansPage />
-    ) : activeRouteId === "family" ? (
-      <FamilyGuidePage />
-    ) : activeRouteId === "memories" ? (
-      <MemoriesPage />
-    ) : activeRouteId === "itinerary" ? (
-      <ItineraryPage />
-    ) : activeRouteId === "today" ? (
-      <TodayPage />
-    ) : activeRouteId === "ports" ? (
-      <PortGuidePage />
-    ) : activeRouteId === "ship" ? (
-      <ShipPage />
-    ) : (
-      <DashboardPage />
-    );
-
-  if (database.loading) return <LocalDataState kind="loading" />;
-  if (database.error) return <LocalDataState kind="error" />;
+  const page =
+    activeRoute.id === "today" ? <TodayPage /> :
+    activeRoute.id === "itinerary" ? <ItineraryPage /> :
+    activeRoute.id === "ports" ? <PortsPage /> :
+    activeRoute.id === "ship" ? <ShipPage /> :
+    activeRoute.id === "plans" ? <PlansPage /> :
+    activeRoute.id === "memories" ? <MemoriesPage /> :
+    activeRoute.id === "about" ? <AboutPage /> :
+    <DashboardPage />;
 
   return (
-    <AppShell
-      activeRouteId={activeRouteId}
-      onNavigate={handleNavigate}
-      routes={routeConfig}
-    >
-      {activePage}
+    <AppShell activeRoute={activeRoute} onNavigate={navigate}>
+      {page}
     </AppShell>
   );
 }

@@ -1,48 +1,38 @@
 # Complete Cruising
 
-Complete Cruising is a Lawrence Family Series progressive web app in development: a premium, local-first cruise companion for sailings, itinerary days, ship intelligence, port guidebook content, shore plans, family notes and memories.
+Complete Cruising is a Lawrence Family Series PWA for the Lawrence family's real **Sun Princess Mediterranean 2026** sailing.
 
-The product follows the **Ocean Luxe** direction established by the standalone prototype. It is intended to feel like a personal cruise guidebook, not a generic administration interface.
+The active branch direction is now a **fresh-base rescue**: a premium, static, cruise-stable guidebook rather than a reusable local-database platform.
 
 ## Project status
 
-**Local-first application stage - Tranche 25: Weather Snapshot Review Workflow Polish v0.1 complete.**
+**Fresh base active on `fresh-base/sun-princess-2026`.**
 
-The repository contains the project foundations, governance, illustrative sample records, authoritative visual prototype, tested Ocean Luxe React experience, Zod-backed canonical data and a versioned Dexie/IndexedDB persistence foundation. The app defaults to the real local Sun Princess 2026 Eastern Mediterranean Cruise shell, with Day 1 to Day 15 generated for 2026-08-15 to 2026-08-29 and operational times left empty pending review. Tranche 20 adds a MapLibre-powered Port Atlas using a centralised OpenFreeMap no-key style configuration, visible attribution, approximate port-area coordinates, missing-coordinate fallback states and no geocoding, routing, weather overlays, geolocation or tile caching. Tranche 21 adds local-first cruise weather intelligence with Open-Meteo forecast and archive refreshes, route badges, Today and port weather cards, itinerary weather chips and local weather snapshot persistence. Tranche 21A repairs the six-type enrichment workflow contract so governed request prompts, import types, preview validation and commit routing now stay in parity for sailing shell, itinerary, ship pack, port pack, day guide and shore plan flows, while Sailing Setup can also manage, archive and safely delete local sailings. Tranche 22 adds a derived Cruise Conditions and Day Readiness layer across Dashboard, Today and Itinerary, preserving trust metadata while surfacing forecast caveats, return-buffer gaps and practical review needs without adding new persistence. Tranche 23 refines weather into a manual-only, trust-aware Open-Meteo flow that distinguishes visit-date forecasts from current port context, preserves trusted snapshots and keeps attribution visible across weather surfaces. Tranche 24 fixes sea-day wording, stores competing snapshots, adds a local Weather Review route and records audit events when the preferred snapshot is changed or a conflict is acknowledged. Tranche 25 adds an illustrative Weather Review demo toggle, clearer empty/stable/conflict/resolved presentation, richer audit copy and mobile-tight comparison cards while keeping every competing snapshot preserved. Live integrations remain deliberately deferred apart from the approved weather source.
+The live app path has been reset to a new static React shell under `app/src`, while the previous failed implementation has been archived under `legacy/` for reference only.
 
 ## Start here
 
-- Read the [project knowledge index](docs/README.md) to find the authoritative source for each decision.
-- Review the [standalone Ocean Luxe prototype](prototypes/v0.1/complete-cruising-prototype-v0.1.html) before making visual changes.
-- Follow [AGENTS.md](AGENTS.md) for mandatory project-working rules.
-- Use the [tranche plan](docs/build-plan/tranche-plan-v0.1.md) alongside the authoritative [Build Plan v0.1](docs/07-build-plan-v0.1.md).
+- Read the [project knowledge index](docs/README.md).
+- Review the [fresh-base product brief](docs/fresh-base/00-fresh-base-product-brief.md).
+- Review the [fresh-base architecture](docs/fresh-base/01-fresh-base-architecture.md).
+- Use the [standalone Ocean Luxe prototype](prototypes/v0.1/complete-cruising-prototype-v0.1.html) as the visual reference.
+- Follow [AGENTS.md](AGENTS.md) for working rules.
 
 ## Repository structure
 
 ```text
 complete-cruising/
-|-- app/               Ocean Luxe React app through Tranche 25
-|-- docs/              Product foundations, decisions and delivery plans
-|-- enrichment/        Prompt, staged-import and reviewed-output workspaces
-|-- prototypes/        Preserved visual reference artefacts
-`-- samples/           Illustrative sailing, ship and port records
+|-- app/               Active fresh-base cruise companion
+|-- docs/              Foundations, rescue notes, decisions and fresh-base scope
+|-- content-source/    Source corpus and verification notes
+|-- legacy/            Archived failed v1 runtime reference
+|-- enrichment/        Preserved enrichment artefacts
+|-- prototypes/        Preserved Ocean Luxe reference artefacts
+`-- samples/           Preserved illustrative JSON reference files
 ```
-
-## Current artefacts
-
-- Product Specification v0.1
-- Enrichment Framework v0.1
-- Data Model v0.1
-- Visual Experience Brief v0.1
-- HTML Prototype Specification v0.1
-- Technical Architecture v0.1
-- Build Plan v0.1
-- Ocean Luxe standalone HTML prototype at `prototypes/v0.1/complete-cruising-prototype-v0.1.html`
 
 ## Development approach
 
-Work proceeds in small, independently reviewable tranches. The MVP direction is a visually rich, local-first static PWA suitable for GitHub Pages, with structured and reviewable data flows rather than live external integrations.
+This branch exists to stay deployable until after the real cruise. Work should favour static content, British English, Ocean Luxe presentation, mobile usefulness and calm confidence cues.
 
-Sample data must remain illustrative and must never include sensitive family information, booking references, cabin details, passport data, insurance data, addresses or other private details.
-
-The app can be installed and validated from `app/`; see [app/README.md](app/README.md) for commands and the GitHub Pages base-path decision. The recommended next tranche is **Tranche 26: Weather Review Cross-Surface Status Cues v0.1**.
+The app can be validated from `app/`; see [app/README.md](app/README.md) for commands.
