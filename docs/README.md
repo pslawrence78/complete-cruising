@@ -24,6 +24,9 @@ complete-cruising/
 |   |-- tsconfig.node.json            Tooling TypeScript config
 |   |-- vite.config.ts                Vite config with GitHub Pages base path
 |   |-- vitest.config.ts              Test runner config
+|   |-- public/
+|   |   |-- manifest.webmanifest      Fresh-base install metadata for GitHub Pages
+|   |   `-- icons/                    Fresh-base favicon, iPhone and PWA icon set
 |   `-- src/
 |       |-- App.tsx                   Active hash-routed app composition
 |       |-- main.tsx                  React entry point
@@ -43,6 +46,8 @@ complete-cruising/
 |       |   `-- app.css               Shell, cards and responsive layout styles
 |       `-- tests/
 |           |-- App.test.tsx          Routing and primary-view render tests
+|           |-- deploymentReadiness.test.ts
+|           |                           Deployment metadata and route-contract checks
 |           `-- setup.ts              Testing Library setup
 |-- content-source/
 |   `-- 00-source-register.md         Source, confidence and verification register
@@ -87,7 +92,9 @@ complete-cruising/
 |   |   |-- 00-fresh-base-product-brief.md
 |   |   |-- 01-fresh-base-architecture.md
 |   |   |-- 02-cruise-stable-scope.md
-|   |   `-- 03-post-cruise-backlog.md Fresh-base delivery pack
+|   |   |-- 03-post-cruise-backlog.md Fresh-base delivery pack
+|   |   `-- 04-deployment-checklist.md
+|   |                                  Production asset and release checklist
 |   `-- rescue/
 |       `-- 2026-07-01-fresh-base-reset.md
 |                                      Rescue note explaining the reset
@@ -118,17 +125,18 @@ complete-cruising/
 | [fresh-base/01-fresh-base-architecture.md](fresh-base/01-fresh-base-architecture.md) | Fresh-base architecture | The active technical structure for the rebuilt static app. |
 | [fresh-base/02-cruise-stable-scope.md](fresh-base/02-cruise-stable-scope.md) | Stable scope | Defines what must be present before the cruise and what should stay out. |
 | [fresh-base/03-post-cruise-backlog.md](fresh-base/03-post-cruise-backlog.md) | Deferred backlog | Captures intentionally postponed features and complexities. |
+| [fresh-base/04-deployment-checklist.md](fresh-base/04-deployment-checklist.md) | Deployment checklist | Records the production branch, active route contract, removed-route fallback behaviour and pre-release checks for GitHub Pages. |
 | [rescue/2026-07-01-fresh-base-reset.md](rescue/2026-07-01-fresh-base-reset.md) | Rescue record | Explains why the reset happened and how the repository was stabilised. |
 | [decisions/0002-fresh-base-reset.md](decisions/0002-fresh-base-reset.md) | Architectural decision | Records the choice to replace the failed runtime with a fresh cruise-stable base while preserving history. |
 | [decisions/0001-project-start.md](decisions/0001-project-start.md), [decisions/0001-project-reset-to-single-sailing-guidebook.md](decisions/0001-project-reset-to-single-sailing-guidebook.md) | Historical decisions | Earlier product-shaping decisions retained as authoritative background. |
 | [01-product-specification-v0.1.md](01-product-specification-v0.1.md), [02-enrichment-framework-v0.1.md](02-enrichment-framework-v0.1.md), [03-data-model-v0.1.md](03-data-model-v0.1.md), [04-visual-experience-brief-v0.1.md](04-visual-experience-brief-v0.1.md), [05-html-prototype-specification-v0.1.md](05-html-prototype-specification-v0.1.md), [06-technical-architecture-v0.1.md](06-technical-architecture-v0.1.md) and [07-build-plan-v0.1.md](07-build-plan-v0.1.md) | Foundation set | Original product, trust, data, visual and technical foundations that still guide the fresh-base implementation unless superseded by newer rescue documents. |
 | [../prototypes/v0.1/complete-cruising-prototype-v0.1.html](../prototypes/v0.1/complete-cruising-prototype-v0.1.html) | Visual reference | The authoritative Ocean Luxe prototype used as the visual benchmark rather than as copy-paste production code. |
-| [../app/README.md](../app/README.md), [index.html](../app/index.html), [package.json](../app/package.json), [vite.config.ts](../app/vite.config.ts), [vitest.config.ts](../app/vitest.config.ts) and [tsconfig.json](../app/tsconfig.json) | Active app tooling | Defines how the fresh-base app runs, builds, tests and deploys to GitHub Pages. |
+| [../app/README.md](../app/README.md), [index.html](../app/index.html), [package.json](../app/package.json), [vite.config.ts](../app/vite.config.ts), [vitest.config.ts](../app/vitest.config.ts), [public/manifest.webmanifest](../app/public/manifest.webmanifest) and [public/icons](../app/public/icons/favicon.svg) | Active app tooling | Defines how the fresh-base app runs, builds, tests and deploys to GitHub Pages, including the fresh production manifest and icon assets. |
 | [../app/src/App.tsx](../app/src/App.tsx), [main.tsx](../app/src/main.tsx), [routes/routeConfig.ts](../app/src/routes/routeConfig.ts) and [components/AppShell.tsx](../app/src/components/AppShell.tsx) | Active app shell | Compose the fresh-base React shell, hash-safe routing and eight primary guidebook routes. |
 | [../app/src/data/sunPrincess2026.ts](../app/src/data/sunPrincess2026.ts) and [services/guidebook.ts](../app/src/services/guidebook.ts) | Active content and derivation layer | Bundle the static sailing, itinerary, port, ship, plan and memory content and derive Today/Countdown behaviour without external services. |
 | [../app/src/pages/DashboardPage.tsx](../app/src/pages/DashboardPage.tsx), [TodayPage.tsx](../app/src/pages/TodayPage.tsx), [ItineraryPage.tsx](../app/src/pages/ItineraryPage.tsx), [PortsPage.tsx](../app/src/pages/PortsPage.tsx), [ShipPage.tsx](../app/src/pages/ShipPage.tsx), [PlansPage.tsx](../app/src/pages/PlansPage.tsx), [MemoriesPage.tsx](../app/src/pages/MemoriesPage.tsx) and [AboutPage.tsx](../app/src/pages/AboutPage.tsx) | Active guidebook views | Implement the cruise-stable user-facing pages for the fresh-base release. |
 | [../app/src/styles/tokens.css](../app/src/styles/tokens.css), [base.css](../app/src/styles/base.css) and [app.css](../app/src/styles/app.css) | Active styling | Translate Ocean Luxe into maintainable design tokens, surfaces and responsive layouts for the fresh-base app. |
-| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx) and [setup.ts](../app/src/tests/setup.ts) | Active validation | Provide route and render smoke coverage for the fresh-base shell. |
+| [../app/src/tests/App.test.tsx](../app/src/tests/App.test.tsx), [deploymentReadiness.test.ts](../app/src/tests/deploymentReadiness.test.ts) and [setup.ts](../app/src/tests/setup.ts) | Active validation | Provide route, render, metadata and deployment-contract coverage for the fresh-base shell. |
 | [../legacy/failed-v1-notes.md](../legacy/failed-v1-notes.md), [../legacy/failed-v1-app-README.md](../legacy/failed-v1-app-README.md), [../legacy/failed-v1-app-src](../legacy/failed-v1-app-src) and [../legacy/failed-v1-public](../legacy/failed-v1-public) | Archived v1 implementation | Preserved failed runtime, PWA assets and notes for reference. These files are not the active application and should not be revived implicitly. |
 | [12-import-preview-v0.1.md](12-import-preview-v0.1.md) through [25-weather-snapshot-review-workflow-polish-v0.1.md](25-weather-snapshot-review-workflow-polish-v0.1.md) | Historical tranche records | Document the previous implementation path and remain useful for auditability, learned lessons and possible future feature recovery. |
 
@@ -165,9 +173,9 @@ Use the narrowest authoritative source before making a change.
 
 The following expected artefacts are not yet present in the active fresh-base runtime:
 
-- production-specific public assets for a new favicon, manifest and offline shell, following the retirement of the archived v1 PWA assets;
 - automated visual regression references for the fresh-base rescue UI;
-- content build validation beyond route/render smoke tests.
+- deeper content build validation beyond route, render and deployment-contract smoke tests;
+- any offline shell or service-worker layer for the fresh base, which remains intentionally deferred in favour of low-risk static deployment.
 
 ## Maintenance rules
 

@@ -36,3 +36,10 @@ complete-cruising/
 This branch exists to stay deployable until after the real cruise. Work should favour static content, British English, Ocean Luxe presentation, mobile usefulness and calm confidence cues.
 
 The app can be validated from `app/`; see [app/README.md](app/README.md) for commands.
+
+## Deployment notes
+
+- The deployment branch is `fresh-base/sun-princess-2026`.
+- The active GitHub Pages routes are `/#/`, `/#/today`, `/#/itinerary`, `/#/ports`, `/#/ship`, `/#/plans`, `/#/memories` and `/#/about`.
+- `/#/guide-loader` is intentionally absent from the fresh base and should fall back to the dashboard.
+- The failed v1 runtime remains archived under `legacy/` and must not be restored before the live cruise.

@@ -1,0 +1,33 @@
+{
+  "name": "Complete Cruising",
+  "short_name": "Cruising",
+  "description": "Sun Princess Mediterranean 2026 cruise-stable fresh base for the Lawrence family.",
+  "lang": "en-GB",
+  "start_url": "/complete-cruising/#/",
+  "scope": "/complete-cruising/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0d2436",
+  "theme_color": "#082b43",
+  "categories": ["travel", "lifestyle"],
+  "icons": [
+    {
+      "src": "/complete-cruising/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/complete-cruising/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/complete-cruising/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
